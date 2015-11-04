@@ -1,0 +1,40 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<description>
+	<![CDATA[
+        Define Competency Component & Service
+	]]>
+	</description>
+	<!--  
+		Cache settin options :
+		maxElementsInMemory : 
+		timeToIdleSeconds : Set the time in seconds to idle for an element before it expires i.e. the maximum amount of time between accesses before an element expires. It is only used if the element is not eternal. Default is 120 seconds.
+		timeToLiveSeconds : Set t he time in seconds to live for an element before it expires, i.e. the maximum time between creation time and when an element expires. It is only used if the element is not eternal. Default is 120 seconds.
+		diskExpiryThreadIntervalSeconds : Set the number of seconds between runs of the disk expiry thread. The default is 120 seconds. 
+	-->			
+
+	<!--  =============================  -->
+	<!--  PollManager      			  	 -->
+	<!--  =============================  -->			
+	<bean id="codeSetDao" class="com.podosoftware.competency.code.dao.jdbc.JdbcCodeSetDao" parent="jdbcDaoSupport" />	
+	<bean id="codeSetCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeSetCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="codeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	
+	<bean id="codeSetManager"
+		class="com.podosoftware.competency.code.DefaultCodeSetManager"
+		depends-on="codeSetDao" 
+		p:userManager-ref="userManager"
+		p:companyManager-ref="companyManager"
+		p:codeSetDao-ref="codeSetDao"
+		/>	
+</beans>

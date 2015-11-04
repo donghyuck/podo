@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<models>
+	<rank>1000</rank>
+
+	<model id="50" code="CODE_SET" />
+	<model id="51" code="CODE" />
+	
+</models>

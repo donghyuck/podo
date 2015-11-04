@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlset>
+	<name>COMPETENCY_ACCESSMENT</name>
+	<version>2.0</version>
+	<description>Queries for COMPETENCY_ACCESSMENT COMPONENTS</description>
+	<sql-query name="INSERT_VOTE" description="INSERT_VOTE"><![CDATA[
+	INSERT INTO V2_POLL_VOTE (
+		OPTION_ID,
+		USER_ID,
+		GUEST_ID,
+		VOTE_DATE,
+		IP
+	) VALUES ( ?, ?, ?, ?, ?)		
+	]]></sql-query>			
+	<row-mapper></row-mapper>						
+</sqlset>
