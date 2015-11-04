@@ -1,0 +1,3 @@
+
+Insert into V2_SEQUENCER (SEQUENCER_ID,NAME,VALUE) values (50,'CODE_SET',1);
+Insert into V2_SEQUENCER (SEQUENCER_ID,NAME,VALUE) values (51,'CODE',1);
