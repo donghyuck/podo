@@ -3,7 +3,6 @@ package com.podosoftware.competency.codeset;
 import java.util.List;
 
 import architecture.common.user.Company;
-import architecture.ee.web.community.comment.CommentTreeWalker;
 
 public interface CodeSetManager {
 
