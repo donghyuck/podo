@@ -2,7 +2,7 @@
 <models>
 	<rank>1000</rank>
 
-	<model id="50" code="CODE_SET" />
-	<model id="51" code="CODE" />
+	<model id="50" code="CODESET" />
+	<model id="51" code="CODESET_VALUE" />
 	
 </models>

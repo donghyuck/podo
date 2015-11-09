@@ -1,12 +1,13 @@
-package com.podosoftware.competency.code;
+package com.podosoftware.competency.codeset;
 
 import java.util.List;
 
 import architecture.common.user.Company;
+import architecture.ee.web.community.comment.CommentTreeWalker;
 
 public interface CodeSetManager {
 
-	public void updateCodeSet(CodeSet codeset);
+	public void saveOrUpdate(CodeSet codeset);
 	
 	public List<CodeSet> getCodeSets(Company company);
 	
@@ -16,6 +17,8 @@ public interface CodeSetManager {
 	
 	public int getCodeSetCount(CodeSet codeset);
 		
+	public CodeSet getCodeSet(long codeSetId) throws CodeSetNotFoundException;
+	
 	/**
 	 * 인자로 전달된 company 의  표준 코드 세트을 생성한다.
 	 *   
@@ -36,5 +39,5 @@ public interface CodeSetManager {
 	 */
 	public CodeSet createCodeSet(CodeSet codeset, String name, String desctiption);
 	
-	
+	public CodeSetTreeWalker getCodeSetTreeWalker(Company company);
 }

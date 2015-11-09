@@ -1,4 +1,4 @@
-package com.podosoftware.competency.code;
+package com.podosoftware.competency.codeset;
 
 import java.util.Collections;
 import java.util.Date;
@@ -10,8 +10,8 @@ public class DefaultCodeSet implements CodeSet, Cacheable {
 	private int objectType;
 	private long objectId;
 	private long codeSetId;
-	private CodeSet parentCodeSet;
-    private String name;	
+	private long parentCodeSetId;
+	private String name;	
     private String description;
 	private boolean enabled;
     private Date creationDate;
@@ -20,6 +20,9 @@ public class DefaultCodeSet implements CodeSet, Cacheable {
     
 	public DefaultCodeSet() {
 		this.codeSetId = -1L;
+		this.parentCodeSetId = -1L;
+		this.objectType = -1;
+		this.objectId = -1L;		
 		this.creationDate = new Date();
 		this.modifiedDate = this.creationDate;
 		this.codes = Collections.EMPTY_LIST;
@@ -30,6 +33,14 @@ public class DefaultCodeSet implements CodeSet, Cacheable {
 	}
 	
 	
+	public long getParentCodeSetId() {
+		return parentCodeSetId;
+	}
+
+	public void setParentCodeSetId(long parentCodeSetId) {
+		this.parentCodeSetId = parentCodeSetId;
+	}
+
 	public int getObjectType() {
 		return objectType;
 	}
@@ -94,14 +105,6 @@ public class DefaultCodeSet implements CodeSet, Cacheable {
 
 	public void setCodeSetId(long codeSetId) {
 		this.codeSetId = codeSetId;
-	}
-
-	public CodeSet getParentCodeSet() {
-		return parentCodeSet;
-	}
-
-	public void setParentCodeSet(CodeSet parentCodeSet) {
-		this.parentCodeSet = parentCodeSet;
 	}
 
 	public List<Code> getCodes() {

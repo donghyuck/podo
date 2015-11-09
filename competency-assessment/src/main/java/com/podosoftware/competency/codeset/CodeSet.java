@@ -1,4 +1,4 @@
-package com.podosoftware.competency.code;
+package com.podosoftware.competency.codeset;
 
 import java.util.Date;
 import java.util.List;
@@ -29,9 +29,9 @@ public interface CodeSet {
 
 	public void setCodeSetId(long codeSetId) ;
 
-	public CodeSet getParentCodeSet() ;
+	public long getParentCodeSetId() ;
 
-	public void setParentCodeSet(CodeSet parentCodeSet);
+	public void setParentCodeSetId(long parentCodeSetId);
 
 	public List<Code> getCodes() ;
 

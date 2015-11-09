@@ -1,4 +1,4 @@
-package com.podosoftware.competency.code;
+package com.podosoftware.competency.codeset;
 
 public class DefaultCode {
 

@@ -3,14 +3,53 @@
 	<name>COMPETENCY_ACCESSMENT</name>
 	<version>2.0</version>
 	<description>Queries for COMPETENCY_ACCESSMENT COMPONENTS</description>
-	<sql-query name="INSERT_VOTE" description="INSERT_VOTE"><![CDATA[
-	INSERT INTO V2_POLL_VOTE (
+	<sql-query name="INSERT_CODESET" description="INSERT_CODESET"><![CDATA[
+	INSERT INTO CA_CODESET (
+		CODESET_ID,
+		OBJECT_TYPE,
+		OBJECT_ID,
+		PARENT_CODESET_ID,
+		NAME,
+		DESCRIPTION,
+		CREATION_DATE,
+		MODIFIED_DATE
+	) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)		
+	]]></sql-query>			
+
+	<sql-query name="UPDATE_CODESET" description="UPDATE_CODESET"><![CDATA[
+	INSERT INTO CA_CODESET (
 		OPTION_ID,
 		USER_ID,
 		GUEST_ID,
 		VOTE_DATE,
 		IP
 	) VALUES ( ?, ?, ?, ?, ?)		
+	]]></sql-query>		
+		
+	<sql-query name="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID" description="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID"><![CDATA[
+	SELECT COUNT(CODESET_ID) FROM CA_CODESET 
+	WHERE OBJECT_TYPE = ? AND OBJECT_ID = ?		
 	]]></sql-query>			
+	
+	<sql-query name="SELECT_ROOT_CODESET" description="SELECT_ROOT_CODESET"><![CDATA[
+	SELECT CODESET_ID, CREATION_DATE FROM CA_CODESET 
+	WHERE 
+		OBJECT_TYPE = ? AND 
+		OBJECT_ID = ?	AND 
+		PARENT_CODESET_ID IS NULL
+	ORDER BY CREATION_DATE ASC
+	]]></sql-query>			
+	
+	<sql-query name="SELECT_CHILD_CODESET" description="SELECT_CHILD_CODESET"><![CDATA[
+	SELECT CODESET_ID, PARENT_COMMENT_ID FROM CA_CODESET 
+	WHERE 
+		OBJECT_TYPE = ? AND 
+		OBJECT_ID = ?	AND 
+		PARENT_CODESET_ID IS NOT NULL 
+	ORDER BY 
+		CREATION_DATE, 
+		CODESET_ID ASC	
+	]]></sql-query>		
+		
 	<row-mapper></row-mapper>						
 </sqlset>
