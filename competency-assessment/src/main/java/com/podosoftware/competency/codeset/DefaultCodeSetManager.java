@@ -1,43 +1,69 @@
 package com.podosoftware.competency.codeset;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.podosoftware.competency.codeset.dao.CodeSetDao;
 
 import architecture.common.user.Company;
+import architecture.common.user.CompanyManager;
+import architecture.common.user.UserManager;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 
 public class DefaultCodeSetManager implements CodeSetManager {
 	
 	public static final CodeSet ROOT_CODE_SET = new DefaultCodeSet();
 	private CodeSetDao codeSetDao;
-	
-	
-	
-	public CodeSetDao getCodeSetDao() {
-		return codeSetDao;
-	}
-
-	public void setCodeSetDao(CodeSetDao codeSetDao) {
-		this.codeSetDao = codeSetDao;
-	}
+	private UserManager userManager;
+	private CompanyManager companyManager;
+	protected Cache codeSetCache;
 
 	@Override
-	public List<CodeSet> getCodeSets(Company company) {
-		// TODO Auto-generated method stub
-		return null;
+	public CodeSet getCodeSet(long codeSetId) throws CodeSetNotFoundException {
+		CodeSet codeset = getCodeSetInCache(codeSetId);		
+		if (codeset == null) {			
+			codeset = codeSetDao.getCodeSetById(codeSetId);
+			if(codeset == null)
+				throw new CodeSetNotFoundException();
+			codeSetCache.put(new Element(codeSetId, codeset));
+		}
+		return codeset;
+	}
+	
+	protected CodeSet getCodeSetInCache(long codeSetId){
+		if( codeSetCache.get(codeSetId) != null)
+			return  (CodeSet) codeSetCache.get( codeSetId ).getValue();
+		else 
+			return null;
 	}
 
-	@Override
+
 	public List<CodeSet> getCodeSets(CodeSet codeset) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+
 	@Override
-	public int getCodeSetCount(Company company) {
-		// TODO Auto-generated method stub
-		return 0;
+	public List<CodeSet> getCodeSets(Company company) {
+		List<Long> codesetIds =  codeSetDao.getCodeSetIds(1, company.getCompanyId());
+		List<CodeSet> codesets = new ArrayList<CodeSet>(codesetIds.size());		
+		for(long codesetId:codesetIds){
+			CodeSet codeset;
+			try {
+				codeset = getCodeSet(codesetId);
+				codesets.add(codeset);
+			} catch (CodeSetNotFoundException e) {				
+			}			
+		}		
+		return codesets;
+	}
+	
+	@Override
+	public int getCodeSetCount(Company company) {	
+		return codeSetDao.getCodeSetCount(1, company.getCompanyId());
 	}
 
 	@Override
@@ -75,8 +101,9 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		{			
 			Date now = new Date();
 			codeset.setModifiedDate(now);		
-		}		
-		
+		}else{
+			codeset.setCodeSetId(-1L);
+		}
 		codeSetDao.saveOrUpdateCodeSet(codeset);
 		
 	}
@@ -90,10 +117,40 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		return treeWalker;
 	}
 
-	@Override
-	public CodeSet getCodeSet(long codeSetId) throws CodeSetNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public CodeSetDao getCodeSetDao() {
+		return codeSetDao;
 	}
+
+	public void setCodeSetDao(CodeSetDao codeSetDao) {
+		this.codeSetDao = codeSetDao;
+	}
+
+	public UserManager getUserManager() {
+		return userManager;
+	}
+
+	public void setUserManager(UserManager userManager) {
+		this.userManager = userManager;
+	}
+
+	public CompanyManager getCompanyManager() {
+		return companyManager;
+	}
+
+	public void setCompanyManager(CompanyManager companyManager) {
+		this.companyManager = companyManager;
+	}
+
+	public Cache getCodeSetCache() {
+		return codeSetCache;
+	}
+
+	public void setCodeSetCache(Cache codeSetCache) {
+		this.codeSetCache = codeSetCache;
+	}
+	
+	
+	
 
 }

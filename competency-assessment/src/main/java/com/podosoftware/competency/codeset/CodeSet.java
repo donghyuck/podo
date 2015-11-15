@@ -3,7 +3,9 @@ package com.podosoftware.competency.codeset;
 import java.util.Date;
 import java.util.List;
 
-public interface CodeSet {
+import architecture.common.cache.Cacheable;
+
+public interface CodeSet extends Cacheable{
 	
 	public boolean isEnabled() ;
 
@@ -29,9 +31,9 @@ public interface CodeSet {
 
 	public void setCodeSetId(long codeSetId) ;
 
-	public long getParentCodeSetId() ;
+	public Long getParentCodeSetId() ;
 
-	public void setParentCodeSetId(long parentCodeSetId);
+	public void setParentCodeSetId(Long parentCodeSetId);
 
 	public List<Code> getCodes() ;
 

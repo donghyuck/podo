@@ -7,13 +7,13 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.podosoftware.competency.codeset.json.CustomJsonLongDeserializer;
 import com.podosoftware.competency.codeset.json.CustomJsonLongSerializer;
 
-import architecture.common.cache.Cacheable;
 import architecture.common.model.json.CustomJsonDateDeserializer;
 import architecture.common.model.json.CustomJsonDateSerializer;
 
-public class DefaultCodeSet implements CodeSet, Cacheable {
+public class DefaultCodeSet implements CodeSet {
 	
 	private int objectType;
 	private long objectId;
@@ -47,6 +47,7 @@ public class DefaultCodeSet implements CodeSet, Cacheable {
 		return parentCodeSetId;
 	}
 
+	@JsonDeserialize(using = CustomJsonLongDeserializer.class)	
 	public void setParentCodeSetId(Long parentCodeSetId) {
 		this.parentCodeSetId = parentCodeSetId;
 	}
@@ -117,6 +118,7 @@ public class DefaultCodeSet implements CodeSet, Cacheable {
 		return codeSetId;
 	}
 
+	@JsonDeserialize(using = CustomJsonLongDeserializer.class)	
 	public void setCodeSetId(long codeSetId) {
 		this.codeSetId = codeSetId;
 	}
