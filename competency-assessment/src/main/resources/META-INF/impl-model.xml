@@ -4,5 +4,6 @@
 
 	<model id="50" code="CODESET" />
 	<model id="51" code="CODESET_VALUE" />
+	<model id="53" code="COMPETENCY" />
 	
 </models>

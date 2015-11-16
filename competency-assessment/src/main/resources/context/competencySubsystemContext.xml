@@ -24,17 +24,33 @@
 	-->			
 
 	<!--  =============================  -->
-	<!--  PollManager      			  	 -->
+	<!--  CodeSetManager  			  	 -->
 	<!--  =============================  -->			
-	<bean id="codeSetDao" class="com.podosoftware.competency.code.dao.jdbc.JdbcCodeSetDao" parent="jdbcDaoSupport" />	
+	<bean id="codeSetDao" class="com.podosoftware.competency.codeset.dao.jdbc.JdbcCodeSetDao" parent="jdbcDaoSupport" />	
 	<bean id="codeSetCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeSetCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	<bean id="codeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	
 	<bean id="codeSetManager"
-		class="com.podosoftware.competency.code.DefaultCodeSetManager"
+		class="com.podosoftware.competency.codeset.DefaultCodeSetManager"
 		depends-on="codeSetDao" 
+		p:codeSetCache-ref="codeSetCache"
 		p:userManager-ref="userManager"
 		p:companyManager-ref="companyManager"
 		p:codeSetDao-ref="codeSetDao"
 		/>	
+		
+	<!--  =============================  -->
+	<!--  CompetencyManager			  	 -->
+	<!--  =============================  -->		
+	<bean id="competencyDao" class="com.podosoftware.competency.competency.dao.jdbc.JdbcCompetencyDao" parent="jdbcDaoSupport" depends-on="extendedPropertyDao" p:extendedPropertyDao-ref="extendedPropertyDao" />	
+	<bean id="competencyCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="competencyCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	
+	<bean id="competencyManager"
+		class="com.podosoftware.competency.competency.DefaultCompetencyManager"
+		depends-on="competencyDao" 
+		p:competencyCache-ref="competencyCache"
+		p:companyManager-ref="companyManager"
+		p:competencyDao-ref="competencyDao"
+		/>			
+		
 </beans>
