@@ -12,6 +12,12 @@ public interface CompetencyManager {
 
 	public abstract List<Competency> getCompetencies(Company company) ;
 	
+	public abstract List<Competency> getCompetencies(Company company, int startIndex, int numResults) ;
+	
+	public abstract int getCompetencyCount(Company company) ;
+	
+	
+	
 	public abstract void updateCompetency(Competency competency) throws CompetencyNotFoundException ;
 	
 	public Competency getCompetency(long competencyId) throws CompetencyNotFoundException;

@@ -117,7 +117,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 
 
 	public Competency getCompetencyById(long competencyId) {
-		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_COMPETENCY").getSql(), 
+		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_BY_ID").getSql(), 
 			competencyMapper,
 			new SqlParameterValue( Types.NUMERIC, competencyId )
 		);
