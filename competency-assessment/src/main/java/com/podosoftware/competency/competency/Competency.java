@@ -1,27 +1,28 @@
 package com.podosoftware.competency.competency;
 
 import architecture.common.cache.Cacheable;
+import architecture.common.model.PropertyAware;
 
-public interface Competency extends Cacheable {
+public interface Competency extends PropertyAware, Cacheable {
+
+	public Integer getObjectType();
+
+	public void setObjectType(Integer objectType) ;
+
+	public Long getObjectId() ;
+
+	public void setObjectId(Long objectId);
 	
-	public long getCompetencyId();
+	public Long getCompetencyId();
 	
-	public void setCompetencyId(long competencyId);
+	public void setCompetencyId(Long competencyId);
 	
 	public String getName();
 	
-	public void setName();
+	public void setName(String name);
 		
 	public String getDescription();
 	
 	public void setDescription(String description);
-
-	public int getObjectType();
-
-	public void setObjectType(int objectType) ;
-
-	public long getObjectId() ;
-
-	public void setObjectId(long objectId);
 	
 }
