@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,13 +31,13 @@ import architecture.common.user.CompanyNotFoundException;
 import architecture.common.user.CompanyTemplate;
 import architecture.common.user.SecurityHelper;
 import architecture.common.user.User;
-
 import architecture.ee.web.spring.controller.MyCloudDataController.ItemList;
 
 @Controller ("secure-competency-data-controller")
 @RequestMapping("/secure/data")
 public class SecureCompetencyMgmtController {
-
+	
+	private Log log = LogFactory.getLog(getClass());
 	
 	@Inject
 	@Qualifier("codeSetManager")
@@ -126,7 +128,10 @@ public class SecureCompetencyMgmtController {
 				items = competencyManager.getCompetencies(company);
 		}
 		
+		log.debug(items);
+		
 		ItemList list = new ItemList(items, totalCount);
+		
 		return list;
 	}
 	
@@ -148,13 +153,25 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/update.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Competency updateCompetency(@RequestBody DefaultCompetency competency ) throws CompetencyNotFoundException{		
+	public Competency updateCompetency(@RequestBody DefaultCompetency competency ) throws CompetencyNotFoundException, CompetencyAlreadyExistsException{		
 		
 		User user = SecurityHelper.getUser();		
-		
-		if( competency.getCompetencyId() > 0)
-			competencyManager.updateCompetency(competency);
-		return competency;
+		Company company = user.getCompany();
+		Competency competencyToUse = competency;
+		if( competencyToUse.getCompetencyId() > 0)
+			competencyManager.updateCompetency(competencyToUse);
+		else{
+			if( competencyToUse.getObjectType() == 1 && competencyToUse.getObjectId() > 0){
+				try {
+					company = companyManager.getCompany(competency.getObjectId());
+				} catch (CompanyNotFoundException e) {
+					throw new CompetencyNotFoundException();
+				}
+				competencyToUse = competencyManager.createCompetency(company, competencyToUse.getName(), competencyToUse.getDescription());
+			}
+			
+		}
+		return competencyToUse;
 	}	
 
 	
