@@ -18,8 +18,18 @@ public interface CompetencyManager {
 		
 	public abstract void updateCompetency(Competency competency) throws CompetencyNotFoundException ;
 	
-	public abstract void saveOrUpdate(Competency competency) ;
+	public abstract void saveOrUpdate(Competency competency) throws CompetencyNotFoundException ;
 	
-	public Competency getCompetency(long competencyId) throws CompetencyNotFoundException;
+	public abstract Competency getCompetency(long competencyId) throws CompetencyNotFoundException;
+		
+	
+	public abstract List<EssentialElement> getEssentialElements(Competency competency) ;
+	
+	public abstract void createEssentialElement( EssentialElement essentialElement) throws CompetencyNotFoundException ;
+	
+	public abstract void updateEssentialElement( EssentialElement essentialElement) throws EssentialElementNotFoundException;
+	
+	public abstract void saveOrUpdate(EssentialElement essentialElement) throws EssentialElementNotFoundException ;
+
 	
 }

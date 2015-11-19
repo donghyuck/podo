@@ -84,7 +84,7 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.description = description;
 	}
 
-
+	@JsonIgnore
 	public Serializable getPrimaryKeyObject() {
 		return this.getCompetencyId();
 	}

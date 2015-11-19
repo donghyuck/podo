@@ -1,16 +1,17 @@
 package com.podosoftware.competency.competency;
 
 import architecture.common.cache.Cacheable;
+import architecture.common.model.PropertyAware;
 
-public interface EssentialElement extends Cacheable {
+public interface EssentialElement extends PropertyAware, Cacheable {
 
-	public long getCompetencyId();
+	public Long getCompetencyId();
 	
-	public void setCompetencyId(long competencyId);
+	public void setCompetencyId(Long competencyId);
 	
-	public long getEssentialElementId();
+	public Long getEssentialElementId();
 	
-	public void setEssestialElementId(long essestialElementId);
+	public void setEssentialElementId(Long essestialElementId);
 	
 	public String getName();
 	
@@ -18,6 +19,10 @@ public interface EssentialElement extends Cacheable {
 
 	public String getCapabilityStandard();
 	
-	public void setCapabilitytandard(String capabilityStandard);
+	public void setCapabilityStandard(String capabilityStandard);
+	
+	public Integer getLevel() ;
+
+	public void setLevel(Integer level) ;
 	
 }

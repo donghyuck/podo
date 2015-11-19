@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.SqlParameterValue;
 
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.DefaultCompetency;
+import com.podosoftware.competency.competency.DefaultEssentialElement;
+import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.competency.dao.CompetencyDao;
 
 import architecture.common.user.Company;
@@ -34,14 +36,32 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		}		
 	};	
 	
+	private final RowMapper<EssentialElement> essentialElementMapper = new RowMapper<EssentialElement>(){
+
+		public EssentialElement mapRow(ResultSet rs, int rowNum) throws SQLException {		
+			DefaultEssentialElement element = new DefaultEssentialElement();	
+			element.setCompetencyId(rs.getLong("COMPETENCY_ID"));
+			element.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
+			element.setName(rs.getString("NAME"));
+			element.setLevel(rs.getInt("COMPETENCY_LEVEL"));			
+			return element;
+		}		
+	};	
 	
 	private String sequencerName = "COMPETENCY";
 	
 	private String competencyPropertyTableName = "CA_COMPETENCY_PROPERTY";
 	
 	private String competencyPropertyPrimaryColumnName = "COMPETENCY_ID";
+		
+	private String essentialElementSequencerName = "ESSENTIAL_ELEMENT";
+	
+	private String essentialElementPropertyTableName = "CA_ESSENTIAL_ELEMENT_PROPERTY";
+	
+	private String essentialElementPropertyPrimaryColumnName = "ESSENTIAL_ELEMENT_ID";
 	
 	private ExtendedPropertyDao extendedPropertyDao;
+	
 	
 	
 	public JdbcCompetencyDao() {
@@ -63,10 +83,60 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 	}
 
 
+	public String getCompetencyPropertyTableName() {
+		return competencyPropertyTableName;
+	}
+
+
+	public void setCompetencyPropertyTableName(String competencyPropertyTableName) {
+		this.competencyPropertyTableName = competencyPropertyTableName;
+	}
+
+
+	public String getCompetencyPropertyPrimaryColumnName() {
+		return competencyPropertyPrimaryColumnName;
+	}
+
+
+	public void setCompetencyPropertyPrimaryColumnName(String competencyPropertyPrimaryColumnName) {
+		this.competencyPropertyPrimaryColumnName = competencyPropertyPrimaryColumnName;
+	}
+
+
+	public String getEssentialElementSequencerName() {
+		return essentialElementSequencerName;
+	}
+
+
+	public void setEssentialElementSequencerName(String essentialElementSequencerName) {
+		this.essentialElementSequencerName = essentialElementSequencerName;
+	}
+
+
+	public String getEssentialElementPropertyTableName() {
+		return essentialElementPropertyTableName;
+	}
+
+
+	public void setEssentialElementPropertyTableName(String essentialElementPropertyTableName) {
+		this.essentialElementPropertyTableName = essentialElementPropertyTableName;
+	}
+
+
+	public String getEssentialElementPropertyPrimaryColumnName() {
+		return essentialElementPropertyPrimaryColumnName;
+	}
+
+
+	public void setEssentialElementPropertyPrimaryColumnName(String essentialElementPropertyPrimaryColumnName) {
+		this.essentialElementPropertyPrimaryColumnName = essentialElementPropertyPrimaryColumnName;
+	}
+
+
 	public void setExtendedPropertyDao(ExtendedPropertyDao extendedPropertyDao) {
 		this.extendedPropertyDao = extendedPropertyDao;
 	}
-
+	
 	public Map<String, String> getCompetencyProperties(long competencyId) {
 		return extendedPropertyDao.getProperties(competencyPropertyTableName, competencyPropertyPrimaryColumnName, competencyId);
 	}
@@ -75,9 +145,14 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		extendedPropertyDao.updateProperties(competencyPropertyTableName, competencyPropertyPrimaryColumnName, competencyId, props);
 	}
 
+	public Map<String, String> getEssentialElementProperties(long essentialElementId) {
+		return extendedPropertyDao.getProperties(essentialElementPropertyTableName, essentialElementPropertyPrimaryColumnName, essentialElementId);
+	}
 
-	
-	
+	public void setEssentialElementProperties(long essentialElementId, Map<String, String> props) {
+		extendedPropertyDao.updateProperties(essentialElementPropertyTableName, essentialElementPropertyPrimaryColumnName, essentialElementId, props);
+	}
+
 	
 	public Competency createCompetency(Competency competency) {
 		Long competencyId = getNextId(sequencerName);
@@ -117,20 +192,24 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 
 
 	public Competency getCompetencyById(long competencyId) {
-		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_BY_ID").getSql(), 
+		Competency competency = getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_BY_ID").getSql(), 
 			competencyMapper,
 			new SqlParameterValue( Types.NUMERIC, competencyId )
 		);
+		competency.setProperties(getCompetencyProperties(competency.getCompetencyId()));		
+		return competency;
 	}
 
 
 	public Competency getCompetencyByName(Company company, String name) {
-		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_NAME").getSql(), 
+		Competency competency = getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_NAME").getSql(), 
 				competencyMapper,
 				new SqlParameterValue( Types.NUMERIC, 1),
 				new SqlParameterValue( Types.NUMERIC, company.getCompanyId() ),
 				new SqlParameterValue( Types.VARCHAR, name )
 			);
+		competency.setProperties(getCompetencyProperties(competency.getCompetencyId()));		
+		return competency;
 	}
 
 	public void deleteCompetency(Competency competency) {
@@ -165,6 +244,61 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 				new Object[]{ 1, company.getCompanyId()}, 
 				new int[] {Types.NUMERIC, Types.NUMERIC}, 
 				Long.class);
+	}
+
+
+	@Override
+	public void createEssentialElement(EssentialElement essentialElement) {
+		Long essentialElementId = getNextId(essentialElementSequencerName);
+		essentialElement.setEssentialElementId(essentialElementId);
+		try {
+			getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.CREATE_ESSENTIAL_ELEMENT").getSql(), 
+					new SqlParameterValue( Types.NUMERIC, essentialElement.getCompetencyId() ),
+					new SqlParameterValue( Types.NUMERIC, essentialElement.getEssentialElementId()),
+					new SqlParameterValue( Types.VARCHAR, essentialElement.getName() ),
+					new SqlParameterValue( Types.NUMERIC, essentialElement.getLevel() )
+			);
+			
+			if(essentialElement.getProperties().size() > 0)
+				setEssentialElementProperties(essentialElement.getEssentialElementId(), essentialElement.getProperties());
+		} catch (DataAccessException e) {
+			throw e;
+		}			
+	}
+
+
+	@Override
+	public void updateEssentialElement(EssentialElement essentialElement) {
+		Date now = new Date();		
+		try {
+			getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ESSENTIAL_ELEMENT").getSql(), 
+					new SqlParameterValue( Types.VARCHAR, essentialElement.getName() ),
+					new SqlParameterValue( Types.VARCHAR, essentialElement.getLevel())
+			);
+			setEssentialElementProperties(essentialElement.getEssentialElementId(), essentialElement.getProperties());
+		} catch (DataAccessException e) {
+			throw e;
+		}		
+	}
+
+
+	@Override
+	public EssentialElement getEssentialElementById(long essentialElementId) {
+		EssentialElement essentialElement = getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ESSENTIAL_ELEMENT_BY_ID").getSql(), 
+				essentialElementMapper,
+				new SqlParameterValue( Types.NUMERIC, essentialElementId )
+			);
+		essentialElement.setProperties(getEssentialElementProperties(essentialElement.getEssentialElementId()));		
+		return essentialElement;
+	}
+
+
+	@Override
+	public List<Long> getEssentialElementIds(Competency competency) {
+		return getExtendedJdbcTemplate().queryForList(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ESSENTIAL_ELEMENT_IDS_BY_COMPETENCY_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId() )				
+		);
 	}
 	
 }

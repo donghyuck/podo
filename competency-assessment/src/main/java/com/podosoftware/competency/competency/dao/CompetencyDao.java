@@ -3,6 +3,7 @@ package com.podosoftware.competency.competency.dao;
 import java.util.List;
 
 import com.podosoftware.competency.competency.Competency;
+import com.podosoftware.competency.competency.EssentialElement;
 
 import architecture.common.user.Company;
 
@@ -23,5 +24,14 @@ public interface CompetencyDao {
 	public abstract List<Long> getCompetencyIds(Company company);
 	
 	public abstract List<Long> getCompetencyIds(Company company, int startIndex, int numResults);
+	
+	
+	public abstract void createEssentialElement(EssentialElement essentialElement);
+	
+	public abstract void updateEssentialElement(EssentialElement essentialElement);
+	
+	public abstract EssentialElement getEssentialElementById(long essentialElementId);
+		
+	public abstract List<Long> getEssentialElementIds(Competency competency);
 	
 }

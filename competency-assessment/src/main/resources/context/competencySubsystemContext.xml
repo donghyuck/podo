@@ -49,7 +49,6 @@
 		class="com.podosoftware.competency.competency.DefaultCompetencyManager"
 		depends-on="competencyDao" 
 		p:competencyCache-ref="competencyCache"
-		p:companyManager-ref="companyManager"
 		p:competencyDao-ref="competencyDao"
 		/>			
 		

@@ -24,6 +24,9 @@ import com.podosoftware.competency.competency.CompetencyAlreadyExistsException;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.competency.CompetencyNotFoundException;
 import com.podosoftware.competency.competency.DefaultCompetency;
+import com.podosoftware.competency.competency.DefaultEssentialElement;
+import com.podosoftware.competency.competency.EssentialElement;
+import com.podosoftware.competency.competency.EssentialElementNotFoundException;
 
 import architecture.common.user.Company;
 import architecture.common.user.CompanyManager;
@@ -108,8 +111,7 @@ public class SecureCompetencyMgmtController {
 		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
 		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize,		
 		NativeWebRequest request
-	){		
-		
+	){			
 		User user = SecurityHelper.getUser();
 		Company company = user.getCompany();
 		if( companyId > 0){
@@ -117,8 +119,7 @@ public class SecureCompetencyMgmtController {
 				company = companyManager.getCompany(companyId);
 			} catch (CompanyNotFoundException e) {
 			}
-		}
-		
+		}		
 		List<Competency> items = Collections.EMPTY_LIST;
 		int totalCount = competencyManager.getCompetencyCount(company);
 		if( totalCount > 0 ){
@@ -126,12 +127,9 @@ public class SecureCompetencyMgmtController {
 				items = competencyManager.getCompetencies(company, startIndex, pageSize);
 			else
 				items = competencyManager.getCompetencies(company);
-		}
-		
-		log.debug(items);
-		
-		ItemList list = new ItemList(items, totalCount);
-		
+		}		
+		log.debug(items);		
+		ItemList list = new ItemList(items, totalCount);		
 		return list;
 	}
 	
@@ -153,26 +151,37 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/update.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Competency updateCompetency(@RequestBody DefaultCompetency competency ) throws CompetencyNotFoundException, CompetencyAlreadyExistsException{		
-		
+	public Competency updateCompetency(@RequestBody DefaultCompetency competency ) throws CompetencyNotFoundException, CompetencyAlreadyExistsException{			
 		User user = SecurityHelper.getUser();		
 		Company company = user.getCompany();
-		Competency competencyToUse = competency;
-		if( competencyToUse.getCompetencyId() > 0)
-			competencyManager.updateCompetency(competencyToUse);
-		else{
-			if( competencyToUse.getObjectType() == 1 && competencyToUse.getObjectId() > 0){
-				try {
-					company = companyManager.getCompany(competency.getObjectId());
-				} catch (CompanyNotFoundException e) {
-					throw new CompetencyNotFoundException();
-				}
-				competencyToUse = competencyManager.createCompetency(company, competencyToUse.getName(), competencyToUse.getDescription());
-			}
-			
+		Competency competencyToUse = competency;		
+		
+		if(competencyToUse.getObjectType() == 0 || competencyToUse.getObjectId() == 0 ){
+			throw new IllegalArgumentException();
 		}
+		competencyManager.saveOrUpdate(competencyToUse);
 		return competencyToUse;
-	}	
+	}
+	
+	@RequestMapping(value="/mgmt/competency/element/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<EssentialElement> getEssentialElements(
+			@RequestParam(value="competencyId", defaultValue="0", required=false ) Long competencyId
+	) throws CompetencyNotFoundException{
+		Competency competency = competencyManager.getCompetency(competencyId);
+		return competencyManager.getEssentialElements(competency);
+	}
+	
+	@RequestMapping(value="/mgmt/competency/element/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public EssentialElement updateEssentialElement(
+			@RequestBody DefaultEssentialElement element
+			) throws EssentialElementNotFoundException, CompetencyNotFoundException{
+		EssentialElement elementToUse = element;
+		Competency competencyToUse = competencyManager.getCompetency(element.getCompetencyId());
+		competencyManager.saveOrUpdate(elementToUse);		
+		return elementToUse;
+	}
 
 	
 }

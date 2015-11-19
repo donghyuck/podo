@@ -18,6 +18,10 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	
 	protected Cache competencyCache;
 	
+	protected Cache essentialElementCache;
+	
+	
+	
 	public DefaultCompetencyManager() {
 	}
 
@@ -37,6 +41,14 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		this.competencyCache = competencyCache;
 	}
 	
+	public Cache getEssentialElementCache() {
+		return essentialElementCache;
+	}
+
+	public void setEssentialElementCache(Cache essentialElementCache) {
+		this.essentialElementCache = essentialElementCache;
+	}
+
 	private Competency getCompetencyInCache(Long competencyId){
 		if( competencyCache.get(competencyId) == null )
 			return null;		
@@ -74,7 +86,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		return competencyDao.getCompetencyCount(company);
 	}
 	
-	public List<Competency> getCompetencies(Company company) {		
+	public List<Competency> getCompetencies(Company company) {			
 		List<Long> ids = competencyDao.getCompetencyIds(company);
 		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
 		for( Long id : ids ){			
@@ -88,7 +100,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 	
 	public List<Competency> getCompetencies(Company company, int startIndex, int numResults) {		
-		List<Long> ids = competencyDao.getCompetencyIds(company, startIndex, numResults);
+		List<Long> ids = competencyDao.getCompetencyIds(company);
 		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
 		for( Long id : ids ){			
 			try {
@@ -112,7 +124,6 @@ public class DefaultCompetencyManager implements CompetencyManager {
 
 	public Competency getCompetency(long competencyId) throws CompetencyNotFoundException {		
 		Competency competency = getCompetencyInCache(competencyId);
-		
 		if(competency == null){
 			competency = competencyDao.getCompetencyById(competencyId);			
 			if( competency == null ){				
@@ -120,7 +131,82 @@ public class DefaultCompetencyManager implements CompetencyManager {
 			}
 			updateCache(competency);
 		}
-		return null;
+		return competency;
 	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveOrUpdate(Competency competency) throws CompetencyNotFoundException {
+		if(competency.getCompetencyId() > 0 ){
+			updateCompetency(competency);
+		}else{
+			competencyDao.createCompetency(competency);
+		}
+		
+	}
+
+	
+	public EssentialElement getEssentialElement(long essentialElementId) throws EssentialElementNotFoundException {		
+		EssentialElement essentialElement = getEssentialElementInCache(essentialElementId);
+		if(essentialElement == null){
+			essentialElement = competencyDao.getEssentialElementById(essentialElementId);			
+			if( essentialElement == null ){				
+				throw new EssentialElementNotFoundException();
+			}
+			updateCache(essentialElement);
+		}
+		return essentialElement;
+	}
+	
+	@Override
+	public void createEssentialElement(EssentialElement essentialElement) throws CompetencyNotFoundException {
+		if(essentialElement.getCompetencyId() < 1){
+			throw new CompetencyNotFoundException();
+		}
+		getCompetency(essentialElement.getCompetencyId());
+		competencyDao.createEssentialElement(essentialElement);
+	}
+
+	@Override
+	public void updateEssentialElement(EssentialElement essentialElement) throws EssentialElementNotFoundException {
+		if( essentialElement.getEssentialElementId() > 0)
+		{
+			competencyDao.updateEssentialElement(essentialElement);			
+			updateCache( getEssentialElement(essentialElement.getEssentialElementId() ));
+		}			
+	}
+	
+	private EssentialElement getEssentialElementInCache(Long essentialElementId){
+		if( essentialElementCache.get(essentialElementId) == null )
+			return null;		
+		return (EssentialElement)essentialElementCache.get(essentialElementId).getValue(); 
+	}
+	
+	private void updateCache( EssentialElement essentialElement){
+		essentialElementCache.put(new Element(essentialElement.getEssentialElementId(), essentialElement));
+	}
+
+	@Override
+	public List<EssentialElement> getEssentialElements(Competency competency) {
+		List<Long> ids = competencyDao.getEssentialElementIds(competency);
+		ArrayList<EssentialElement> list = new ArrayList<EssentialElement>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getEssentialElement(id));
+			} catch (EssentialElementNotFoundException e) {
+				
+			}			
+		}		
+		return list;
+	}
+
+	@Override
+	public void saveOrUpdate(EssentialElement essentialElement) throws EssentialElementNotFoundException {
+		if(essentialElement.getCompetencyId() > 0 ){
+			updateEssentialElement(essentialElement);
+		}else{
+			competencyDao.createEssentialElement(essentialElement);
+		}		
+	}
+	
 
 }
