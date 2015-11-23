@@ -9,16 +9,17 @@ import architecture.common.model.support.PropertyAwareSupport;
 
 public class DefaultCompetency extends PropertyAwareSupport implements Competency  {
 
-	private int objectType;
+	private Integer objectType;
 	
-	private long objectId;
+	private Long objectId;
 	
-	private long competencyId;
+	private Long competencyId;
 	
 	private String name;
 	
 	private String description;
 	
+	private Integer level;
 	
 	public DefaultCompetency() {
 		this.objectType = 1;
@@ -26,6 +27,17 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.competencyId = -1L;
 		this.name = null;
 		this.description = null;
+		this.level = 0 ;
+	}
+
+
+	public Integer getLevel() {
+		return level;
+	}
+
+
+	public void setLevel(Integer level) {
+		this.level = level;
 	}
 
 

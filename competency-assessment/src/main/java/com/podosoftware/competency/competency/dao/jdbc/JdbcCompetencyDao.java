@@ -32,6 +32,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 			dc.setCompetencyId( rs.getLong("COMPETENCY_ID") );			
 			dc.setName(rs.getString("NAME")); 
 			dc.setDescription( rs.getString("DESCRIPTION")); 		
+			dc.setLevel(rs.getInt("COMPETENCY_LEVEL"));
 			return dc;
 		}		
 	};	
@@ -163,7 +164,8 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					new SqlParameterValue( Types.NUMERIC, competency.getObjectType() ),
 					new SqlParameterValue( Types.NUMERIC, competency.getObjectId() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getName() ),
-					new SqlParameterValue( Types.VARCHAR, competency.getDescription() )
+					new SqlParameterValue( Types.VARCHAR, competency.getDescription() ),
+					new SqlParameterValue( Types.VARCHAR, competency.getLevel())
 			);
 			
 			if(competency.getProperties().size() > 0)
@@ -181,6 +183,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 			getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_COMPETENCY").getSql(), 
 					new SqlParameterValue( Types.VARCHAR, competency.getName() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getDescription() ),
+					new SqlParameterValue( Types.VARCHAR, competency.getLevel()),
 					new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId() )
 			);
 			setCompetencyProperties(competency.getCompetencyId(), competency.getProperties());
@@ -273,7 +276,8 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		try {
 			getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ESSENTIAL_ELEMENT").getSql(), 
 					new SqlParameterValue( Types.VARCHAR, essentialElement.getName() ),
-					new SqlParameterValue( Types.VARCHAR, essentialElement.getLevel())
+					new SqlParameterValue( Types.VARCHAR, essentialElement.getLevel()),
+					new SqlParameterValue( Types.NUMERIC, essentialElement.getEssentialElementId())
 			);
 			setEssentialElementProperties(essentialElement.getEssentialElementId(), essentialElement.getProperties());
 		} catch (DataAccessException e) {

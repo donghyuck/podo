@@ -78,8 +78,7 @@ public class DefaultEssentialElement extends PropertyAwareSupport implements Ess
 
 	@Override
 	public int getModelObjectType() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 54;
 	}
 
 }

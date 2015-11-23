@@ -56,6 +56,9 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 	
 	private void updateCache(Competency competency){
+		if( competencyCache.get(competency.getCompetencyId()) != null ){
+			competencyCache.remove(competency.getCompetencyId());
+		}
 		competencyCache.put(new Element(competency.getCompetencyId(), competency));
 	}
 
@@ -117,7 +120,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	public void updateCompetency(Competency competency) throws CompetencyNotFoundException {
 		if( competency.getCompetencyId() > 0)
 		{
-			competencyDao.updateCompetency(competency);			
+			competencyDao.updateCompetency(competency);		
 			updateCache( getCompetency(competency.getCompetencyId() ));
 		}
 	}
@@ -146,6 +149,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 
 	
 	public EssentialElement getEssentialElement(long essentialElementId) throws EssentialElementNotFoundException {		
+		
 		EssentialElement essentialElement = getEssentialElementInCache(essentialElementId);
 		if(essentialElement == null){
 			essentialElement = competencyDao.getEssentialElementById(essentialElementId);			
@@ -157,7 +161,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		return essentialElement;
 	}
 	
-	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void createEssentialElement(EssentialElement essentialElement) throws CompetencyNotFoundException {
 		if(essentialElement.getCompetencyId() < 1){
 			throw new CompetencyNotFoundException();
@@ -166,11 +170,11 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		competencyDao.createEssentialElement(essentialElement);
 	}
 
-	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateEssentialElement(EssentialElement essentialElement) throws EssentialElementNotFoundException {
 		if( essentialElement.getEssentialElementId() > 0)
 		{
-			competencyDao.updateEssentialElement(essentialElement);			
+			competencyDao.updateEssentialElement(essentialElement);		
 			updateCache( getEssentialElement(essentialElement.getEssentialElementId() ));
 		}			
 	}
@@ -182,6 +186,9 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 	
 	private void updateCache( EssentialElement essentialElement){
+		if( competencyCache.get(essentialElement.getEssentialElementId()) != null ){
+			competencyCache.remove(essentialElement.getEssentialElementId());
+		}
 		essentialElementCache.put(new Element(essentialElement.getEssentialElementId(), essentialElement));
 	}
 
@@ -199,9 +206,9 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		return list;
 	}
 
-	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdate(EssentialElement essentialElement) throws EssentialElementNotFoundException {
-		if(essentialElement.getCompetencyId() > 0 ){
+		if(essentialElement.getEssentialElementId() > 0 ){
 			updateEssentialElement(essentialElement);
 		}else{
 			competencyDao.createEssentialElement(essentialElement);
