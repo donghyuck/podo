@@ -1,12 +1,15 @@
 package com.podosoftware.competency.codeset.dao.jdbc;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
@@ -43,19 +46,77 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 			g.setParentCodeSetId(rs.getLong("PARENT_CODESET_ID"));
 			
 			g.setName(rs.getString("NAME"));			
+			g.setCode(rs.getString("CODE"));
 			g.setDescription(rs.getString("DESCRIPTION"));
 			g.setCreationDate( rs.getDate("CREATION_DATE") ); 
 			g.setModifiedDate( rs.getDate("MODIFIED_DATE") ); 		
 			return g;
 		}		
 	};
-	private String sequencerName = "CODESET";
 	
+	private String sequencerName = "CODESET";	
 	private String codesetValueSequencerName = "CODESET_VALUE";
 
-	@Override
-	public void saveOrUpdateCodeSet(CodeSet codeset) {
-		
+	public void saveOrUpdateCodeSet(List<CodeSet> codesets){		
+		final List<CodeSet> updates = new ArrayList<CodeSet>();		
+		final List<CodeSet> inserts = new ArrayList<CodeSet>();		
+		for(CodeSet codeSet : codesets)
+		{
+			if(codeSet.getCodeSetId() < 1 ){
+				long codeSetId = getNextId(sequencerName);
+				codeSet.setCodeSetId(codeSetId);	
+				inserts.add(codeSet);
+			}else{
+				updates.add(codeSet);
+			}
+		}				
+		if(updates.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_CODESET").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						CodeSet c = updates.get(i);		
+						ps.setLong(1, c.getParentCodeSetId());
+						ps.setString(2, c.getName());
+						ps.setString(3, c.getCode());
+						ps.setString(4, c.getDescription());
+						ps.setDate(5, new java.sql.Date(c.getModifiedDate().getTime()));
+						ps.setLong(6, c.getCodeSetId());
+					}					
+					public int getBatchSize() {
+						return updates.size();
+					}
+				});		
+		}		
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_CODESET").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						CodeSet c = inserts.get(i);
+						ps.setLong(1, c.getCodeSetId());	
+						ps.setInt(2, c.getObjectType());
+						ps.setLong(3,  c.getObjectId());
+						ps.setLong(4, c.getParentCodeSetId());
+						ps.setString(5, c.getName());
+						ps.setString(6, c.getCode());
+						ps.setString(7, c.getDescription());
+						ps.setDate(8, new java.sql.Date(c.getCreationDate().getTime()));
+						ps.setDate(9, new java.sql.Date(c.getModifiedDate().getTime()));
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}
+	}
+	
+
+	public Long newCodeSetId() {
+		return getNextId(sequencerName);
+	} 
+			
+	public void saveOrUpdateCodeSet(CodeSet codeset) {		
 		if( codeset.getCodeSetId() == -1L ){		
 			long codeSetId = getNextId(sequencerName);
 			codeset.setCodeSetId(codeSetId);
@@ -65,6 +126,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 					new SqlParameterValue (Types.NUMERIC, codeset.getObjectId()),	
 					new SqlParameterValue (Types.NUMERIC, codeset.getParentCodeSetId()),	
 					new SqlParameterValue (Types.VARCHAR, codeset.getName()),	
+					new SqlParameterValue (Types.VARCHAR, codeset.getCode()),
 					new SqlParameterValue (Types.VARCHAR, codeset.getDescription()),	
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getCreationDate()),	
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getModifiedDate())				
@@ -73,6 +135,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_CODESET").getSql(),
 					new SqlParameterValue (Types.NUMERIC, codeset.getParentCodeSetId()),	
 					new SqlParameterValue (Types.VARCHAR, codeset.getName()),	
+					new SqlParameterValue (Types.VARCHAR, codeset.getCode()),
 					new SqlParameterValue (Types.VARCHAR, codeset.getDescription()),			
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getModifiedDate()),
 					new SqlParameterValue (Types.NUMERIC, codeset.getCodeSetId())
@@ -89,8 +152,6 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 	CREATION_DATE
 	MODIFIED_DATE
 	*/
-
-	
 	public CodeSetTreeWalker getCodeSetTreeWalker(int objectType, long objectId){
 		
 		int numCodeSets = getExtendedJdbcTemplate().queryForObject(
@@ -173,5 +234,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 				new SqlParameterValue(Types.NUMERIC, objectType ),
 				new SqlParameterValue(Types.NUMERIC, objectId ));
 				
-	} 
+	}
+
+	
 }

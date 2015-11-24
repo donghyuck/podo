@@ -158,7 +158,7 @@ public class SecureCompetencyMgmtController {
 			log.debug("row:"+ firstRowCount + "-" + rowCount);
 			for( int i = skipRowCount ; i < rowCount ; i ++ ){				
 				Row row = reader.getRow(i);
-				log.debug("row[" + i + "]:" + row );
+				//log.debug("row[" + i + "]:" + row );
 				if( row != null ){
 					int columnCount = row.getPhysicalNumberOfCells();
 					int firstColumnCount = row.getFirstCellNum();
@@ -191,8 +191,8 @@ public class SecureCompetencyMgmtController {
 				}
 			}
 		}		
-	//	CodeSet codeset = codeSetManager.getCodeSet(codeSetId);
-	//	codeSetManager.batchUpdate(codeset, new ArrayList<CodeItem>(codes.values()));
+		CodeSet codeset = codeSetManager.getCodeSet(codeSetId);
+		codeSetManager.batchUpdate(codeset, new ArrayList<CodeItem>(codes.values()));
 		
 		/*
 		List<CodeSet> list = new ArrayList<CodeSet>();

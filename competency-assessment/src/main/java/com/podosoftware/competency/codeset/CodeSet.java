@@ -47,4 +47,8 @@ public interface CodeSet extends Cacheable{
 
 	public void setObjectId(long objectId);
 
+	public String getCode();
+
+	public void setCode(String code);
+	
 }

@@ -19,6 +19,7 @@ public class DefaultCodeSet implements CodeSet {
 	private long objectId;
 	private long codeSetId;
 	private Long parentCodeSetId;
+	private String code;
 	private String name;	
     private String description;
 	private boolean enabled;
@@ -35,6 +36,7 @@ public class DefaultCodeSet implements CodeSet {
 		this.creationDate = new Date();
 		this.modifiedDate = this.creationDate;
 		this.hasChildren = false;
+		this.code = null;
 		this.codes = Collections.EMPTY_LIST;
 	}	
 	
@@ -132,6 +134,13 @@ public class DefaultCodeSet implements CodeSet {
 	}
 
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	public boolean isHasChildren() {
 		return hasChildren;

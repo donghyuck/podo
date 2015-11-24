@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.podosoftware.competency.codeset.dao.CodeSetDao;
 
 import architecture.common.user.Company;
@@ -41,7 +44,6 @@ public class DefaultCodeSetManager implements CodeSetManager {
 
 
 	public List<CodeSet> getCodeSets(CodeSet codeset) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -73,6 +75,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 	}
 
 
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public CodeSet createCodeSet(Company company, String name, String description) {		
 		int objectType = 1;
 		long objectId = company.getCompanyId();				
@@ -84,6 +87,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		return codeset;
 	}
 
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public CodeSet createCodeSet(CodeSet orgCodeset, String name, String description) {		
 		CodeSet codeset = new DefaultCodeSet();
 		codeset.setObjectType(orgCodeset.getObjectType());
@@ -94,13 +98,14 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		return codeset;
 	}
 
-	@Override
-	
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdate(CodeSet codeset) {
 		if( codeset.getCodeSetId() > 0)
 		{			
 			Date now = new Date();
 			codeset.setModifiedDate(now);		
+			clearCodeSetCache(codeset.getCodeSetId());
 		}else{
 			codeset.setCodeSetId(-1L);
 		}
@@ -108,12 +113,15 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		
 	}
 
-	@Override
+
+	private void clearCodeSetCache(long codeSetId){
+		if(codeSetCache.get(codeSetId) != null)
+			codeSetCache.remove( codeSetId);
+	}
+	
 	public CodeSetTreeWalker getCodeSetTreeWalker(Company company) {
 		CodeSetTreeWalker treeWalker ;
-		
 		treeWalker = codeSetDao.getCodeSetTreeWalker(company.getModelObjectType(), company.getCompanyId());
-		
 		return treeWalker;
 	}
 
@@ -149,8 +157,54 @@ public class DefaultCodeSetManager implements CodeSetManager {
 	public void setCodeSetCache(Cache codeSetCache) {
 		this.codeSetCache = codeSetCache;
 	}
-	
-	
-	
+
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveOrUpdate(List<CodeSet> codesets) {
+		for(CodeSet code : codesets){
+			if(code.getCodeSetId() > 0 )
+			{
+				clearCodeSetCache(code.getCodeSetId());
+			}
+		}
+		this.codeSetDao.saveOrUpdateCodeSet(codesets);		
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void batchUpdate(CodeSet codeSet, List<CodeItem> items) {
+		List<CodeSet> list = new ArrayList<CodeSet>();
+		for(CodeItem item : items)
+		{
+			DefaultCodeSet newCodeSet = new DefaultCodeSet();
+			newCodeSet.setCodeSetId(codeSetDao.newCodeSetId());
+			newCodeSet.setObjectType(codeSet.getObjectType());
+			newCodeSet.setObjectId(codeSet.getObjectId());
+			newCodeSet.setParentCodeSetId(codeSet.getCodeSetId());
+			newCodeSet.setCode(item.getCode());
+			newCodeSet.setName(item.getName());		
+			list.add(newCodeSet);			
+			for(CodeItem item2 : item.getItems().values()){				
+				DefaultCodeSet newCodeSet2 = new DefaultCodeSet();
+				newCodeSet2.setCodeSetId(codeSetDao.newCodeSetId());
+				newCodeSet2.setObjectType(newCodeSet.getObjectType());
+				newCodeSet2.setObjectId(newCodeSet.getObjectId());
+				newCodeSet2.setParentCodeSetId(newCodeSet.getCodeSetId());
+				newCodeSet2.setCode(item2.getCode());
+				newCodeSet2.setName(item2.getName());		
+				list.add(newCodeSet2);					
+				for(CodeItem item3 :item2.getItems().values()){
+					DefaultCodeSet newCodeSet3 = new DefaultCodeSet();
+					newCodeSet3.setCodeSetId(codeSetDao.newCodeSetId());
+					newCodeSet3.setObjectType(newCodeSet2.getObjectType());
+					newCodeSet3.setObjectId(newCodeSet2.getObjectId());
+					newCodeSet3.setParentCodeSetId(newCodeSet2.getCodeSetId());
+					newCodeSet3.setCode(item3.getCode());
+					newCodeSet3.setName(item3.getName());		
+					list.add(newCodeSet3);
+				}
+			}
+		}
+		codeSetDao.saveOrUpdateCodeSet(list);
+	}
 
 }

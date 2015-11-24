@@ -10,8 +10,6 @@ public interface PerformanceCriteria {
 	
 	public void setPerformanceCriteriaId( long performanceCriteriaId);
 		
-	public boolean isSelfAccessment();
-	
 	public String getDescription();
 	
 	public void setDescription(String description);
