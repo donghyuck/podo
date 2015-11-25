@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import architecture.common.cache.CacheSizes;
 
-public class DefaultClassfication implements Classfication {
+public class DefaultClassification implements Classification {
 
 	private Long classifiedMajorityId;
 
@@ -18,7 +18,7 @@ public class DefaultClassfication implements Classfication {
 
 	private String classifiedMinorityName;
 
-	public DefaultClassfication() {
+	public DefaultClassification() {
 		
 		this.classifiedMajorityId = -1L;
 		this.classifiedMiddleId = -1L;
@@ -26,7 +26,7 @@ public class DefaultClassfication implements Classfication {
 		
 	}
 
-	public DefaultClassfication(Long classifiedMajorityId, Long classifiedMiddleId, Long classifiedMinorityId) {
+	public DefaultClassification(Long classifiedMajorityId, Long classifiedMiddleId, Long classifiedMinorityId) {
 		this.classifiedMajorityId = classifiedMajorityId;
 		this.classifiedMiddleId = classifiedMiddleId;
 		this.classifiedMinorityId = classifiedMinorityId;

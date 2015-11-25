@@ -11,9 +11,17 @@ public interface Job extends PropertyAware, Cacheable  {
 	
 	public void setJobId(Long jobId);
 	
-	public Classfication getClassfication();
+	public Long getObjectId();
 	
-	public void setClassfication(Classfication classfication);
+	public Integer getObjectType();
+	
+	public void setObjectType(Integer objectType);
+	
+	public void setObjectId(Long objectId);
+	
+	public Classification getClassification();
+	
+	public void setClassification(Classification classfication);
 	
 	public String getName();
 	

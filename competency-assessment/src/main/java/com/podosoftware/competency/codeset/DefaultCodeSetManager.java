@@ -8,20 +8,39 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.podosoftware.competency.codeset.dao.CodeSetDao;
+import com.podosoftware.competency.job.DefaultClassification;
+import com.podosoftware.competency.job.DefaultJob;
+import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
 import architecture.common.user.CompanyManager;
 import architecture.common.user.UserManager;
+import architecture.common.util.LockUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 public class DefaultCodeSetManager implements CodeSetManager {
 	
 	public static final CodeSet ROOT_CODE_SET = new DefaultCodeSet();
+	
 	private CodeSetDao codeSetDao;
+	
+	private JobDao jobDao; 
+	
 	private UserManager userManager;
 	private CompanyManager companyManager;
 	protected Cache codeSetCache;
+	private Cache treeWalkerCache;
+		
+	
+	public Cache getTreeWalkerCache() {
+		return treeWalkerCache;
+	}
+
+	public void setTreeWalkerCache(Cache treeWalkerCache) {
+		this.treeWalkerCache = treeWalkerCache;
+	}
 
 	@Override
 	public CodeSet getCodeSet(long codeSetId) throws CodeSetNotFoundException {
@@ -105,7 +124,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		{			
 			Date now = new Date();
 			codeset.setModifiedDate(now);		
-			clearCodeSetCache(codeset.getCodeSetId());
+			clearCodeSetCache(codeset);
 		}else{
 			codeset.setCodeSetId(-1L);
 		}
@@ -119,12 +138,34 @@ public class DefaultCodeSetManager implements CodeSetManager {
 			codeSetCache.remove( codeSetId);
 	}
 	
+	private void clearCodeSetCache(CodeSet codeSet){
+		String key = getTreeWalkerCacheKey( codeSet.getObjectType(), codeSet.getObjectId());
+		clearCodeSetCache(codeSet.getCodeSetId()); 
+		synchronized(key){
+			treeWalkerCache.remove(key);
+		}
+	}
+	
 	public CodeSetTreeWalker getCodeSetTreeWalker(Company company) {
 		CodeSetTreeWalker treeWalker ;
 		treeWalker = codeSetDao.getCodeSetTreeWalker(company.getModelObjectType(), company.getCompanyId());
 		return treeWalker;
 	}
-
+	
+	public CodeSetTreeWalker getCodeSetTreeWalker(int objectType, long objectId)
+	{
+		String key = getTreeWalkerCacheKey(objectType, objectId);
+		CodeSetTreeWalker treeWalker ;
+		if(treeWalkerCache.get(key) != null ){
+			treeWalker = (CodeSetTreeWalker)treeWalkerCache.get(key).getValue();
+		}else{
+			synchronized(key){
+				treeWalker = codeSetDao.getCodeSetTreeWalker(objectType, objectId);
+				treeWalkerCache.put(new Element(key, treeWalker));
+			}
+		}				
+		return treeWalker;
+	}
 	
 	public CodeSetDao getCodeSetDao() {
 		return codeSetDao;
@@ -173,10 +214,12 @@ public class DefaultCodeSetManager implements CodeSetManager {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void batchUpdate(CodeSet codeSet, List<CodeItem> items) {
 		List<CodeSet> list = new ArrayList<CodeSet>();
+		List<Job> jobs = new ArrayList<Job>();
+		
 		for(CodeItem item : items)
 		{
 			DefaultCodeSet newCodeSet = new DefaultCodeSet();
-			newCodeSet.setCodeSetId(codeSetDao.newCodeSetId());
+			newCodeSet.setCodeSetId(codeSetDao.nextCodeSetId());
 			newCodeSet.setObjectType(codeSet.getObjectType());
 			newCodeSet.setObjectId(codeSet.getObjectId());
 			newCodeSet.setParentCodeSetId(codeSet.getCodeSetId());
@@ -185,7 +228,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 			list.add(newCodeSet);			
 			for(CodeItem item2 : item.getItems().values()){				
 				DefaultCodeSet newCodeSet2 = new DefaultCodeSet();
-				newCodeSet2.setCodeSetId(codeSetDao.newCodeSetId());
+				newCodeSet2.setCodeSetId(codeSetDao.nextCodeSetId());
 				newCodeSet2.setObjectType(newCodeSet.getObjectType());
 				newCodeSet2.setObjectId(newCodeSet.getObjectId());
 				newCodeSet2.setParentCodeSetId(newCodeSet.getCodeSetId());
@@ -194,17 +237,41 @@ public class DefaultCodeSetManager implements CodeSetManager {
 				list.add(newCodeSet2);					
 				for(CodeItem item3 :item2.getItems().values()){
 					DefaultCodeSet newCodeSet3 = new DefaultCodeSet();
-					newCodeSet3.setCodeSetId(codeSetDao.newCodeSetId());
+					newCodeSet3.setCodeSetId(codeSetDao.nextCodeSetId());
 					newCodeSet3.setObjectType(newCodeSet2.getObjectType());
 					newCodeSet3.setObjectId(newCodeSet2.getObjectId());
 					newCodeSet3.setParentCodeSetId(newCodeSet2.getCodeSetId());
 					newCodeSet3.setCode(item3.getCode());
 					newCodeSet3.setName(item3.getName());		
-					list.add(newCodeSet3);
+					list.add(newCodeSet3);					
+					for( CodeItem item4 : item3.getItems().values()){						
+						Job job = new DefaultJob();
+						job.setObjectType(codeSet.getObjectType());
+						job.setObjectId(codeSet.getObjectId());
+						job.setClassification(new DefaultClassification(newCodeSet.getCodeSetId(), newCodeSet2.getCodeSetId(), newCodeSet3.getCodeSetId() ));
+						job.setName(item4.getName());
+						job.getProperties().put("code", item4.getCode());
+						
+						jobs.add(job);
+					}
 				}
 			}
 		}
+		
+		String key = getTreeWalkerCacheKey( codeSet.getObjectType(), codeSet.getObjectId());
+		synchronized(key){
+			treeWalkerCache.remove(key);
+		}		
 		codeSetDao.batchInsertCodeSet(list);
+		
+		if(jobDao != null)
+			jobDao.batchInsertJob(jobs);
+		
 	}
 
+	 private static String getTreeWalkerCacheKey( int objectType, long objectId) {
+		 return LockUtils.intern((new StringBuilder("codesetTreeWalker-")).append(objectType).append("-").append(objectId).toString());
+	 }
+
+	 
 }

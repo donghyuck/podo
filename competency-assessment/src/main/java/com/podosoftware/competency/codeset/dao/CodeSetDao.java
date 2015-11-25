@@ -7,7 +7,7 @@ import com.podosoftware.competency.codeset.CodeSetTreeWalker;
 
 public interface CodeSetDao {
 	
-	public Long newCodeSetId();
+	public Long nextCodeSetId();
 	
 	public void batchInsertCodeSet(List<CodeSet> codesets);
 	

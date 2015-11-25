@@ -103,7 +103,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 	
 	public List<Competency> getCompetencies(Company company, int startIndex, int numResults) {		
-		List<Long> ids = competencyDao.getCompetencyIds(company);
+		List<Long> ids = competencyDao.getCompetencyIds(company, startIndex, numResults);
 		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
 		for( Long id : ids ){			
 			try {

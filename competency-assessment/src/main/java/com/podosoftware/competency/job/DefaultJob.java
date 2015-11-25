@@ -28,12 +28,15 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 
 	private Date modifiedDate;
 
-	private Classfication Classfication;
+	private Classification Classfication;
 
 	public DefaultJob() {
 		this.jobId = -1L;
 		this.objectType = 0 ;
 		this.objectId = -1L;
+		Date now = new Date();
+		this.creationDate = now;
+		this.modifiedDate = now;
 	}
 
 	public Long getJobId() {
@@ -96,11 +99,11 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		this.modifiedDate = modifiedDate;
 	}
 
-	public Classfication getClassfication() {
+	public Classification getClassification() {
 		return Classfication;
 	}
 
-	public void setClassfication(Classfication classfication) {
+	public void setClassification(Classification classfication) {
 		Classfication = classfication;
 	}
 

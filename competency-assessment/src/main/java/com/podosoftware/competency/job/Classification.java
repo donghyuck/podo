@@ -2,7 +2,7 @@ package com.podosoftware.competency.job;
 
 import architecture.common.cache.Cacheable;
 
-public interface Classfication  extends Cacheable{
+public interface Classification  extends Cacheable{
 
 	
 	public Long getClassifiedMajorityId();

@@ -122,7 +122,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 	}
 	
 
-	public Long newCodeSetId() {
+	public Long nextCodeSetId() {
 		return getNextId(sequencerName);
 	} 
 			

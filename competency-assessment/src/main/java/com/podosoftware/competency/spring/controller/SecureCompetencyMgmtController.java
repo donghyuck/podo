@@ -164,18 +164,16 @@ public class SecureCompetencyMgmtController {
 					int firstColumnCount = row.getFirstCellNum();
 					log.debug("column[" + columnCount + "]:"+ firstColumnCount );
 					if( columnCount > 0){
-						/*
-						for( int c = 0; c < columnCount; c++ ){
-							Cell cell = row.getCell(c);			
-							log.debug( c + ":"+ cell.toString() + ",boolean=" + reader.isBooleanCell(cell) + ", numinuc=" + reader.isNumericCell(cell) + ", string=" + reader.isStringCell(cell));			 
-						}
-						*/
 						String l_code = getStringCellValue(reader, row.getCell(0));
 						String m_code = getStringCellValue(reader, row.getCell(2));
 						String s_code = getStringCellValue(reader, row.getCell(4));
+						String job_code = getStringCellValue(reader, row.getCell(6));
+						
 						String l_code_name = getStringCellValue(reader, row.getCell(1));
 						String m_code_name = getStringCellValue(reader, row.getCell(3));
-						String s_code_name = getStringCellValue(reader, row.getCell(5));					
+						String s_code_name = getStringCellValue(reader, row.getCell(5));				
+						String job_name = getStringCellValue(reader, row.getCell(7));				
+						
 						if(!codes.containsKey(l_code)){
 							codes.put(l_code, new CodeItem(l_code_name, l_code));			
 						}				
@@ -185,7 +183,12 @@ public class SecureCompetencyMgmtController {
 						}				
 						CodeItem m_item = l_item.getItems().get(m_code);
 						if( !m_item.getItems().containsKey(s_code)){
-							m_item.getItems().put(s_code, new CodeItem(s_code_name, s_code));					
+							m_item.getItems().put(s_code, new CodeItem(s_code_name, s_code));
+						}
+						
+						CodeItem s_item = m_item.getItems().get(s_code);
+						if( !s_item.getItems().containsKey(job_code)){
+							s_item.getItems().put(job_code, new CodeItem(job_code, job_name));
 						}
 					}
 				}
@@ -193,33 +196,6 @@ public class SecureCompetencyMgmtController {
 		}		
 		CodeSet codeset = codeSetManager.getCodeSet(codeSetId);
 		codeSetManager.batchUpdate(codeset, new ArrayList<CodeItem>(codes.values()));
-		
-		/*
-		List<CodeSet> list = new ArrayList<CodeSet>();
-		for(CodeItem item : codes.values())
-		{
-			DefaultCodeSet newCodeSet = new DefaultCodeSet();
-			newCodeSet.setObjectType(codeset.getObjectType());
-			newCodeSet.setObjectId(codeset.getObjectId());
-			newCodeSet.setParentCodeSetId(codeset.getCodeSetId());
-			newCodeSet.setCode(item.getCode());
-			newCodeSet.setName(item.getName());		
-			list.add(newCodeSet);
-		}
-		codeSetManager.saveOrUpdate(list);		
-		List<CodeSet> list2 = new ArrayList<CodeSet>();
-		for(CodeItem item : codes.values()){			
-			for(CodeItem item2 : item.getItems().values() ){
-				DefaultCodeSet newCodeSet = new DefaultCodeSet();
-				newCodeSet.setObjectType(codeset.getObjectType());
-				newCodeSet.setObjectId(codeset.getObjectId());
-				newCodeSet.setParentCodeSetId(item.getCodeSetId());
-				newCodeSet.setCode(item.getCode());
-				newCodeSet.setName(item.getName());		
-				list2.add(newCodeSet);	
-			}
-		}
-		*/		
 		return codes;
 	}
 	
