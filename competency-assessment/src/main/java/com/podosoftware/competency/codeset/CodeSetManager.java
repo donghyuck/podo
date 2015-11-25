@@ -18,10 +18,17 @@ public interface CodeSetManager {
 	
 	public List<CodeSet> getCodeSets(CodeSet codeset);
 		
+	public List<CodeSet> getRecrusiveCodesets(CodeSet codeset);
+	
 	public int getCodeSetCount(Company company);
 	
+	
+	
 	public int getCodeSetCount(CodeSet codeset);
-		
+	
+	public int getRecrusiveCodeSetCount(CodeSet codeset);
+	
+	
 	public CodeSet getCodeSet(long codeSetId) throws CodeSetNotFoundException;
 	
 	/**

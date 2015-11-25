@@ -34,6 +34,14 @@ public class DefaultCodeSetManager implements CodeSetManager {
 	private Cache treeWalkerCache;
 		
 	
+	public JobDao getJobDao() {
+		return jobDao;
+	}
+
+	public void setJobDao(JobDao jobDao) {
+		this.jobDao = jobDao;
+	}
+
 	public Cache getTreeWalkerCache() {
 		return treeWalkerCache;
 	}
@@ -63,7 +71,17 @@ public class DefaultCodeSetManager implements CodeSetManager {
 
 
 	public List<CodeSet> getCodeSets(CodeSet codeset) {
-		return null;
+		List<Long> codesetIds =  codeSetDao.getCodeSetIds(codeset.getObjectType(), codeset.getObjectId(), codeset);
+		List<CodeSet> codesets = new ArrayList<CodeSet>(codesetIds.size());		
+		for(long codesetId:codesetIds){
+			CodeSet item;
+			try {
+				item = getCodeSet(codesetId);
+				codesets.add(item);
+			} catch (CodeSetNotFoundException e) {				
+			}			
+		}		
+		return codesets;
 	}
 
 
@@ -89,8 +107,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 
 	@Override
 	public int getCodeSetCount(CodeSet codeset) {
-		// TODO Auto-generated method stub
-		return 0;
+		return codeSetDao.getCodeSetCount(codeset.getObjectType(), codeset.getObjectId(), codeset);
 	}
 
 
@@ -246,12 +263,11 @@ public class DefaultCodeSetManager implements CodeSetManager {
 					list.add(newCodeSet3);					
 					for( CodeItem item4 : item3.getItems().values()){						
 						Job job = new DefaultJob();
+						job.setJobId(jobDao.nextJobId());
 						job.setObjectType(codeSet.getObjectType());
 						job.setObjectId(codeSet.getObjectId());
 						job.setClassification(new DefaultClassification(newCodeSet.getCodeSetId(), newCodeSet2.getCodeSetId(), newCodeSet3.getCodeSetId() ));
 						job.setName(item4.getName());
-						job.getProperties().put("code", item4.getCode());
-						
 						jobs.add(job);
 					}
 				}
@@ -272,6 +288,18 @@ public class DefaultCodeSetManager implements CodeSetManager {
 	 private static String getTreeWalkerCacheKey( int objectType, long objectId) {
 		 return LockUtils.intern((new StringBuilder("codesetTreeWalker-")).append(objectType).append("-").append(objectId).toString());
 	 }
+
+	@Override
+	public List<CodeSet> getRecrusiveCodesets(CodeSet codeset) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getRecrusiveCodeSetCount(CodeSet codeset) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	 
 }
