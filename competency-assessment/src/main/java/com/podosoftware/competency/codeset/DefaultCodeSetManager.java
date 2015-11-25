@@ -204,7 +204,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 				}
 			}
 		}
-		codeSetDao.saveOrUpdateCodeSet(list);
+		codeSetDao.batchInsertCodeSet(list);
 	}
 
 }

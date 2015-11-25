@@ -9,6 +9,8 @@ public interface CodeSetDao {
 	
 	public Long newCodeSetId();
 	
+	public void batchInsertCodeSet(List<CodeSet> codesets);
+	
 	public void saveOrUpdateCodeSet(List<CodeSet> codesets);
 	
 	public void saveOrUpdateCodeSet(CodeSet codeset);

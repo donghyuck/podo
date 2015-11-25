@@ -61,8 +61,7 @@
 		CODESET_ID ASC	
 	]]></sql-query>	
 	
-	
-		
+			
 	<sql-query name="SELECT_ROOT_CODESET" description="SELECT_ROOT_CODESET"><![CDATA[
 	SELECT CODESET_ID, CREATION_DATE FROM CA_CODESET 
 	WHERE 

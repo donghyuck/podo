@@ -56,38 +56,9 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 	
 	private String sequencerName = "CODESET";	
 	private String codesetValueSequencerName = "CODESET_VALUE";
-
-	public void saveOrUpdateCodeSet(List<CodeSet> codesets){		
-		final List<CodeSet> updates = new ArrayList<CodeSet>();		
-		final List<CodeSet> inserts = new ArrayList<CodeSet>();		
-		for(CodeSet codeSet : codesets)
-		{
-			if(codeSet.getCodeSetId() < 1 ){
-				long codeSetId = getNextId(sequencerName);
-				codeSet.setCodeSetId(codeSetId);	
-				inserts.add(codeSet);
-			}else{
-				updates.add(codeSet);
-			}
-		}				
-		if(updates.size() > 0){
-			getExtendedJdbcTemplate().batchUpdate(				
-				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_CODESET").getSql(), 
-				new BatchPreparedStatementSetter() {					
-					public void setValues(PreparedStatement ps, int i) throws SQLException {
-						CodeSet c = updates.get(i);		
-						ps.setLong(1, c.getParentCodeSetId());
-						ps.setString(2, c.getName());
-						ps.setString(3, c.getCode());
-						ps.setString(4, c.getDescription());
-						ps.setDate(5, new java.sql.Date(c.getModifiedDate().getTime()));
-						ps.setLong(6, c.getCodeSetId());
-					}					
-					public int getBatchSize() {
-						return updates.size();
-					}
-				});		
-		}		
+	
+	public void batchInsertCodeSet(List<CodeSet> codesets){
+		final List<CodeSet> inserts = codesets;		
 		if(inserts.size() > 0){
 			getExtendedJdbcTemplate().batchUpdate(				
 				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_CODESET").getSql(), 
@@ -108,7 +79,46 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 						return inserts.size();
 					}
 				});		
-		}
+		}	
+	}
+
+	public void batchUpdateCodeSet(List<CodeSet> codesets){
+		final List<CodeSet> updates = codesets;		
+		if(updates.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_CODESET").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						CodeSet c = updates.get(i);		
+						ps.setLong(1, c.getParentCodeSetId());
+						ps.setString(2, c.getName());
+						ps.setString(3, c.getCode());
+						ps.setString(4, c.getDescription());
+						ps.setDate(5, new java.sql.Date(c.getModifiedDate().getTime()));
+						ps.setLong(6, c.getCodeSetId());
+					}					
+					public int getBatchSize() {
+						return updates.size();
+					}
+				});		
+		}	
+	}
+	
+	public void saveOrUpdateCodeSet(List<CodeSet> codesets){		
+		List<CodeSet> updates = new ArrayList<CodeSet>();		
+		List<CodeSet> inserts = new ArrayList<CodeSet>();		
+		for(CodeSet codeSet : codesets)
+		{
+			if(codeSet.getCodeSetId() < 1 ){
+				long codeSetId = getNextId(sequencerName);
+				codeSet.setCodeSetId(codeSetId);	
+				inserts.add(codeSet);
+			}else{
+				updates.add(codeSet);
+			}
+		}		
+		batchUpdateCodeSet(updates);
+		batchInsertCodeSet(inserts);
 	}
 	
 
@@ -152,8 +162,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 	CREATION_DATE
 	MODIFIED_DATE
 	*/
-	public CodeSetTreeWalker getCodeSetTreeWalker(int objectType, long objectId){
-		
+	public CodeSetTreeWalker getCodeSetTreeWalker(int objectType, long objectId){		
 		int numCodeSets = getExtendedJdbcTemplate().queryForObject(
 				getBoundSql("COMPETENCY_ACCESSMENT.COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
 				Integer.class,
@@ -191,6 +200,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 		for( long id : tree.getRecursiveChildren(-1L) ){
 			sb.append(id).append(", ");
 		}
+		
 		log.debug( sb.toString());
 		
 		return new DefaultCodeSetTreeWalker(objectType, objectId, tree);		
