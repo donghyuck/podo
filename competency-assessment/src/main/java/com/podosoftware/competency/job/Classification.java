@@ -1,5 +1,7 @@
 package com.podosoftware.competency.job;
 
+import java.util.Map;
+
 import architecture.common.cache.Cacheable;
 
 public interface Classification  extends Cacheable{
@@ -24,13 +26,14 @@ public interface Classification  extends Cacheable{
 	public String getClassifiedMiddleName();
 	
 	public String getClassifiedMinorityName();
-	
-
-	
+		
 	public void setClassifiedMajorityName(String classifiedMajorityName);
 	
 	public void setClassifiedMiddleName(String classifiedMiddleName);
 	
 	public void setClassifiedMinorityName(String classifiedMinorityName);
+	
+	
+	public abstract Map<String, Long> toMap();
 	
 }

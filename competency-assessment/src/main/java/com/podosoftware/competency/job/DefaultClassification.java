@@ -1,5 +1,8 @@
 package com.podosoftware.competency.job;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import architecture.common.cache.CacheSizes;
@@ -79,6 +82,15 @@ public class DefaultClassification implements Classification {
 
 	public void setClassifiedMinorityName(String classifiedMinorityName) {
 		this.classifiedMinorityName = classifiedMinorityName;
+	}
+	
+	@JsonIgnore
+	public Map<String, Long> toMap(){
+		Map<String, Long> additionalParameters = new HashMap<String, Long>(4);
+		additionalParameters.put("majorityId", this.classifiedMajorityId);
+		additionalParameters.put("middleId", this.classifiedMiddleId);
+		additionalParameters.put("minorityId", this.classifiedMinorityId);
+		return additionalParameters;
 	}
 
 	@JsonIgnore

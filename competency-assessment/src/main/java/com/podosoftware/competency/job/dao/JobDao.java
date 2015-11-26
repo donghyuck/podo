@@ -2,6 +2,7 @@ package com.podosoftware.competency.job.dao;
 
 import java.util.List;
 
+import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
 
 import architecture.common.user.Company;
@@ -23,4 +24,12 @@ public interface JobDao {
 	public abstract List<Long> getJobIds(Company company);
 	
 	public abstract List<Long> getJobIds(Company company, int startIndex, int numResults);
+	
+	
+	public abstract int getJobCount(Company company, Classification classify);
+	
+	public abstract List<Long> getJobIds(Company company, Classification classify);
+	
+	public abstract List<Long> getJobIds(Company company, Classification classify, int startIndex, int numResults);
+	
 }

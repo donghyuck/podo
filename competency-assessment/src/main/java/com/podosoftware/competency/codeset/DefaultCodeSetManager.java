@@ -71,7 +71,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 
 
 	public List<CodeSet> getCodeSets(CodeSet codeset) {
-		List<Long> codesetIds =  codeSetDao.getCodeSetIds(codeset.getObjectType(), codeset.getObjectId(), codeset);
+		List<Long> codesetIds =  codeSetDao.getCodeSetIds(codeset.getObjectType(), codeset.getObjectId(), codeset.getCodeSetId());
 		List<CodeSet> codesets = new ArrayList<CodeSet>(codesetIds.size());		
 		for(long codesetId:codesetIds){
 			CodeSet item;
@@ -107,7 +107,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 
 	@Override
 	public int getCodeSetCount(CodeSet codeset) {
-		return codeSetDao.getCodeSetCount(codeset.getObjectType(), codeset.getObjectId(), codeset);
+		return codeSetDao.getCodeSetCount(codeset.getObjectType(), codeset.getObjectId(), codeset.getCodeSetId());
 	}
 
 

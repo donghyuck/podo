@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -230,5 +231,31 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 					}
 				});		
 		}			
+	}
+
+	public int getJobCount(Company company, Classification classify) {
+		return getExtendedJdbcTemplate().queryForObject( 
+			getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(),
+			Integer.class,
+			new SqlParameterValue( Types.NUMERIC, 1),
+			new SqlParameterValue( Types.NUMERIC, company.getCompanyId() )
+		);
+	}
+
+	public List<Long> getJobIds(Company company, Classification classify) {
+		return getExtendedJdbcTemplate().queryForList(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, 1),
+				new SqlParameterValue( Types.NUMERIC, company.getCompanyId())				
+		);
+	}
+
+	public List<Long> getJobIds(Company company, Classification classify, int startIndex, int numResults) {
+		return getExtendedJdbcTemplate().queryScrollable(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
+				startIndex, 
+				numResults, 
+				new Object[]{ 1, company.getCompanyId()}, 
+				new int[] {Types.NUMERIC, Types.NUMERIC}, 
+				Long.class);
 	}
 }

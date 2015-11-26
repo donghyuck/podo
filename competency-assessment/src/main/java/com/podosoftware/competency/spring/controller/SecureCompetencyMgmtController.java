@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetManager.CodeItem;
+import com.podosoftware.competency.codeset.CodeSetNotFoundException;
 import com.podosoftware.competency.codeset.DefaultCodeSet;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyAlreadyExistsException;
@@ -37,6 +38,12 @@ import com.podosoftware.competency.competency.DefaultCompetency;
 import com.podosoftware.competency.competency.DefaultEssentialElement;
 import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.competency.EssentialElementNotFoundException;
+import com.podosoftware.competency.job.Classification;
+import com.podosoftware.competency.job.DefaultClassification;
+import com.podosoftware.competency.job.DefaultJob;
+import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobManager;
+import com.podosoftware.competency.job.JobNotFoundException;
 
 import architecture.common.user.Company;
 import architecture.common.user.CompanyManager;
@@ -66,6 +73,20 @@ public class SecureCompetencyMgmtController {
 	private CompetencyManager competencyManager;
 
 	
+	@Inject
+	@Qualifier("jobManager")
+	private JobManager jobManager;
+	
+	
+	
+	public JobManager getJobManager() {
+		return jobManager;
+	}
+
+	public void setJobManager(JobManager jobManager) {
+		this.jobManager = jobManager;
+	}
+
 	public CodeSetManager getCodeSetManager() {
 		return codeSetManager;
 	}
@@ -90,15 +111,27 @@ public class SecureCompetencyMgmtController {
 		this.competencyManager = competencyManager;
 	}
 	
-	
-	
+
 	@RequestMapping(value="/mgmt/competency/codeset/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
-	public List<CodeSet> listCodeSet(@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId ){		
+	public List<CodeSet> listCodeSet(
+		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="codeSetId", defaultValue="0", required=false ) Integer codeSetId
+			){		
+		
 		User user = SecurityHelper.getUser();		
+		if( codeSetId > 0 ){
+			try {
+				CodeSet codeset = codeSetManager.getCodeSet(codeSetId);
+				return codeSetManager.getCodeSets(codeset);
+			} catch (CodeSetNotFoundException e) {
+			}
+		}
+		
 		if( companyId > 0 ){
 			return codeSetManager.getCodeSets(new CompanyTemplate(companyId));
-		}		
+		}	
+		
 		return Collections.EMPTY_LIST;
 	}
 	
@@ -113,9 +146,6 @@ public class SecureCompetencyMgmtController {
 		return codeset;
 	}
 	
-	
-
-
 	private String getStringCellValue(ExcelReader reader, Cell cell){
 		if( reader.isStringCell(cell))
 			return reader.getStringCellValue(cell);
@@ -126,7 +156,6 @@ public class SecureCompetencyMgmtController {
 		else 
 			return cell.toString();		
 	}
-	
 	
 	@RequestMapping(value="/mgmt/competency/codeset/import.json", method=RequestMethod.POST)
 	@ResponseBody
@@ -188,7 +217,7 @@ public class SecureCompetencyMgmtController {
 						
 						CodeItem s_item = m_item.getItems().get(s_code);
 						if( !s_item.getItems().containsKey(job_code)){
-							s_item.getItems().put(job_code, new CodeItem(job_code, job_name));
+							s_item.getItems().put(job_code, new CodeItem(job_name, job_code ));
 						}
 					}
 				}
@@ -198,6 +227,8 @@ public class SecureCompetencyMgmtController {
 		codeSetManager.batchUpdate(codeset, new ArrayList<CodeItem>(codes.values()));
 		return codes;
 	}
+
+	
 	
 	@RequestMapping(value="/mgmt/competency/list.json", method=RequestMethod.POST)
 	@ResponseBody
@@ -258,6 +289,66 @@ public class SecureCompetencyMgmtController {
 		return competencyToUse;
 	}
 	
+	
+	@RequestMapping(value="/mgmt/competency/job/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public ItemList listJob(
+		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
+		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
+		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,					
+		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
+		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize,		
+		NativeWebRequest request
+	){			
+		User user = SecurityHelper.getUser();
+		Company company = user.getCompany();
+		if( companyId > 0){
+			try {
+				company = companyManager.getCompany(companyId);
+			} catch (CompanyNotFoundException e) {
+			}
+		}		
+		
+		List<Job> items = Collections.EMPTY_LIST;
+		int totalCount = 0 ;
+		
+		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
+		if( classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
+		{
+			totalCount = jobManager.getJobCount(company, classify);
+			if( totalCount > 0 ){
+				if( pageSize > 0){
+					items = jobManager.getJobs(company, classify, startIndex, pageSize);
+				}else{
+					items = jobManager.getJobs(company, classify);
+				}
+			}	
+			
+		} else {
+			totalCount = jobManager.getJobCount(company);
+			if( totalCount > 0 ){
+				if( pageSize > 0){
+					items = jobManager.getJobs(company, startIndex, pageSize);
+				}else{
+					items = jobManager.getJobs(company);
+				}
+			}		
+		}
+		ItemList list = new ItemList(items, totalCount);		
+		return list;
+	}	
+	
+	@RequestMapping(value="/mgmt/competency/job/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public Job updateJob(
+			@RequestBody DefaultJob job
+			) throws JobNotFoundException{
+		Job elementToUse = job;
+		jobManager.saveOrUpdate(elementToUse);
+		return elementToUse;
+	}
+	
 	@RequestMapping(value="/mgmt/competency/element/list.json", method=RequestMethod.POST)
 	@ResponseBody
 	public List<EssentialElement> getEssentialElements(
@@ -277,6 +368,5 @@ public class SecureCompetencyMgmtController {
 		competencyManager.saveOrUpdate(elementToUse);		
 		return elementToUse;
 	}
-
 	
 }

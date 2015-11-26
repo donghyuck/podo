@@ -161,4 +161,43 @@ public class DefaultJobManager implements JobManager {
 		}
 		jobDao.batchInsertJob(jobs);
 	}
+
+
+
+	@Override
+	public int getJobCount(Company company, Classification classify) {
+		return jobDao.getJobCount(company, classify);
+	}
+
+
+
+	@Override
+	public List<Job> getJobs(Company company, Classification classify) {
+		List<Long> ids = jobDao.getJobIds(company, classify);
+		ArrayList<Job> list = new ArrayList<Job>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJob(id));
+			} catch (JobNotFoundException e) {
+				
+			}			
+		}		
+		return list;
+	}
+
+
+
+	@Override
+	public List<Job> getJobs(Company company, Classification classify, int startIndex, int numResults) {
+		List<Long> ids = jobDao.getJobIds(company, classify, startIndex, numResults);
+		ArrayList<Job> list = new ArrayList<Job>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJob(id));
+			} catch (JobNotFoundException e) {
+				
+			}			
+		}		
+		return list;
+	}
 }

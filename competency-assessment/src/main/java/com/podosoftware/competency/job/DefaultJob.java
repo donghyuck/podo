@@ -28,7 +28,7 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 
 	private Date modifiedDate;
 
-	private Classification Classfication;
+	private Classification classification;
 
 	public DefaultJob() {
 		this.jobId = -1L;
@@ -100,11 +100,11 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 	}
 
 	public Classification getClassification() {
-		return Classfication;
+		return classification;
 	}
 
 	public void setClassification(Classification classfication) {
-		Classfication = classfication;
+		classification = classfication;
 	}
 
 	@JsonIgnore

@@ -246,22 +246,22 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 	}
 
 	@Override
-	public int getCodeSetCount(int objectType, long objectId, CodeSet codeSet) {
+	public int getCodeSetCount(int objectType, long objectId, Long codeSetId) {
 		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CODESET_ID").getSql(), 
 				Integer.class,
 				new SqlParameterValue(Types.NUMERIC, objectType ),
 				new SqlParameterValue(Types.NUMERIC, objectId ),
-				new SqlParameterValue(Types.NUMERIC, codeSet.getCodeSetId() ));
+				new SqlParameterValue(Types.NUMERIC, codeSetId ));
 	}
 
 	@Override
-	public List<Long> getCodeSetIds(int objectType, long objectId, CodeSet codeSet) {
+	public List<Long> getCodeSetIds(int objectType, long objectId, Long codeSetId) {
 		return getExtendedJdbcTemplate().queryForList(
 				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CODESET_ID").getSql(), 
 				Long.class,
 				new SqlParameterValue(Types.NUMERIC, objectType ),
 				new SqlParameterValue(Types.NUMERIC, objectId ),
-				new SqlParameterValue(Types.NUMERIC, codeSet.getCodeSetId() ));
+				new SqlParameterValue(Types.NUMERIC, codeSetId ));
 	}
 
 	

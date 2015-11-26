@@ -21,9 +21,7 @@ public interface CodeSetManager {
 	public List<CodeSet> getRecrusiveCodesets(CodeSet codeset);
 	
 	public int getCodeSetCount(Company company);
-	
-	
-	
+		
 	public int getCodeSetCount(CodeSet codeset);
 	
 	public int getRecrusiveCodeSetCount(CodeSet codeset);
