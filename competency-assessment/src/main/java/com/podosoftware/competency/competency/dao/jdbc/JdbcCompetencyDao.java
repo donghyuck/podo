@@ -1,5 +1,6 @@
 package com.podosoftware.competency.competency.dao.jdbc;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
 
@@ -33,6 +35,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 			dc.setName(rs.getString("NAME")); 
 			dc.setDescription( rs.getString("DESCRIPTION")); 		
 			dc.setLevel(rs.getInt("COMPETENCY_LEVEL"));
+			dc.setCompetencyUnitCode(rs.getString("COMPETENCY_UNIT_CODE"));
 			return dc;
 		}		
 	};	
@@ -154,6 +157,9 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		extendedPropertyDao.updateProperties(essentialElementPropertyTableName, essentialElementPropertyPrimaryColumnName, essentialElementId, props);
 	}
 
+	public Long nextCompetencyId() {
+		return getNextId(sequencerName);
+	}
 	
 	public Competency createCompetency(Competency competency) {
 		Long competencyId = getNextId(sequencerName);
@@ -165,7 +171,8 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					new SqlParameterValue( Types.NUMERIC, competency.getObjectId() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getName() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getDescription() ),
-					new SqlParameterValue( Types.VARCHAR, competency.getLevel())
+					new SqlParameterValue( Types.VARCHAR, competency.getLevel()),
+					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyUnitCode())
 			);
 			
 			if(competency.getProperties().size() > 0)
@@ -184,6 +191,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					new SqlParameterValue( Types.VARCHAR, competency.getName() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getDescription() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getLevel()),
+					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyUnitCode()),
 					new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId() )
 			);
 			setCompetencyProperties(competency.getCompetencyId(), competency.getProperties());
@@ -303,6 +311,31 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 				Long.class,
 				new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId() )				
 		);
+	}
+
+
+	@Override
+	public void batchInsertCompetency(List<Competency> competencies) {
+		final List<Competency> inserts = competencies;
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.CREATE_COMPETENCY").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {						
+						Competency competency = inserts.get(i);		
+						ps.setLong(1, competency.getCompetencyId());
+						ps.setInt(2, competency.getObjectType());
+						ps.setLong(3, competency.getObjectId());
+						ps.setString(4, competency.getName());
+						ps.setString(5, competency.getDescription());
+						ps.setInt(6, competency.getLevel());	
+						ps.setString(7,  competency.getCompetencyUnitCode());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}
 	}
 	
 }

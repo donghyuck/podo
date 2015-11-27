@@ -25,7 +25,6 @@ public interface CodeSetDao {
 	
 	public List<Long> getCodeSetIds(int objectType, long objectId, Long codeSetId);
 	
-	
 	public CodeSetTreeWalker getCodeSetTreeWalker(int objectType, long objectId);
 	
 }

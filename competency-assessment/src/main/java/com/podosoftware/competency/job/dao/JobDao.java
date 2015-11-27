@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobCompetencyRelationship;
 
 import architecture.common.user.Company;
 
@@ -12,6 +13,8 @@ public interface JobDao {
 	public Long nextJobId();
 	
 	public void batchInsertJob(List<Job> jobs);
+	
+	public void batchInsertJobCompetencyRelationship(List<JobCompetencyRelationship> relationships);
 	
 	public abstract void saveOrUpdateJob(Job job);
 	

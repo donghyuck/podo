@@ -16,6 +16,7 @@ import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.DefaultJob;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobCompetencyRelationship;
 import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
@@ -204,6 +205,34 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 				new int[] {Types.NUMERIC, Types.NUMERIC}, 
 				Long.class);
 	}
+
+	public int getJobCount(Company company, Classification classify) {
+		return getExtendedJdbcTemplate().queryForObject( 
+			getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(),
+			Integer.class,
+			new SqlParameterValue( Types.NUMERIC, 1),
+			new SqlParameterValue( Types.NUMERIC, company.getCompanyId() )
+		);
+	}
+
+	public List<Long> getJobIds(Company company, Classification classify) {
+		return getExtendedJdbcTemplate().queryForList(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, 1),
+				new SqlParameterValue( Types.NUMERIC, company.getCompanyId())				
+		);
+	}
+
+	public List<Long> getJobIds(Company company, Classification classify, int startIndex, int numResults) {
+		return getExtendedJdbcTemplate().queryScrollable(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
+				startIndex, 
+				numResults, 
+				new Object[]{ 1, company.getCompanyId()}, 
+				new int[] {Types.NUMERIC, Types.NUMERIC}, 
+				Long.class);
+	}
+
+	
 	
 	
 	public void batchInsertJob(List<Job> jobs) {
@@ -233,29 +262,25 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 		}			
 	}
 
-	public int getJobCount(Company company, Classification classify) {
-		return getExtendedJdbcTemplate().queryForObject( 
-			getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(),
-			Integer.class,
-			new SqlParameterValue( Types.NUMERIC, 1),
-			new SqlParameterValue( Types.NUMERIC, company.getCompanyId() )
-		);
-	}
-
-	public List<Long> getJobIds(Company company, Classification classify) {
-		return getExtendedJdbcTemplate().queryForList(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
-				Long.class,
-				new SqlParameterValue( Types.NUMERIC, 1),
-				new SqlParameterValue( Types.NUMERIC, company.getCompanyId())				
-		);
-	}
-
-	public List<Long> getJobIds(Company company, Classification classify, int startIndex, int numResults) {
-		return getExtendedJdbcTemplate().queryScrollable(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
-				startIndex, 
-				numResults, 
-				new Object[]{ 1, company.getCompanyId()}, 
-				new int[] {Types.NUMERIC, Types.NUMERIC}, 
-				Long.class);
+	
+	
+	public void batchInsertJobCompetencyRelationship(List<JobCompetencyRelationship> relationships) {
+		final List<JobCompetencyRelationship> inserts = relationships;
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_JOB_COMPETENCY_RELATIONSHIP").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobCompetencyRelationship relationship = inserts.get(i);		
+						ps.setInt(1, relationship.getObjectType() );
+						ps.setLong(2, relationship.getObjectId());
+						ps.setLong(3, relationship.getJobId() );
+						ps.setLong(4, relationship.getCompetencyId());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}	
 	}
 }

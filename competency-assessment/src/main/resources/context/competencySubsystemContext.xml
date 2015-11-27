@@ -27,18 +27,39 @@
 	<!--  CodeSetManager  			  	 -->
 	<!--  =============================  -->			
 	<bean id="codeSetDao" class="com.podosoftware.competency.codeset.dao.jdbc.JdbcCodeSetDao" parent="jdbcDaoSupport" />	
+	
 	<bean id="codeSetCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeSetCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	<bean id="codeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="codeSetTreeWalkerCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeSetTreeWalkerCache"  p:maxElementsInMemory="1000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	
 	
 	<bean id="codeSetManager"
 		class="com.podosoftware.competency.codeset.DefaultCodeSetManager"
 		depends-on="codeSetDao" 
 		p:codeSetCache-ref="codeSetCache"
+		p:treeWalkerCache-ref="codeSetTreeWalkerCache"
 		p:userManager-ref="userManager"
 		p:companyManager-ref="companyManager"
 		p:codeSetDao-ref="codeSetDao"
+		p:jobDao-ref="jobDao"
+		/>	
+
+	<!--  =============================  -->
+	<!--  JobManager			  	 	 -->
+	<!--  =============================  -->	
+	<bean id="jobDao" class="com.podosoftware.competency.job.dao.jdbc.JdbcJobDao" parent="jdbcDaoSupport" depends-on="extendedPropertyDao" p:extendedPropertyDao-ref="extendedPropertyDao" />	
+	
+	<bean id="jobCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="jobCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	
+	<bean id="jobManager"
+		class="com.podosoftware.competency.job.DefaultJobManager"
+		depends-on="jobDao" 
+		p:jobCache-ref="jobCache"
+		p:jobDao-ref="jobDao"
+		p:codeSetManager-ref="codeSetManager"
 		/>	
 		
+					
 	<!--  =============================  -->
 	<!--  CompetencyManager			  	 -->
 	<!--  =============================  -->		

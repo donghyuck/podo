@@ -193,6 +193,7 @@ public class SecureCompetencyMgmtController {
 					int firstColumnCount = row.getFirstCellNum();
 					log.debug("column[" + columnCount + "]:"+ firstColumnCount );
 					if( columnCount > 0){
+						
 						String l_code = getStringCellValue(reader, row.getCell(0));
 						String m_code = getStringCellValue(reader, row.getCell(2));
 						String s_code = getStringCellValue(reader, row.getCell(4));
@@ -202,6 +203,10 @@ public class SecureCompetencyMgmtController {
 						String m_code_name = getStringCellValue(reader, row.getCell(3));
 						String s_code_name = getStringCellValue(reader, row.getCell(5));				
 						String job_name = getStringCellValue(reader, row.getCell(7));				
+						
+						String competencyUnitCode = getStringCellValue(reader, row.getCell(8));	
+						String competencyUnitTitle = getStringCellValue(reader, row.getCell(9));	
+						String competencyLevel = getStringCellValue(reader, row.getCell(10));
 						
 						if(!codes.containsKey(l_code)){
 							codes.put(l_code, new CodeItem(l_code_name, l_code));			
@@ -217,7 +222,12 @@ public class SecureCompetencyMgmtController {
 						
 						CodeItem s_item = m_item.getItems().get(s_code);
 						if( !s_item.getItems().containsKey(job_code)){
-							s_item.getItems().put(job_code, new CodeItem(job_name, job_code ));
+							s_item.getItems().put(job_code, new CodeItem("job", job_name, job_code ));
+						}		
+						
+						CodeItem job_item = m_item.getItems().get(job_code);
+						if( !job_item.getItems().containsKey(competencyUnitCode)){						
+							job_item.getItems().put(competencyUnitCode, new CodeItem("competency", competencyUnitTitle, competencyUnitCode, competencyLevel ));
 						}
 					}
 				}

@@ -33,5 +33,9 @@ public interface CompetencyDao {
 	public abstract EssentialElement getEssentialElementById(long essentialElementId);
 		
 	public abstract List<Long> getEssentialElementIds(Competency competency);
+		
+	public abstract Long nextCompetencyId();
+	
+	public abstract void batchInsertCompetency(List<Competency> competencies);
 	
 }

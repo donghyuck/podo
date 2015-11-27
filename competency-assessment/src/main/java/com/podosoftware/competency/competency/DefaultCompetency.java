@@ -21,6 +21,8 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	
 	private Integer level;
 	
+	private String competencyUnitCode;
+	
 	public DefaultCompetency() {
 		this.objectType = 1;
 		this.objectId = -1L;
@@ -28,7 +30,21 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.name = null;
 		this.description = null;
 		this.level = 0 ;
+		this.competencyUnitCode = null;
 	}
+
+	
+
+	public String getCompetencyUnitCode() {
+		return competencyUnitCode;
+	}
+
+
+
+	public void setCompetencyUnitCode(String competencyUnitCode) {
+		this.competencyUnitCode = competencyUnitCode;
+	}
+
 
 
 	public Integer getLevel() {

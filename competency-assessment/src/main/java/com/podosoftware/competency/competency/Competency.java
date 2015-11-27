@@ -29,4 +29,8 @@ public interface Competency extends PropertyAware, Cacheable {
 
 	public void setLevel(Integer level) ;
 	
+	public abstract String getCompetencyUnitCode();
+	
+	public abstract void setCompetencyUnitCode(String competencyUnitCode);
+	
 }

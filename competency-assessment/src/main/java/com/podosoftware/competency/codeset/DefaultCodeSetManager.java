@@ -4,13 +4,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.podosoftware.competency.codeset.dao.CodeSetDao;
+import com.podosoftware.competency.competency.Competency;
+import com.podosoftware.competency.competency.DefaultCompetency;
+import com.podosoftware.competency.competency.dao.CompetencyDao;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.DefaultJob;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobCompetencyRelationship;
 import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
@@ -22,11 +28,15 @@ import net.sf.ehcache.Element;
 
 public class DefaultCodeSetManager implements CodeSetManager {
 	
+	private Log log = LogFactory.getLog(getClass());
+	
 	public static final CodeSet ROOT_CODE_SET = new DefaultCodeSet();
 	
 	private CodeSetDao codeSetDao;
 	
 	private JobDao jobDao; 
+	
+	private CompetencyDao competencyDao; 
 	
 	private UserManager userManager;
 	private CompanyManager companyManager;
@@ -34,6 +44,14 @@ public class DefaultCodeSetManager implements CodeSetManager {
 	private Cache treeWalkerCache;
 		
 	
+	public CompetencyDao getCompetencyDao() {
+		return competencyDao;
+	}
+
+	public void setCompetencyDao(CompetencyDao competencyDao) {
+		this.competencyDao = competencyDao;
+	}
+
 	public JobDao getJobDao() {
 		return jobDao;
 	}
@@ -228,10 +246,35 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		this.codeSetDao.saveOrUpdateCodeSet(codesets);		
 	}
 
+
+	 private static String getTreeWalkerCacheKey( int objectType, long objectId) {
+		 return LockUtils.intern((new StringBuilder("codesetTreeWalker-")).append(objectType).append("-").append(objectId).toString());
+	 }
+
+	@Override
+	public List<CodeSet> getRecrusiveCodesets(CodeSet codeset) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getRecrusiveCodeSetCount(CodeSet codeset) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	
+	/**
+	 * 
+	 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void batchUpdate(CodeSet codeSet, List<CodeItem> items) {
 		List<CodeSet> list = new ArrayList<CodeSet>();
 		List<Job> jobs = new ArrayList<Job>();
+		List<Competency> competencies = new ArrayList<Competency>();
+		List<JobCompetencyRelationship> relationships = new ArrayList<JobCompetencyRelationship>();
+		
 		
 		for(CodeItem item : items)
 		{
@@ -261,14 +304,25 @@ public class DefaultCodeSetManager implements CodeSetManager {
 					newCodeSet3.setCode(item3.getCode());
 					newCodeSet3.setName(item3.getName());		
 					list.add(newCodeSet3);					
-					for( CodeItem item4 : item3.getItems().values()){						
+					for( CodeItem item4 : item3.getItems().values()){		
 						Job job = new DefaultJob();
 						job.setJobId(jobDao.nextJobId());
 						job.setObjectType(codeSet.getObjectType());
 						job.setObjectId(codeSet.getObjectId());
 						job.setClassification(new DefaultClassification(newCodeSet.getCodeSetId(), newCodeSet2.getCodeSetId(), newCodeSet3.getCodeSetId() ));
 						job.setName(item4.getName());
-						jobs.add(job);
+						jobs.add(job);						
+						for( CodeItem item5 : item4.getItems().values()){		
+							Competency competency = new DefaultCompetency();
+							competency.setCompetencyId(competencyDao.nextCompetencyId());
+							competency.setObjectId(job.getObjectId());
+							competency.setObjectType(job.getObjectType());
+							competency.setName(item5.getName());
+							competency.setLevel(Integer.parseInt(item5.getEtc1()));
+							competency.setCompetencyUnitCode(item5.getCode());						
+							competencies.add(competency);
+							relationships.add(new JobCompetencyRelationship(job.getObjectType(),job.getObjectId(),job.getJobId(), competency.getCompetencyId()) );
+						}
 					}
 				}
 			}
@@ -278,28 +332,22 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		synchronized(key){
 			treeWalkerCache.remove(key);
 		}		
+		
+		log.debug("batch processing codeset:" + list.size() );
 		codeSetDao.batchInsertCodeSet(list);
 		
-		if(jobDao != null)
+		if(jobDao != null){
+			
+			log.debug("batch processing jobs:" + jobs.size() );
 			jobDao.batchInsertJob(jobs);
+			
+			log.debug("batch processing compentecy:" + jobs.size() );
+			competencyDao.batchInsertCompetency(competencies);
+			
+			log.debug("batch processing job and competency relations:" + jobs.size() );
+			jobDao.batchInsertJobCompetencyRelationship(relationships);
+		}
+			
 		
 	}
-
-	 private static String getTreeWalkerCacheKey( int objectType, long objectId) {
-		 return LockUtils.intern((new StringBuilder("codesetTreeWalker-")).append(objectType).append("-").append(objectId).toString());
-	 }
-
-	@Override
-	public List<CodeSet> getRecrusiveCodesets(CodeSet codeset) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getRecrusiveCodeSetCount(CodeSet codeset) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	 
 }

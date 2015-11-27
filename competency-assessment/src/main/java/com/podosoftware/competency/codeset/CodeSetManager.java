@@ -54,20 +54,60 @@ public interface CodeSetManager {
 	
 	
 	public static class CodeItem {
+		
+		private String type;
+		
 		private String name;
+		
 		private String code;
+		
+		private String etc1 ;
+		
 		private Map<String, CodeItem> items;
+		
 		public CodeItem() {
+			this.type = "code";
 			this.name = null;
 			this.code = null;
 			items = new HashMap<String, CodeItem>();
 		}
 		
-		
 		public CodeItem(String name, String code) {
 			this.name = name;
 			this.code = code;
 			items = new HashMap<String, CodeItem>();
+		}
+		
+		public CodeItem(String type, String name, String code) {
+			this.type = type;
+			this.name = name;
+			this.code = code;
+			items = new HashMap<String, CodeItem>();
+		}
+
+		public CodeItem(String type, String name, String code, String etc) {
+			this.type = type;
+			this.name = name;
+			this.code = code;
+			this.etc1 = etc;
+			items = new HashMap<String, CodeItem>();
+		}
+
+		public String getEtc1() {
+			return etc1;
+		}
+
+		public void setEtc1(String etc1) {
+			this.etc1 = etc1;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+
+		public void setType(String type) {
+			this.type = type;
 		}
 
 
