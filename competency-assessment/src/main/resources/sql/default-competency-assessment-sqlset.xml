@@ -147,6 +147,15 @@
 	AND NAME = ?
 	]]></sql-query>	
 	
+	<sql-query name="SELECT_COMPETENCY_ID_WITH_COMPETENCY_UNIT_CODE" description="SELECT_COMPETENCY_ID_WITH_COMPETENCY_UNIT_CODE"><![CDATA[
+	SELECT 
+		COMPETENCY_ID,
+		COMPETENCY_UNIT_CODE	
+	FROM CA_COMPETENCY
+	WHERE OBJECT_TYPE = ? 
+	AND OBJECT_ID = ?
+	AND COMPETENCY_UNIT_CODE is not null
+	]]></sql-query>		
 	<sql-query name="DELETE_COMPETENCY" description="DELETE_COMPETENCY"><![CDATA[
 	DELETE CA_COMPETENCY WHERE COMPETENCY_ID = ?	
 	]]></sql-query>	
@@ -161,11 +170,13 @@
 	SELECT COMPETENCY_ID FROM CA_COMPETENCY
 	WHERE OBJECT_TYPE = ? 
 	AND OBJECT_ID = ?	
+	ORDER BY NAME ASC
 	]]></sql-query>	
 	
 	<sql-query name="SELECT_ESSENTIAL_ELEMENT_IDS_BY_COMPETENCY_ID" description="SELECT_ESSENTIAL_ELEMENT_IDS_BY_COMPETENCY_ID"><![CDATA[
 	SELECT ESSENTIAL_ELEMENT_ID FROM CA_ESSENTIAL_ELEMENT
 	WHERE COMPETENCY_ID = ?
+	ORDER BY NAME ASC
 	]]></sql-query>		
 
 	<sql-query name="SELECT_ESSENTIAL_ELEMENT_BY_ID" description="SELECT_ESSENTIAL_ELEMENT_BY_ID"><![CDATA[
@@ -223,6 +234,7 @@
 	SELECT JOB_ID FROM CA_JOB
 	WHERE OBJECT_TYPE = ? 
 	AND OBJECT_ID = ?	
+	ORDER BY NAME ASC
 	]]></sql-query>	
 	<sql-query name="COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID" description="COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID"><![CDATA[
 	SELECT COUNT(JOB_ID) FROM CA_JOB WHERE 
@@ -244,7 +256,9 @@
 	<#if (minorityId > 0) >
 	AND S_CLASSIFIED_ID = ${minorityId}
 	</#if>			
-	]]></dynamic></sql-query>	
+	]]></dynamic><![CDATA[
+	ORDER BY NAME ASC
+	]]></sql-query>	
 	
 	<sql-query name="COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY" description="COUNT_JOB_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY"><![CDATA[
 	SELECT COUNT(JOB_ID) FROM CA_JOB WHERE 
@@ -260,7 +274,9 @@
 	<#if (minorityId > 0) >
 	AND S_CLASSIFIED_ID = ${minorityId}
 	</#if>				
-	]]></dynamic></sql-query>		
+	]]></dynamic><![CDATA[
+	ORDER BY NAME ASC
+	]]></sql-query>		
 	
 	<sql-query name="SELECT_JOB_BY_ID" description="SELECT_JOB_BY_ID"><![CDATA[
 	SELECT 
@@ -278,6 +294,7 @@
  	WHERE JOB_ID = ?	
  	ORDER BY L_CLASSIFIED_ID DESC, M_CLASSIFIED_ID ASC, S_CLASSIFIED_ID ASC
 	]]></sql-query>	
+	
 	<sql-query name="UPDATE_JOB" description="UPDATE_JOB"><![CDATA[
 	UPDATE CA_JOB SET
 		L_CLASSIFIED_ID = ?,
@@ -298,7 +315,61 @@
 		COMPETENCY_ID
 	) VALUES (?,?,?,?)	
 	]]></sql-query>								
-										
+									
+	<sql-query name="SELECT_COMPETENCY_ID_BY_JOB_ID" description="SELECT_COMPETENCY_ID_BY_JOB_ID"><![CDATA[
+	SELECT COMPETENCY_ID FROM CA_JOB_COMPETENCY_REL
+	WHERE
+		JOB_ID = ?
+	ORDER BY COMPETENCY_ID ASC
+	]]></sql-query>					
+
+	<sql-query name="COUNT_COMPETENCY_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY" description="COUNT_COMPETENCY_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY"><![CDATA[
+	SELECT 
+		COUNT(T2.COMPETENCY_ID)
+	FROM 
+		CA_JOB T1, 
+		CA_JOB_COMPETENCY_REL T2 						
+	WHERE 
+		T1.OBJECT_TYPE = ?
+		AND T1.OBJECT_ID = ?			
+	]]><dynamic><![CDATA[
+	<#if (majorityId > 0) >
+	AND L_CLASSIFIED_ID = ${majorityId}
+	</#if>		
+	<#if (middleId > 0) >
+	AND M_CLASSIFIED_ID = ${middleId}
+	</#if>		
+	<#if (minorityId > 0) >
+	AND S_CLASSIFIED_ID = ${minorityId}
+	</#if>				
+	]]></dynamic><![CDATA[
+	AND T1.JOB_ID = T2.JOB_ID 
+	]]></sql-query>	
+	
+	<sql-query name="SELECT_COMPETENCY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY" description="SELECT_COMPETENCY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY"><![CDATA[
+	SELECT 
+		T2.COMPETENCY_ID 
+	FROM 
+		CA_JOB T1, 
+		CA_JOB_COMPETENCY_REL T2 						
+	WHERE 
+		T1.OBJECT_TYPE = ?
+		AND T1.OBJECT_ID = ?			
+	]]><dynamic><![CDATA[
+	<#if (majorityId > 0) >
+	AND L_CLASSIFIED_ID = ${majorityId}
+	</#if>		
+	<#if (middleId > 0) >
+	AND M_CLASSIFIED_ID = ${middleId}
+	</#if>		
+	<#if (minorityId > 0) >
+	AND S_CLASSIFIED_ID = ${minorityId}
+	</#if>				
+	]]></dynamic><![CDATA[
+	AND T1.JOB_ID = T2.JOB_ID 
+	]]></sql-query>	
+	
+	
 	<row-mapper>
 		
 	</row-mapper>	
