@@ -6,6 +6,7 @@ import java.util.Map;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.job.Classification;
+import com.podosoftware.competency.job.Job;
 
 import architecture.common.user.Company;
 
@@ -54,6 +55,32 @@ public interface CompetencyDao {
 	 * @return
 	 */
 	public abstract List<Long> getCompetencyIds(Company company, Classification classify, int startIndex, int numResults);
+	
+	
+	/**
+	 * 직업에 따른 역량 수 리턴. 
+	 * @param job
+	 * @return
+	 */
+	public abstract int getCompetencyCount(Job job);
+	
+	/**
+	 * 직업에 따른 역량 수 리턴. 
+	 * @param job
+	 * @return
+	 */
+	public abstract List<Long> getCompetencyIds(Job job);
+	
+	/**
+	 * 직업에 따른 역량 수 리턴. 
+	 * @param job
+	 * @param startIndex
+	 * @param numResults
+	 * @return
+	 */
+	public abstract List<Long> getCompetencyIds(Job job, int startIndex, int numResults);
+	
+	
 	
 	public abstract void createEssentialElement(EssentialElement essentialElement);
 	

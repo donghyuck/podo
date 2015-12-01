@@ -21,6 +21,7 @@ import com.podosoftware.competency.competency.DefaultEssentialElement;
 import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.competency.dao.CompetencyDao;
 import com.podosoftware.competency.job.Classification;
+import com.podosoftware.competency.job.Job;
 
 import architecture.common.user.Company;
 import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
@@ -417,6 +418,33 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 				numResults, 
 				new Object[]{ 1, company.getCompanyId()}, 
 				new int[] {Types.NUMERIC, Types.NUMERIC}, 
+				Long.class);
+	}
+
+ 
+	public int getCompetencyCount(Job job) {
+		return getExtendedJdbcTemplate().queryForObject( 
+				getBoundSql("COMPETENCY_ACCESSMENT.COUNT_COMPETENCY_BY_JOB_ID").getSql(),
+				Integer.class,
+				new SqlParameterValue( Types.NUMERIC, job.getJobId() )
+			);
+	}
+ 
+	public List<Long> getCompetencyIds(Job job) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_IDS_BY_JOB_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, job.getJobId())				
+		);
+	}
+ 
+	public List<Long> getCompetencyIds(Job job, int startIndex, int numResults) {
+		return getExtendedJdbcTemplate().queryScrollable(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_IDS_BY_JOB_ID").getSql(), 
+				startIndex, 
+				numResults, 
+				new Object[]{ job.getJobId() }, 
+				new int[] {Types.NUMERIC}, 
 				Long.class);
 	}
 	
