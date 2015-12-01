@@ -5,11 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
 
@@ -18,6 +20,7 @@ import com.podosoftware.competency.competency.DefaultCompetency;
 import com.podosoftware.competency.competency.DefaultEssentialElement;
 import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.competency.dao.CompetencyDao;
+import com.podosoftware.competency.job.Classification;
 
 import architecture.common.user.Company;
 import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
@@ -159,6 +162,10 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 
 	public Long nextCompetencyId() {
 		return getNextId(sequencerName);
+	}
+	
+	public Long nextEssentialElementId(){
+		return getNextId(essentialElementSequencerName);
 	}
 	
 	public Competency createCompetency(Competency competency) {
@@ -336,6 +343,81 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					}
 				});		
 		}
+	}
+
+
+	@Override
+	public Map<String, Long> getCompetencyIdsWithCompetencyUnitCode(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().query(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_ID_WITH_COMPETENCY_UNIT_CODE").getSql(), 				
+				new ResultSetExtractor<Map<String, Long>>(){
+					public Map<String, Long> extractData(ResultSet rs) throws SQLException, DataAccessException {
+						Map<String, Long> map = new HashMap<String, Long>();
+						while(rs.next()){
+							String key = rs.getString(2);
+							Long value = rs.getLong(1);
+							map.put(key, value);
+						}						
+						return map;
+					}}, 				
+				new SqlParameterValue( Types.NUMERIC, objectType),
+				new SqlParameterValue( Types.NUMERIC, objectId));
+	}
+
+
+	
+	
+	@Override
+	public void batchInsertEssentialElement(List<EssentialElement> elements) {
+		final List<EssentialElement> inserts = elements;
+		if(inserts.size() > 0){
+			for( EssentialElement item : inserts){
+				if(item.getEssentialElementId() <= 0 ){
+					item.setEssentialElementId(nextEssentialElementId());
+				}
+			}
+			
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.CREATE_ESSENTIAL_ELEMENT").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {						
+						EssentialElement element = inserts.get(i);		
+						ps.setLong(1, element.getCompetencyId());
+						ps.setLong(2, element.getEssentialElementId());
+						ps.setString(3, element.getName());
+						ps.setInt(4, element.getLevel());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+			});		
+		}
+	}
+
+	public int getCompetencyCount(Company company, Classification classify) {
+		return getExtendedJdbcTemplate().queryForObject( 
+				getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.COUNT_COMPETENCY_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(),
+				Integer.class,
+				new SqlParameterValue( Types.NUMERIC, 1),
+				new SqlParameterValue( Types.NUMERIC, company.getCompanyId() )
+			);
+	}
+
+
+	public List<Long> getCompetencyIds(Company company, Classification classify) {
+		return getExtendedJdbcTemplate().queryForList(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, 1),
+				new SqlParameterValue( Types.NUMERIC, company.getCompanyId())				
+		);
+	}
+
+	public List<Long> getCompetencyIds(Company company, Classification classify, int startIndex, int numResults) {
+		return getExtendedJdbcTemplate().queryScrollable(getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CLASSIFY", classify.toMap()).getSql(), 
+				startIndex, 
+				numResults, 
+				new Object[]{ 1, company.getCompanyId()}, 
+				new int[] {Types.NUMERIC, Types.NUMERIC}, 
+				Long.class);
 	}
 	
 }

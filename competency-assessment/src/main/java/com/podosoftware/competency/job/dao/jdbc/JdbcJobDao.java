@@ -283,4 +283,12 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 				});		
 		}	
 	}
+
+	@Override
+	public List<Long> getJobCompetencyIds(Job job) {
+		return getExtendedJdbcTemplate().queryForList(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_ID_BY_JOB_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, job.getJobId())		
+		);
+	}
 }

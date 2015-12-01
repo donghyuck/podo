@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetNotFoundException;
+import com.podosoftware.competency.competency.Competency;
+import com.podosoftware.competency.competency.CompetencyManager;
+import com.podosoftware.competency.competency.CompetencyNotFoundException;
 import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
@@ -23,12 +26,25 @@ public class DefaultJobManager implements JobManager {
 	
 	private CodeSetManager codeSetManager;
 	
-
+	private CompetencyManager competencyManager;
+	
 	public DefaultJobManager() {
 		
 	}
 	
 	
+
+	public CompetencyManager getCompetencyManager() {
+		return competencyManager;
+	}
+
+
+
+	public void setCompetencyManager(CompetencyManager competencyManager) {
+		this.competencyManager = competencyManager;
+	}
+
+
 
 	public CodeSetManager getCodeSetManager() {
 		return codeSetManager;
@@ -196,6 +212,19 @@ public class DefaultJobManager implements JobManager {
 				list.add(getJob(id));
 			} catch (JobNotFoundException e) {
 				
+			}			
+		}		
+		return list;
+	}
+
+	@Override
+	public List<Competency> getJobCompetencies(Job job) {
+		List<Long> ids = jobDao.getJobCompetencyIds(job);
+		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
+		for( Long competencyId : ids ){			
+			try {
+				list.add(competencyManager.getCompetency(competencyId));
+			} catch (CompetencyNotFoundException e) {
 			}			
 		}		
 		return list;

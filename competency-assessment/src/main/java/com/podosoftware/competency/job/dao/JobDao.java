@@ -35,4 +35,7 @@ public interface JobDao {
 	
 	public abstract List<Long> getJobIds(Company company, Classification classify, int startIndex, int numResults);
 	
+	public abstract List<Long> getJobCompetencyIds(Job job);
+	
+	
 }

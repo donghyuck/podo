@@ -160,20 +160,22 @@ public class SecureCompetencyMgmtController {
 	@RequestMapping(value="/mgmt/competency/codeset/import.json", method=RequestMethod.POST)
 	@ResponseBody
 	public Map<String, CodeItem> importExcle(		
-			
+		@RequestParam(value="type", defaultValue="0", required=false ) Integer type,		
 		@RequestParam(value="codeSetId", defaultValue="0", required=false ) Integer codeSetId,		
+		@RequestParam(value="sheetIndex", defaultValue="0", required=false ) Integer sheetIndex,
 		@RequestParam(value="skipColumnCount", defaultValue="0", required=false ) Integer skipColumnCount,	
 		@RequestParam(value="skipRowCount", defaultValue="1", required=false ) Integer skipRowCount,
-		MultipartHttpServletRequest request) throws Exception {
 		
+		MultipartHttpServletRequest request) throws Exception {
 		log.debug("codeSetId " + codeSetId );		
 		log.debug("skipColumnCount " + skipColumnCount );	
 		log.debug("skipRowCount " + skipRowCount );	
 		Iterator<String> names = request.getFileNames(); 		
-		Map<String, CodeItem> codes = new HashMap<String, CodeItem>();				
+		Map<String, CodeItem> codes = new HashMap<String, CodeItem>();		
+		
 		while(names.hasNext()){
 			String fileName = names.next();	
-			log.debug(fileName);
+			log.debug(fileName);			
 			MultipartFile mpf = request.getFile(fileName);
 			BufferedInputStream is = new BufferedInputStream(mpf.getInputStream()); 
 			
@@ -181,61 +183,87 @@ public class SecureCompetencyMgmtController {
 			log.debug("file size: " + mpf.getSize());
 			log.debug("file type: " + mpf.getContentType());
 			
-			ExcelReader reader = new ExcelReader(is);			
-			int rowCount = reader.getPhysicalNumberOfRows();	
-			int firstRowCount = reader.getFirstRowNum();			
-			log.debug("row:"+ firstRowCount + "-" + rowCount);
-			for( int i = skipRowCount ; i < rowCount ; i ++ ){				
-				Row row = reader.getRow(i);
-				//log.debug("row[" + i + "]:" + row );
-				if( row != null ){
-					int columnCount = row.getPhysicalNumberOfCells();
-					int firstColumnCount = row.getFirstCellNum();
-					//log.debug("column[" + columnCount + "]:"+ firstColumnCount );
-					if( columnCount > 0){						
-						String l_code = getStringCellValue(reader, row.getCell(0));
-						String m_code = getStringCellValue(reader, row.getCell(2));
-						String s_code = getStringCellValue(reader, row.getCell(4));
-						String job_code = getStringCellValue(reader, row.getCell(6));
-						
-						String l_code_name = getStringCellValue(reader, row.getCell(1));
-						String m_code_name = getStringCellValue(reader, row.getCell(3));
-						String s_code_name = getStringCellValue(reader, row.getCell(5));				
-						String job_name = getStringCellValue(reader, row.getCell(7));				
-						
-						String competencyUnitCode = getStringCellValue(reader, row.getCell(8));	
-						String competencyUnitTitle = getStringCellValue(reader, row.getCell(9));	
-						String competencyLevel = getStringCellValue(reader, row.getCell(10));
-						
-						if(!codes.containsKey(l_code)){
-							codes.put(l_code, new CodeItem(l_code_name, l_code));			
-						}				
-						CodeItem l_item = codes.get(l_code);
-						if( !l_item.getItems().containsKey(m_code)){
-							l_item.getItems().put(m_code, new CodeItem(m_code_name, m_code));						
-						}				
-						CodeItem m_item = l_item.getItems().get(m_code);
-						if( !m_item.getItems().containsKey(s_code)){
-							m_item.getItems().put(s_code, new CodeItem(s_code_name, s_code));
-						}
-						
-						CodeItem s_item = m_item.getItems().get(s_code);
-						if( !s_item.getItems().containsKey(job_code)){
-							s_item.getItems().put(job_code, new CodeItem("job", job_name, job_code ));
-						}		
-						
-						log.debug("competencyUnitCode:" + competencyUnitCode);
-						
-						CodeItem job_item = s_item.getItems().get(job_code);
-						if( !job_item.getItems().containsKey(competencyUnitCode)){						
-							job_item.getItems().put(competencyUnitCode, new CodeItem("competency", competencyUnitTitle, competencyUnitCode, competencyLevel ));
+			if( type == 1 || type == 2){			
+				ExcelReader reader = new ExcelReader(is);		
+				if( sheetIndex > 0)
+					reader.setSheetIndex(sheetIndex);
+				
+				int rowCount = reader.getPhysicalNumberOfRows();	
+				int firstRowCount = reader.getFirstRowNum();			
+				log.debug("row:"+ firstRowCount + "-" + rowCount);
+				if ( type == 1){
+					for( int i = skipRowCount ; i < rowCount ; i ++ ){				
+						Row row = reader.getRow(i);
+						if( row != null ){
+							int columnCount = row.getPhysicalNumberOfCells();
+							int firstColumnCount = row.getFirstCellNum();
+							//log.debug("column[" + columnCount + "]:"+ firstColumnCount );
+							if( columnCount > 0){						
+								String l_code = getStringCellValue(reader, row.getCell(0));
+								String m_code = getStringCellValue(reader, row.getCell(2));
+								String s_code = getStringCellValue(reader, row.getCell(4));
+								String job_code = getStringCellValue(reader, row.getCell(6));
+								
+								String l_code_name = getStringCellValue(reader, row.getCell(1));
+								String m_code_name = getStringCellValue(reader, row.getCell(3));
+								String s_code_name = getStringCellValue(reader, row.getCell(5));				
+								String job_name = getStringCellValue(reader, row.getCell(7));				
+								
+								String competencyUnitCode = getStringCellValue(reader, row.getCell(8));	
+								String competencyUnitTitle = getStringCellValue(reader, row.getCell(9));	
+								String competencyLevel = getStringCellValue(reader, row.getCell(10));
+								
+								if(!codes.containsKey(l_code)){
+									codes.put(l_code, new CodeItem(l_code_name, l_code));			
+								}				
+								CodeItem l_item = codes.get(l_code);
+								if( !l_item.getItems().containsKey(m_code)){
+									l_item.getItems().put(m_code, new CodeItem(m_code_name, m_code));						
+								}				
+								CodeItem m_item = l_item.getItems().get(m_code);
+								if( !m_item.getItems().containsKey(s_code)){
+									m_item.getItems().put(s_code, new CodeItem(s_code_name, s_code));
+								}
+								
+								CodeItem s_item = m_item.getItems().get(s_code);
+								if( !s_item.getItems().containsKey(job_code)){
+									s_item.getItems().put(job_code, new CodeItem("job", job_name, job_code ));
+								}		
+								
+								log.debug("competencyUnitCode:" + competencyUnitCode);
+								
+								CodeItem job_item = s_item.getItems().get(job_code);
+								if( !job_item.getItems().containsKey(competencyUnitCode)){						
+									job_item.getItems().put(competencyUnitCode, new CodeItem("competency", competencyUnitTitle, competencyUnitCode, competencyLevel ));
+								}
+							}
 						}
 					}
-				}
+				}else if ( type == 2){
+					Integer key = 0; 
+					for( int i = skipRowCount ; i < rowCount ; i ++ ){				
+						Row row = reader.getRow(i);
+						if( row != null ){
+							key = key + 1;
+							int columnCount = row.getPhysicalNumberOfCells();
+							int firstColumnCount = row.getFirstCellNum();
+							if( columnCount > 0){
+								String code = getStringCellValue(reader, row.getCell(8));	
+								String name = getStringCellValue(reader, row.getCell(11));	
+								String level = getStringCellValue(reader, row.getCell(12));	
+								codes.put(key.toString(), new CodeItem("element", name, code, level, null));
+							}					
+						}
+					}
+				}	
 			}
 		}		
 		CodeSet codeset = codeSetManager.getCodeSet(codeSetId);
-		codeSetManager.batchUpdate(codeset, new ArrayList<CodeItem>(codes.values()));
+		if( type == 1){			
+			codeSetManager.batchUpdate(codeset, new ArrayList<CodeItem>(codes.values()));
+		}else if (type == 2){
+			codeSetManager.batchUpdateForEssentialElement(codeset, new ArrayList<CodeItem>(codes.values()));
+		}		
 		return codes;
 	}
 
@@ -245,6 +273,9 @@ public class SecureCompetencyMgmtController {
 	@ResponseBody
 	public ItemList listCompetency(
 		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
+		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
+		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,			
 		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
 		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize,		
 		NativeWebRequest request
@@ -256,16 +287,28 @@ public class SecureCompetencyMgmtController {
 				company = companyManager.getCompany(companyId);
 			} catch (CompanyNotFoundException e) {
 			}
-		}		
-		List<Competency> items = Collections.EMPTY_LIST;
-		int totalCount = competencyManager.getCompetencyCount(company);
-		if( totalCount > 0 ){
-			if( pageSize > 0)
-				items = competencyManager.getCompetencies(company, startIndex, pageSize);
-			else
-				items = competencyManager.getCompetencies(company);
-		}		
-		log.debug(items);		
+		}
+		int totalCount = 0 ;
+		List<Competency> items = Collections.EMPTY_LIST;		
+		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
+		if( classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
+		{
+			totalCount = competencyManager.getCompetencyCount(company, classify);
+			if( totalCount > 0 ){
+				if( pageSize > 0)
+					items = competencyManager.getCompetencies(company, classify, startIndex, pageSize);
+				else
+					items = competencyManager.getCompetencies(company, classify);				
+			}
+		}else{
+			totalCount = competencyManager.getCompetencyCount(company);
+			if( totalCount > 0 ){
+				if( pageSize > 0)
+					items = competencyManager.getCompetencies(company, startIndex, pageSize);
+				else
+					items = competencyManager.getCompetencies(company);
+			}
+		}
 		ItemList list = new ItemList(items, totalCount);		
 		return list;
 	}
@@ -359,6 +402,15 @@ public class SecureCompetencyMgmtController {
 		jobManager.saveOrUpdate(elementToUse);
 		return elementToUse;
 	}
+	
+	@RequestMapping(value="/mgmt/competency/job/competencies/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<Competency> listJobCompetency(
+			@RequestParam(value="jobId", defaultValue="0", required=true ) Long jobId
+			) throws JobNotFoundException{
+		Job elementToUse = jobManager.getJob(jobId);		
+		return jobManager.getJobCompetencies(elementToUse);
+	}	
 	
 	@RequestMapping(value="/mgmt/competency/element/list.json", method=RequestMethod.POST)
 	@ResponseBody

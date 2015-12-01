@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.podosoftware.competency.competency.dao.CompetencyDao;
+import com.podosoftware.competency.job.Classification;
 
 import architecture.common.user.Company;
 import net.sf.ehcache.Cache;
@@ -213,6 +214,38 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		}else{
 			competencyDao.createEssentialElement(essentialElement);
 		}		
+	}
+
+ 
+	public int getCompetencyCount(Company company, Classification classify) {
+		return competencyDao.getCompetencyCount(company, classify);
+	}
+ 
+	public List<Competency> getCompetencies(Company company, Classification classify) {
+		List<Long> ids = competencyDao.getCompetencyIds(company, classify);
+		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getCompetency(id));
+			} catch (CompetencyNotFoundException e) {
+				
+			}			
+		}		
+		return list;
+	}
+
+ 
+	public List<Competency> getCompetencies(Company company, Classification classify, int startIndex, int numResults) {
+		List<Long> ids = competencyDao.getCompetencyIds(company, classify, startIndex, numResults);
+		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getCompetency(id));
+			} catch (CompetencyNotFoundException e) {
+				
+			}			
+		}		
+		return list;
 	}
 	
 

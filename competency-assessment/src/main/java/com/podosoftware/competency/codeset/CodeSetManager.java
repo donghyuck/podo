@@ -8,6 +8,8 @@ import architecture.common.user.Company;
 
 public interface CodeSetManager {
 	
+	public void batchUpdateForEssentialElement(CodeSet codeSet, List<CodeItem> items);
+	
 	public void batchUpdate(CodeSet codeSet, List<CodeItem> items);
 	
 	public void saveOrUpdate(List<CodeSet> codesets);
@@ -91,6 +93,15 @@ public interface CodeSetManager {
 			this.code = code;
 			this.etc1 = etc;
 			items = new HashMap<String, CodeItem>();
+		}
+
+		public CodeItem(String type, String name, String code, String etc1, Map<String, CodeItem> items) {
+			super();
+			this.type = type;
+			this.name = name;
+			this.code = code;
+			this.etc1 = etc1;
+			this.items = items;
 		}
 
 		public String getEtc1() {

@@ -2,6 +2,8 @@ package com.podosoftware.competency.competency;
 
 import java.util.List;
 
+import com.podosoftware.competency.job.Classification;
+
 import architecture.common.user.Company;
 
 public interface CompetencyManager {
@@ -15,6 +17,14 @@ public interface CompetencyManager {
 	public abstract List<Competency> getCompetencies(Company company, int startIndex, int numResults) ;
 	
 	public abstract int getCompetencyCount(Company company) ;
+	
+	
+	public abstract int getCompetencyCount(Company company, Classification classify);
+	
+	public abstract List<Competency> getCompetencies(Company company, Classification classify) ;
+	
+	public abstract List<Competency> getCompetencies(Company company, Classification classify, int startIndex, int numResults) ;		
+	
 		
 	public abstract void updateCompetency(Competency competency) throws CompetencyNotFoundException ;
 	

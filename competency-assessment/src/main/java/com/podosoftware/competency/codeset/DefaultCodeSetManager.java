@@ -3,7 +3,9 @@ package com.podosoftware.competency.codeset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.podosoftware.competency.codeset.dao.CodeSetDao;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.DefaultCompetency;
+import com.podosoftware.competency.competency.DefaultEssentialElement;
+import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.competency.dao.CompetencyDao;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.DefaultJob;
@@ -21,6 +25,7 @@ import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
 import architecture.common.user.CompanyManager;
+import architecture.common.user.CompanyTemplate;
 import architecture.common.user.UserManager;
 import architecture.common.util.LockUtils;
 import net.sf.ehcache.Cache;
@@ -274,8 +279,6 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		List<Job> jobs = new ArrayList<Job>();
 		List<Competency> competencies = new ArrayList<Competency>();
 		List<JobCompetencyRelationship> relationships = new ArrayList<JobCompetencyRelationship>();
-		
-		
 		for(CodeItem item : items)
 		{
 			DefaultCodeSet newCodeSet = new DefaultCodeSet();
@@ -336,18 +339,32 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		log.debug("batch processing codeset:" + list.size() );
 		codeSetDao.batchInsertCodeSet(list);
 		
-		if(jobDao != null){
-			
+		if(jobDao != null){			
 			log.debug("batch processing jobs:" + jobs.size() );
-			jobDao.batchInsertJob(jobs);
-			
+			jobDao.batchInsertJob(jobs);			
 			log.debug("batch processing compentecy:" + jobs.size() );
-			competencyDao.batchInsertCompetency(competencies);
-			
+			competencyDao.batchInsertCompetency(competencies);			
 			log.debug("batch processing job and competency relations:" + jobs.size() );
 			jobDao.batchInsertJobCompetencyRelationship(relationships);
+		}		
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void batchUpdateForEssentialElement(CodeSet codeSet, List<CodeItem> items) {
+		List<EssentialElement> elements = new ArrayList<EssentialElement>();
+		Map<String, Long> ids =  competencyDao.getCompetencyIdsWithCompetencyUnitCode(codeSet.getObjectType(), codeSet.getObjectId());
+		for( CodeItem code : items){
+			Long competencyId = ids.get(code.getCode());
+			if(StringUtils.equals(code.getType(), "element") && competencyId != null) {
+				EssentialElement element = new DefaultEssentialElement();
+				//element.setEssentialElementId(competencyDao.nextEssentialElementId());
+				element.setCompetencyId(competencyId);
+				element.setName(code.getName());
+				element.setLevel(Integer.parseInt(code.getEtc1()));
+				elements.add(element);
+			}
 		}
-			
+		competencyDao.batchInsertEssentialElement(elements);
 		
 	}
 }
