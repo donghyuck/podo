@@ -20,20 +20,12 @@ delete ca_essential_element ;
 
 delete CA_ESSENTIAL_ELEMENT ;
 
-update V2_SEQUENCER 
-set value = 1 
-where name = “JOB” ;
+update V2_SEQUENCER set value = 1 where name = 'JOB' ;
 
-update V2_SEQUENCER 
-set value = 1 
-where name = “CODESET” ;
+update V2_SEQUENCER set value = 1 where name = 'CODESET' ;
 
-update V2_SEQUENCER 
-set value = 1 
-where name = “COMPETENCY” ;
+update V2_SEQUENCER set value = 1 where name = 'COMPETENCY' ;
 
-update V2_SEQUENCER 
-set value = 1 
-where name = “ESSENTIAL_ELEMENT” ;
+update V2_SEQUENCER set value = 1 where name = 'ESSENTIAL_ELEMENT' ;
 
 
