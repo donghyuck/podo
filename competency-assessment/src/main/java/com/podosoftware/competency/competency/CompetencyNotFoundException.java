@@ -1,8 +1,5 @@
 package com.podosoftware.competency.competency;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import architecture.ee.exception.NotFoundException;
 
 public class CompetencyNotFoundException extends NotFoundException {

@@ -1,8 +1,5 @@
 package com.podosoftware.competency.job;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import architecture.ee.exception.NotFoundException;
 
 public class JobNotFoundException extends NotFoundException {

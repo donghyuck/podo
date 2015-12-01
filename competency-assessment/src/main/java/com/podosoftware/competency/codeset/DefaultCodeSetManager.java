@@ -25,7 +25,6 @@ import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
 import architecture.common.user.CompanyManager;
-import architecture.common.user.CompanyTemplate;
 import architecture.common.user.UserManager;
 import architecture.common.util.LockUtils;
 import net.sf.ehcache.Cache;
