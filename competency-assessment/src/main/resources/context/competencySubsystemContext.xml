@@ -42,6 +42,7 @@
 		p:companyManager-ref="companyManager"
 		p:codeSetDao-ref="codeSetDao"
 		p:jobDao-ref="jobDao"
+		p:competencyDao-ref="competencyDao"
 		/>	
 
 	<!--  =============================  -->
@@ -57,6 +58,7 @@
 		p:jobCache-ref="jobCache"
 		p:jobDao-ref="jobDao"
 		p:codeSetManager-ref="codeSetManager"
+		p:competencyManager-ref="competencyManager"
 		/>	
 		
 					
