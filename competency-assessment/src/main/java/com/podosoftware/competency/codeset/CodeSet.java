@@ -4,8 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import architecture.common.cache.Cacheable;
+import architecture.common.model.PropertyAware;
 
-public interface CodeSet extends Cacheable{
+public interface CodeSet extends PropertyAware, Cacheable{
 	
 	public boolean isEnabled() ;
 

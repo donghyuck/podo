@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -21,6 +22,7 @@ import com.podosoftware.competency.codeset.DefaultCodeSetTreeWalker;
 import com.podosoftware.competency.codeset.dao.CodeSetDao;
 
 import architecture.common.util.LongTree;
+import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
 import architecture.ee.spring.jdbc.support.ExtendedJdbcDaoSupport;
 
 public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao {
@@ -56,6 +58,64 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 	
 	private String sequencerName = "CODESET";	
 	private String codesetValueSequencerName = "CODESET_VALUE";
+	private String codesetPropertyTableName = "CA_CODESET_PROPERTY";
+	private String codesetPropertyPrimaryColumnName = "CODESET_ID";
+	private ExtendedPropertyDao extendedPropertyDao;
+	
+	
+		
+	public ExtendedPropertyDao getExtendedPropertyDao() {
+		return extendedPropertyDao;
+	}
+
+	public void setExtendedPropertyDao(ExtendedPropertyDao extendedPropertyDao) {
+		this.extendedPropertyDao = extendedPropertyDao;
+	}
+
+	public String getSequencerName() {
+		return sequencerName;
+	}
+
+	public void setSequencerName(String sequencerName) {
+		this.sequencerName = sequencerName;
+	}
+
+	public String getCodesetValueSequencerName() {
+		return codesetValueSequencerName;
+	}
+
+	public void setCodesetValueSequencerName(String codesetValueSequencerName) {
+		this.codesetValueSequencerName = codesetValueSequencerName;
+	}
+
+	public String getCodesetPropertyTableName() {
+		return codesetPropertyTableName;
+	}
+
+	public void setCodesetPropertyTableName(String codesetPropertyTableName) {
+		this.codesetPropertyTableName = codesetPropertyTableName;
+	}
+
+	public String getCodesetPropertyPrimaryColumnName() {
+		return codesetPropertyPrimaryColumnName;
+	}
+
+	public void setCodesetPropertyPrimaryColumnName(String codesetPropertyPrimaryColumnName) {
+		this.codesetPropertyPrimaryColumnName = codesetPropertyPrimaryColumnName;
+	}
+
+	public Map<String, String> getCodesetProperties(long codesetId) {
+		return extendedPropertyDao.getProperties(codesetPropertyTableName, codesetPropertyPrimaryColumnName, codesetId);
+	}
+
+	public void setCodesetProperties(long codesetId, Map<String, String> props) {
+		extendedPropertyDao.updateProperties(codesetPropertyTableName, codesetPropertyPrimaryColumnName, codesetId, props);
+	}
+	
+	public void deleteCodesetProperties(long codesetId){
+		extendedPropertyDao.deleteProperties(codesetPropertyTableName, codesetPropertyPrimaryColumnName, codesetId);
+	}
+	
 	
 	public void batchInsertCodeSet(List<CodeSet> codesets){
 		final List<CodeSet> inserts = codesets;		
@@ -141,6 +201,9 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getCreationDate()),	
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getModifiedDate())				
 					);
+			if(codeset.getProperties().size() > 0){				
+				setCodesetProperties(codeset.getCodeSetId(), codeset.getProperties());				
+			}
 		}else{
 			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_CODESET").getSql(),
 					new SqlParameterValue (Types.NUMERIC, codeset.getParentCodeSetId()),	
@@ -149,8 +212,11 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 					new SqlParameterValue (Types.VARCHAR, codeset.getDescription()),			
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getModifiedDate()),
 					new SqlParameterValue (Types.NUMERIC, codeset.getCodeSetId())
-			);			
+			);
+			deleteCodesetProperties(codeset.getCodeSetId());
+			setCodesetProperties(codeset.getCodeSetId(), codeset.getProperties());				
 		}
+		
 	}
 	/*
 	CODESET_ID
@@ -170,8 +236,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 				new SqlParameterValue(Types.NUMERIC, objectId ));
 		numCodeSets++;	
 		
-		final LongTree tree = new LongTree(-1L, numCodeSets);	
-		
+		final LongTree tree = new LongTree(-1L, numCodeSets);
 		getExtendedJdbcTemplate().query(
 				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ROOT_CODESET").getSql(), 
 				new RowCallbackHandler(){
@@ -199,10 +264,8 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 		StringBuilder sb = new StringBuilder();
 		for( long id : tree.getRecursiveChildren(-1L) ){
 			sb.append(id).append(", ");
-		}
-		
-		log.debug( sb.toString());
-		
+		}		
+		log.debug( sb.toString());		
 		return new DefaultCodeSetTreeWalker(objectType, objectId, tree);		
 	}
 
@@ -214,8 +277,6 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 				new SqlParameterValue(Types.NUMERIC, objectId ));
 	}
 
-
-	@Override
 	public CodeSet getCodeSetById(long codesetId) {
 		CodeSet codeset = null;
 		try {
@@ -223,6 +284,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_CODESET_BY_ID").getSql(), 
 					codesetMapper, 
 					new SqlParameterValue(Types.NUMERIC, codesetId ) );
+			codeset.setProperties(getCodesetProperties(codesetId));
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if(e.getActualSize() > 1)
 	        {
@@ -236,8 +298,6 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 		return codeset;
 	}
 
-
-	@Override
 	public int getCodeSetCount(int objectType, long objectId) {		
 		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
 				Integer.class,
@@ -245,7 +305,6 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 				new SqlParameterValue(Types.NUMERIC, objectId ));
 	}
 
-	@Override
 	public int getCodeSetCount(int objectType, long objectId, Long codeSetId) {
 		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CODESET_ID").getSql(), 
 				Integer.class,
@@ -254,7 +313,6 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 				new SqlParameterValue(Types.NUMERIC, codeSetId ));
 	}
 
-	@Override
 	public List<Long> getCodeSetIds(int objectType, long objectId, Long codeSetId) {
 		return getExtendedJdbcTemplate().queryForList(
 				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CODESET_ID").getSql(), 

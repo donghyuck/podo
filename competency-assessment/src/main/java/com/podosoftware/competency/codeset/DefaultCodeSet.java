@@ -1,8 +1,10 @@
 package com.podosoftware.competency.codeset;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -12,11 +14,15 @@ import com.podosoftware.competency.codeset.json.CustomJsonLongSerializer;
 
 import architecture.common.model.json.CustomJsonDateDeserializer;
 import architecture.common.model.json.CustomJsonDateSerializer;
+import architecture.common.model.json.JsonMapPropertyDeserializer;
+import architecture.common.model.json.JsonMapPropertySerializer;
+import architecture.common.model.support.PropertyAwareSupport;
 
-public class DefaultCodeSet implements CodeSet {
+public class DefaultCodeSet extends PropertyAwareSupport implements CodeSet {
 	
 	private int objectType;
 	private long objectId;
+
 	private long codeSetId;
 	private Long parentCodeSetId;
 	private String code;
@@ -125,9 +131,21 @@ public class DefaultCodeSet implements CodeSet {
 		this.codeSetId = codeSetId;
 	}
 
+	
+	@JsonDeserialize(using = JsonMapPropertyDeserializer.class)	
+	public void setProperties(Map<String, String> properties) {
+		super.setProperties(properties);
+	}
+
+	@JsonSerialize(using = JsonMapPropertySerializer.class)	
+	public Map<String, String> getProperties() {
+		return super.getProperties();
+	}
+	
 	public List<Code> getCodes() {
 		return codes;
 	}
+
 
 	public void setCodes(List<Code> codes) {
 		this.codes = codes;
@@ -153,6 +171,15 @@ public class DefaultCodeSet implements CodeSet {
 	@JsonIgnore
 	public int getCachedSize() {
 		return 0;
+	}
+
+	@JsonIgnore
+	public Serializable getPrimaryKeyObject() {
+		return codeSetId;
+	}
+
+	public int getModelObjectType() {
+		return 50;
 	}
 	
 }
