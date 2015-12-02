@@ -1,6 +1,7 @@
 package com.podosoftware.competency.job;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Propagation;
@@ -109,8 +110,24 @@ public class DefaultJobManager implements JobManager {
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdate(Job job) throws JobNotFoundException {
+		
+		
+		if( job.getClassification().getClassifiedMajorityId() <= 0 ||
+			job.getClassification().getClassifiedMajorityId() <= 0 || 
+			job.getClassification().getClassifiedMajorityId() <= 0)
+			throw new IllegalArgumentException("Classification can not be null.");
+				
+		Date now = new Date();
+		if( job.getJobId() > 0){			
+			job.setModifiedDate(now);
+		}else{
+			job.setCreationDate(now);
+			job.setModifiedDate(now);
+		}
+		
 		jobDao.saveOrUpdateJob(job);
 		clearCache( job );
+		
 	}
  
 	public Job getJob(long jobId) throws JobNotFoundException {

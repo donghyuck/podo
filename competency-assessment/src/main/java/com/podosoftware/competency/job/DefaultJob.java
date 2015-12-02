@@ -6,6 +6,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.podosoftware.competency.job.json.CustomJsonClassificationDeserializer;
 
 import architecture.common.cache.CacheSizes;
 import architecture.common.model.json.CustomJsonDateDeserializer;
@@ -103,6 +104,7 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		return classification;
 	}
 
+	@JsonDeserialize(using = CustomJsonClassificationDeserializer.class )
 	public void setClassification(Classification classfication) {
 		classification = classfication;
 	}

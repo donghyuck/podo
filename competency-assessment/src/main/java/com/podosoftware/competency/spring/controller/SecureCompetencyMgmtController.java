@@ -276,6 +276,7 @@ public class SecureCompetencyMgmtController {
 		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
 		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
 		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,			
+		@RequestParam(value="jobId", defaultValue="0", required=false ) Long jobId,			
 		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
 		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize,		
 		NativeWebRequest request
@@ -291,7 +292,18 @@ public class SecureCompetencyMgmtController {
 		int totalCount = 0 ;
 		List<Competency> items = Collections.EMPTY_LIST;		
 		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
-		if( classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
+		if( jobId > 0){
+			try {
+				Job job = jobManager.getJob(jobId);
+				totalCount = competencyManager.getCompetencyCount(job);
+				if( totalCount > 0 ){
+					if( pageSize > 0)
+						items = competencyManager.getCompetencies(job, startIndex, pageSize);
+					else
+						items = competencyManager.getCompetencies(job);				
+				}
+			} catch (JobNotFoundException e) { }
+		}else if( classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
 		{
 			totalCount = competencyManager.getCompetencyCount(company, classify);
 			if( totalCount > 0 ){
@@ -398,9 +410,11 @@ public class SecureCompetencyMgmtController {
 	public Job updateJob(
 			@RequestBody DefaultJob job
 			) throws JobNotFoundException{
-		Job elementToUse = job;
-		jobManager.saveOrUpdate(elementToUse);
-		return elementToUse;
+		Job jobToUse = job;
+		
+		jobManager.saveOrUpdate(jobToUse);
+		
+		return jobToUse;
 	}
 	
 	@RequestMapping(value="/mgmt/competency/job/competencies/list.json", method=RequestMethod.POST)
