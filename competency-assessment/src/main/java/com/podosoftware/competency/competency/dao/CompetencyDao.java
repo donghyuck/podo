@@ -3,6 +3,7 @@ package com.podosoftware.competency.competency.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.podosoftware.competency.competency.Ability;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyType;
 import com.podosoftware.competency.competency.EssentialElement;
@@ -116,8 +117,22 @@ public interface CompetencyDao {
 	
 	public abstract void updatePerformanceCriteria(PerformanceCriteria performanceCriteria);
 	
-	public abstract void saveOrUpdate(List<PerformanceCriteria> performanceCriterias);
+	public abstract void saveOrUpdatePerformanceCriterias(List<PerformanceCriteria> performanceCriterias);
 	
-	public abstract void remove(List<PerformanceCriteria> performanceCriterias);
+	public abstract void removePerformanceCriterias(List<PerformanceCriteria> performanceCriterias);
+	
+	public abstract Long nextAbilityId();
+	
+	public abstract Ability getAbilityById(long abilityId);
+	
+	public abstract List<Long> getAbilityIds(int objectType, long objectId );
+	
+	public abstract void createAbility(Ability ability);
+	
+	public abstract void updateAbility(Ability ability);	
+	
+	public abstract void saveOrUpdateAbilities(List<Ability> abilities);
+	
+	public abstract void removeAbilities(List<Ability> abilities);
 	
 }

@@ -16,8 +16,11 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
 
+import com.podosoftware.competency.competency.Ability;
+import com.podosoftware.competency.competency.AbilityType;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyType;
+import com.podosoftware.competency.competency.DefaultAbility;
 import com.podosoftware.competency.competency.DefaultCompetency;
 import com.podosoftware.competency.competency.DefaultEssentialElement;
 import com.podosoftware.competency.competency.DefaultPerformanceCriteria;
@@ -33,35 +36,50 @@ import architecture.ee.spring.jdbc.support.ExtendedJdbcDaoSupport;
 
 public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements CompetencyDao {
 
+	
+	private final RowMapper<Ability> abilityMapper = new RowMapper<Ability>(){
+
+		public Ability mapRow(ResultSet rs, int rowNum) throws SQLException {		
+			Ability ability = new DefaultAbility();		
+			if(rs.getInt("COMPETENCY_TYPE") > 0) 
+				ability.setAbilityType(AbilityType.getAbilityTypeById(rs.getInt("ABILIYT_TYPE")));				
+			ability.setAbilityId(rs.getLong("ABILITY_ID"));
+			ability.setObjectType(rs.getInt("OBJECT_TYPE"));
+			ability.setObjectId(rs.getLong("OBJECT_ID"));
+			ability.setName( rs.getString("NAME")); 			
+			return ability;
+		}		
+	};
+	
 	private final RowMapper<PerformanceCriteria> performanceCriteriaMapper = new RowMapper<PerformanceCriteria>(){
 
 		public PerformanceCriteria mapRow(ResultSet rs, int rowNum) throws SQLException {		
-			PerformanceCriteria pc = new DefaultPerformanceCriteria();		
-			pc.setPerformanceCriteriaId(rs.getLong("PERFORMANCE_CRITERIA_ID"));
-			pc.setObjectType(rs.getInt("OBJECT_TYPE"));
-			pc.setObjectId(rs.getLong("OBJECT_ID"));
-			pc.setSortOrder( rs.getInt("SORT_ORDER")); 	
-			pc.setDescription( rs.getString("DESCRIPTION")); 	
-			pc.setCreationDate(rs.getDate("CREATION_DATE"));
-			pc.setModifiedDate(rs.getDate("MODIFIED_DATE"));			
-			return pc;
+			PerformanceCriteria criteria = new DefaultPerformanceCriteria();		
+			criteria.setPerformanceCriteriaId(rs.getLong("PERFORMANCE_CRITERIA_ID"));
+			criteria.setObjectType(rs.getInt("OBJECT_TYPE"));
+			criteria.setObjectId(rs.getLong("OBJECT_ID"));
+			criteria.setSortOrder( rs.getInt("SORT_ORDER")); 	
+			criteria.setDescription( rs.getString("DESCRIPTION")); 	
+			criteria.setCreationDate(rs.getDate("CREATION_DATE"));
+			criteria.setModifiedDate(rs.getDate("MODIFIED_DATE"));			
+			return criteria;
 		}		
 	};
 	
 	private final RowMapper<Competency> competencyMapper = new RowMapper<Competency>(){
 
 		public Competency mapRow(ResultSet rs, int rowNum) throws SQLException {		
-			DefaultCompetency dc = new DefaultCompetency();		
+			DefaultCompetency competency = new DefaultCompetency();		
 			if(rs.getInt("COMPETENCY_TYPE")>0) 
-				dc.setCompetencyType(CompetencyType.getCompetencyTypeById(rs.getInt("COMPETENCY_TYPE")));			
-			dc.setObjectType(rs.getInt("OBJECT_TYPE"));
-			dc.setObjectId(rs.getLong("OBJECT_ID"));
-			dc.setCompetencyId( rs.getLong("COMPETENCY_ID") );			
-			dc.setName(rs.getString("NAME")); 
-			dc.setDescription( rs.getString("DESCRIPTION")); 		
-			dc.setLevel(rs.getInt("COMPETENCY_LEVEL"));
-			dc.setCompetencyUnitCode(rs.getString("COMPETENCY_UNIT_CODE"));
-			return dc;
+				competency.setCompetencyType(CompetencyType.getCompetencyTypeById(rs.getInt("COMPETENCY_TYPE")));			
+			competency.setObjectType(rs.getInt("OBJECT_TYPE"));
+			competency.setObjectId(rs.getLong("OBJECT_ID"));
+			competency.setCompetencyId( rs.getLong("COMPETENCY_ID") );			
+			competency.setName(rs.getString("NAME")); 
+			competency.setDescription( rs.getString("DESCRIPTION")); 		
+			competency.setLevel(rs.getInt("COMPETENCY_LEVEL"));
+			competency.setCompetencyUnitCode(rs.getString("COMPETENCY_UNIT_CODE"));
+			return competency;
 		}		
 	};	
 	
@@ -96,6 +114,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 	
 	private String performanceCriteriaPropertyPrimaryColumnName = "PERFORMANCE_CRITERIA_ID";	
 	
+	private String abilitySequencerName = "ABILITY";
 	
 	private ExtendedPropertyDao extendedPropertyDao;
 	
@@ -607,7 +626,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		setPerformanceCriteriaProperties(performanceCriteria.getPerformanceCriteriaId(), performanceCriteria.getProperties());		
 	}
 
-	public void saveOrUpdate(List<PerformanceCriteria> performanceCriterias) {
+	public void saveOrUpdatePerformanceCriterias(List<PerformanceCriteria> performanceCriterias) {
 		final List<PerformanceCriteria> inserts = new ArrayList<PerformanceCriteria>();
 		final List<PerformanceCriteria> updates = new ArrayList<PerformanceCriteria>();		
 		Date now = new Date();
@@ -661,7 +680,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		}		
 	}
 
-	public void remove(List<PerformanceCriteria> performanceCriterias) {
+	public void removePerformanceCriterias(List<PerformanceCriteria> performanceCriterias) {
 		final List<PerformanceCriteria> deletes = performanceCriterias;
 		if(deletes.size() > 0){
 			getExtendedJdbcTemplate().batchUpdate(				
@@ -687,6 +706,123 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 						}
 			});		
 		}			
+	}
+
+	
+	public String getAbilitySequencerName() {
+		return abilitySequencerName;
+	}
+
+
+	public void setAbilitySequencerName(String abilitySequencerName) {
+		this.abilitySequencerName = abilitySequencerName;
+	}
+
+
+	public Long nextAbilityId() {
+		return this.getNextId(abilitySequencerName);
+	}
+
+	public Ability getAbilityById(long abilityId) {
+		Ability ability = getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ABILITY_BY_ID").getSql(), 
+				abilityMapper,
+				new SqlParameterValue( Types.NUMERIC, abilityId )
+			);	
+		return ability;
+	}
+
+	public List<Long> getAbilityIds(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ABILITY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, objectType ),
+				new SqlParameterValue( Types.NUMERIC, objectId ) );
+	}
+
+	public void createAbility(Ability ability) {
+		getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.CREATE_ABILITY").getSql(), 
+				new SqlParameterValue( Types.NUMERIC, ability.getAbilityId()),
+				new SqlParameterValue( Types.NUMERIC, ability.getObjectType()),
+				new SqlParameterValue( Types.NUMERIC, ability.getObjectId()),
+				new SqlParameterValue( Types.NUMERIC, ability.getAbilityType().getId()),
+				new SqlParameterValue( Types.VARCHAR, ability.getName()),
+				new SqlParameterValue( Types.VARCHAR, ability.getDescription())
+		);
+	}
+
+	public void updateAbility(Ability ability) {
+		getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ABILITY").getSql(), 
+				new SqlParameterValue( Types.NUMERIC, ability.getObjectType()),
+				new SqlParameterValue( Types.NUMERIC, ability.getAbilityType().getId()),
+				new SqlParameterValue( Types.VARCHAR, ability.getName()),
+				new SqlParameterValue( Types.VARCHAR, ability.getDescription()),
+				new SqlParameterValue( Types.NUMERIC, ability.getAbilityId())
+		);		
+	}
+
+	public void saveOrUpdateAbilities(List<Ability> abilities) {
+		final List<Ability> inserts = new ArrayList<Ability>();
+		final List<Ability> updates = new ArrayList<Ability>();		
+
+		for( Ability ability : abilities ){
+			if(ability.getAbilityId() > 0){
+				updates.add(ability);
+			}else{
+				ability.setAbilityId(nextAbilityId());
+				inserts.add(ability);
+			}
+		}		
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.CREATE_ABILITY").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {						
+						Ability ability = inserts.get(i);		
+						ps.setLong(1, ability.getAbilityId());
+						ps.setInt(2, ability.getObjectType());
+						ps.setLong(3, ability.getObjectId());
+						ps.setInt(4, ability.getAbilityType().getId());
+						ps.setString(5,  ability.getName());
+						ps.setString(6, ability.getDescription());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}
+		if(updates.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ABILITY").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {						
+						Ability ability = updates.get(i);
+						ps.setInt(1, ability.getAbilityType().getId());
+						ps.setString(2,  ability.getName());
+						ps.setString(3, ability.getDescription());
+						ps.setLong(4, ability.getAbilityId() );
+					}					
+					public int getBatchSize() {
+						return updates.size();
+					}
+				});		
+		}		
+	}
+
+	public void removeAbilities(List<Ability> abilities) {
+		final List<Ability> deletes = abilities;
+		if(deletes.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.DELETE_ABILITY").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {						
+						Ability ability = deletes.get(i);
+						ps.setLong(1, ability.getAbilityId());
+					}					
+					public int getBatchSize() {
+						return deletes.size();
+					}
+			});	
+		}
 	} 
 	
 }

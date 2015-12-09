@@ -26,6 +26,8 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	
 	protected Cache performanceCriteriaIdsCache;
 	
+	protected Cache abilityCache;
+	
 	
 	public DefaultCompetencyManager() {
 	}
@@ -38,6 +40,14 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		this.competencyDao = competencyDao;
 	}
 	
+	public Cache getAbilityCache() {
+		return abilityCache;
+	}
+
+	public void setAbilityCache(Cache abilityCache) {
+		this.abilityCache = abilityCache;
+	}
+
 	public Cache getPerformanceCriteriaCache() {
 		return performanceCriteriaCache;
 	}
@@ -287,6 +297,10 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	private String getPerformanceCriteriaIdsCacheKey(int objectType, long objectId){
 		return new StringBuilder("performanceCriteriaIDs-").append(objectType).append("-").append(objectId).toString();		
 	}
+	
+	private String getAbilityIdsCacheKey(int objectType, long objectId){
+		return new StringBuilder("abilityIDs-").append(objectType).append("-").append(objectId).toString();		
+	}
 
 	private List<PerformanceCriteria> loadPerformanceCriterias(List<Long> ids){
 		ArrayList<PerformanceCriteria> list = new ArrayList<PerformanceCriteria>(ids.size());
@@ -356,8 +370,8 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void saveOrUpdate(List<PerformanceCriteria> performanceCriterias) {		
-		competencyDao.saveOrUpdate(performanceCriterias);
+	public void saveOrUpdatePerformanceCriterias(List<PerformanceCriteria> performanceCriterias) {		
+		competencyDao.saveOrUpdatePerformanceCriterias(performanceCriterias);
 		for( PerformanceCriteria pc : performanceCriterias){
 			String cacheKey = getPerformanceCriteriaIdsCacheKey(pc.getObjectType(), pc.getObjectId());			
 			if(this.performanceCriteriaCache.get(pc.getPerformanceCriteriaId()) != null){
@@ -371,8 +385,8 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void remove(List<PerformanceCriteria> performanceCriterias) {			
-		competencyDao.remove(performanceCriterias);
+	public void removePerformanceCriterias(List<PerformanceCriteria> performanceCriterias) {			
+		competencyDao.removePerformanceCriterias(performanceCriterias);
 		for( PerformanceCriteria pc : performanceCriterias){
 			String cacheKey = getPerformanceCriteriaIdsCacheKey(pc.getObjectType(), pc.getObjectId());			
 			if(this.performanceCriteriaCache.get(pc.getPerformanceCriteriaId()) != null){
@@ -383,4 +397,100 @@ public class DefaultCompetencyManager implements CompetencyManager {
 			}
 		}
 	}
+
+	@Override
+	public List<Ability> getAbilities(int objectType, long objectId) {
+		List<Long> ids = null;
+		String cacheKey = getAbilityIdsCacheKey(objectType, objectId);
+		if(this.performanceCriteriaIdsCache.get(cacheKey) != null){
+			ids = (List<Long>) this.performanceCriteriaIdsCache.get(cacheKey).getObjectValue();
+		}
+		if( ids == null ){
+			ids = competencyDao.getAbilityIds(objectType, objectId);
+			this.performanceCriteriaIdsCache.put(new Element(cacheKey, ids));
+		}		
+		return loadAbilities(ids);
+	}
+
+	private List<Ability> loadAbilities(List<Long> ids){
+		ArrayList<Ability> list = new ArrayList<Ability>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getAbility(id));
+			} catch (AbilityNotFoundException e) {
+			}			
+		}		
+		return list;		
+	}
+	
+	private Ability getAbilityInCache(long abilityId){
+		Ability ability = null;
+		if(this.abilityCache.get(abilityId) != null){
+			ability = (Ability)this.abilityCache.get(abilityId).getObjectValue();
+		}
+		return ability;
+	}
+	
+	private void updateCache(Ability ability){
+		if(this.abilityCache.get(ability.getAbilityId()) != null){
+			this.abilityCache.remove(ability.getAbilityId());
+		}
+		this.abilityCache.put(new Element(ability.getAbilityId(), ability));
+	}
+	
+	@Override
+	public Ability getAbility(long abilityId) throws AbilityNotFoundException {
+		Ability ability = getAbilityInCache(abilityId);
+		if(ability == null){
+			ability = competencyDao.getAbilityById(abilityId);			
+			if( ability == null ){				
+				throw new AbilityNotFoundException();
+			}
+			updateCache(ability);
+		}
+		return ability;
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveOrUpdateAbility(Ability ability) throws AbilityNotFoundException {
+		if( ability.getAbilityId() > 0 ){
+			competencyDao.updateAbility(ability);
+		}else{
+			competencyDao.createAbility(ability);
+		}
+		updateCache(ability);		
+		String cacheKey = getAbilityIdsCacheKey(ability.getObjectType(), ability.getObjectId());
+		if(this.performanceCriteriaIdsCache.get(cacheKey) != null){
+			this.performanceCriteriaIdsCache.remove(cacheKey);
+		}	
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveOrUpdateAblilities(List<Ability> abilities) {
+		competencyDao.saveOrUpdateAbilities(abilities);
+		for( Ability ability : abilities){
+			String cacheKey = getAbilityIdsCacheKey(ability.getObjectType(), ability.getObjectId());			
+			if(this.abilityCache.get(ability.getAbilityId()) != null){
+				abilityCache.remove(ability.getAbilityId());
+			}
+			if(this.performanceCriteriaIdsCache.get(cacheKey) != null){
+				this.performanceCriteriaIdsCache.remove(cacheKey);
+			}
+		}		
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void removeAbilities(List<Ability> abilities) {
+		competencyDao.removeAbilities(abilities);
+		for( Ability ability : abilities){
+			String cacheKey = getAbilityIdsCacheKey(ability.getObjectType(), ability.getObjectId());			
+			if(this.abilityCache.get(ability.getAbilityId()) != null){
+				abilityCache.remove(ability.getAbilityId());
+			}
+			if(this.performanceCriteriaIdsCache.get(cacheKey) != null){
+				this.performanceCriteriaIdsCache.remove(cacheKey);
+			}
+		}
+	}
+
 }

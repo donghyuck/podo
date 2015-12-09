@@ -30,11 +30,14 @@ import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetManager.CodeItem;
 import com.podosoftware.competency.codeset.CodeSetNotFoundException;
 import com.podosoftware.competency.codeset.DefaultCodeSet;
+import com.podosoftware.competency.competency.Ability;
+import com.podosoftware.competency.competency.AbilityNotFoundException;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyAlreadyExistsException;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.competency.CompetencyNotFoundException;
 import com.podosoftware.competency.competency.CompetencyType;
+import com.podosoftware.competency.competency.DefaultAbility;
 import com.podosoftware.competency.competency.DefaultCompetency;
 import com.podosoftware.competency.competency.DefaultEssentialElement;
 import com.podosoftware.competency.competency.DefaultPerformanceCriteria;
@@ -493,7 +496,7 @@ public class SecureCompetencyMgmtController {
 			
 			listToUse.add(performanceCriteria);
 		}
-		competencyManager.saveOrUpdate(listToUse);		
+		competencyManager.saveOrUpdatePerformanceCriterias(listToUse);		
 		return listToUse;
 	}	
 
@@ -510,8 +513,67 @@ public class SecureCompetencyMgmtController {
 			
 			listToUse.add(performanceCriteria);
 		}
-		competencyManager.remove(listToUse);		
+		competencyManager.removePerformanceCriterias(listToUse);		
 		return listToUse;
 	}	
+
 	
+	
+	@RequestMapping(value="/mgmt/competency/ability/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<Ability> listAbility(
+			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
+	) {
+		if( objectType < 1 || objectId < 1)
+			return Collections.EMPTY_LIST;		
+		return competencyManager.getAbilities(objectType, objectId);
+	}
+	
+	
+	@RequestMapping(value="/mgmt/competency/ability/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public Ability updateAbility(
+			@RequestBody DefaultAbility ability
+			) throws AbilityNotFoundException{
+			
+		if(ability.getObjectType() < 1 || ability.getObjectId() < 1)
+			throw new IllegalArgumentException("Ability not allowed for objectType[" + ability.getObjectType() + "] ");	
+		
+		competencyManager.saveOrUpdateAbility(ability);		
+		return ability;
+	}
+	
+	@RequestMapping(value="/mgmt/competency/ability/batch/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<Ability> updateAbilities(
+			@RequestBody List<DefaultAbility> abilities
+			) throws AbilityNotFoundException{
+			
+		List<Ability> listToUse = new ArrayList<Ability>();
+		for( Ability ability : abilities ){
+			if(ability.getObjectType() < 1 || ability.getObjectId() < 1)
+				throw new IllegalArgumentException("Ability not allowed for objectType[" + ability.getObjectType() + "] ");				
+			listToUse.add(ability);
+		}
+		competencyManager.saveOrUpdateAblilities(listToUse);		
+		return listToUse;
+	}	
+
+	@RequestMapping(value="/mgmt/competency/ability/batch/remove.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<Ability> removeAbilities(
+			@RequestBody List<DefaultAbility> abilities
+			) throws AbilityNotFoundException{
+			
+		List<Ability> listToUse = new ArrayList<Ability>();
+		for( Ability ability : abilities ){
+			if(ability.getObjectType() < 1 || ability.getObjectId() < 1)
+				throw new IllegalArgumentException("Ability not allowed for objectType[" + ability.getObjectType() + "] ");	
+			
+			listToUse.add(ability);
+		}
+		competencyManager.removeAbilities(listToUse);		
+		return listToUse;
+	}	
 }

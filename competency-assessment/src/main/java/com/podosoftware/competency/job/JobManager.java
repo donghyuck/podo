@@ -35,6 +35,4 @@ public interface JobManager {
 	
 	public void batchUpdate(List<Job> jobs) ;
 	
-	
-	
 }

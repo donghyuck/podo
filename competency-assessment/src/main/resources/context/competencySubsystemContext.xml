@@ -75,6 +75,7 @@
 	<bean id="essentialElementCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="essentialElementCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	<bean id="performanceCriteriaCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="performanceCriteriaCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	<bean id="performanceCriteriaIdsCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="performanceCriteriaIdsCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="abilityCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="abilityCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	
 	
 	<bean id="competencyManager"
@@ -84,6 +85,7 @@
 		p:essentialElementCache-ref="essentialElementCache"
 		p:performanceCriteriaCache-ref="performanceCriteriaCache"
 		p:performanceCriteriaIdsCache-ref="performanceCriteriaIdsCache"
+		p:abilityCache-ref="abilityCache"
 		p:competencyDao-ref="competencyDao"
 		/>			
 		

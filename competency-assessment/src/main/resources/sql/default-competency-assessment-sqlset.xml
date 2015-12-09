@@ -460,7 +460,53 @@
 	WHERE
 		PERFORMANCE_CRITERIA_ID = ?
 	]]></sql-query>				
-			
+
+
+
+	<sql-query name="CREATE_ABILITY" description="CREATE_ABILITY"><![CDATA[
+	INSERT INTO CA_ABILITY (
+		ABILITY_ID,
+		OBJECT_TYPE,
+		OBJECT_ID,
+		ABILITY_TYPE,
+		NAME,
+		DESCRIPTION
+	) VALUES (?,?,?,?,?,?)		
+	]]></sql-query>		
+	<sql-query name="UPDATE_ABILITY" description="UPDATE_ABILITY"><![CDATA[
+	UPDATE CA_ABILITY SET
+		ABILITY_TYPE = ?,
+		NAME = ?,
+		DESCRIPTION = ?,	
+		MODIFIED_DATE = ?
+	WHERE ABILITY_ID =?		
+	]]></sql-query>		
+	<sql-query name="DELETE_ABILITY" description="DELETE_ABILITY"><![CDATA[
+	DELETE FROM CA_ABILITY
+	WHERE
+		ABILITY_ID = ?	
+	]]></sql-query>		
+	<sql-query name="SELECT_ABILITY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID" description="SELECT_ABILITY_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID"><![CDATA[
+	SELECT 
+		ABILITY_ID
+	FROM CA_ABILITY
+	WHERE
+		OBJECT_TYPE = ?	AND
+		OBJECT_ID = ?	
+	]]></sql-query>		
+	<sql-query name="SELECT_ABILITY_BY_ID" description="SELECT_ABILITY_BY_ID"><![CDATA[
+	SELECT 
+		ABILITY_ID,
+		OBJECT_TYPE,
+		OBJECT_ID,	
+		ABILITY_TYPE,
+		NAME,
+		DESCRIPTION
+	FROM CA_ABILITY
+	WHERE
+		ABILITY_ID = ?	
+	]]></sql-query>						
+				
 	<row-mapper></row-mapper>	
 						
 </sqlset>
