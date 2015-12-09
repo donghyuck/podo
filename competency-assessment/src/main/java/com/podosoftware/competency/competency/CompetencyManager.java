@@ -8,6 +8,8 @@ import com.podosoftware.competency.job.Job;
 import architecture.common.user.Company;
 
 public interface CompetencyManager {
+	
+	public abstract Competency createCompetency(int objectType, long objectId, CompetencyType competencyType) throws CompetencyAlreadyExistsException;
 		
 	public abstract Competency createCompetency(Company company, String name) throws CompetencyAlreadyExistsException;
 	
@@ -19,7 +21,12 @@ public interface CompetencyManager {
 	public abstract List<Competency> getCompetencies(Company company, int startIndex, int numResults) ;
 	
 	public abstract int getCompetencyCount(Company company) ;
+
+	public abstract List<Competency> getCompetencies(Company company, CompetencyType competencyType ) ;
 	
+	public abstract List<Competency> getCompetencies(Company company, CompetencyType competencyType, int startIndex, int numResults) ;
+	
+	public abstract int getCompetencyCount(Company company, CompetencyType competencyType) ;
 	
 	
 	public abstract int getCompetencyCount(Company company, Classification classify);
@@ -45,6 +52,7 @@ public interface CompetencyManager {
 	public abstract Competency getCompetency(long competencyId) throws CompetencyNotFoundException;
 		
 	
+	
 	public abstract List<EssentialElement> getEssentialElements(Competency competency) ;
 	
 	public abstract void createEssentialElement( EssentialElement essentialElement) throws CompetencyNotFoundException ;
@@ -52,6 +60,18 @@ public interface CompetencyManager {
 	public abstract void updateEssentialElement( EssentialElement essentialElement) throws EssentialElementNotFoundException;
 	
 	public abstract void saveOrUpdate(EssentialElement essentialElement) throws EssentialElementNotFoundException ;
-
+	
+	
+	
+	
+	public abstract List<PerformanceCriteria> getPerformanceCriterias( int objectType, long objectId );
+	
+	public abstract PerformanceCriteria getPerformanceCriteria(long performanceCriteriaId) throws PerformanceCriteriaNotFoundException;
+	
+	public abstract void saveOrUpdate(PerformanceCriteria performanceCriteria) throws PerformanceCriteriaNotFoundException ;
+	
+	public abstract void saveOrUpdate(List<PerformanceCriteria> performanceCriterias);
+	
+	public abstract void remove(List<PerformanceCriteria> performanceCriterias);
 	
 }

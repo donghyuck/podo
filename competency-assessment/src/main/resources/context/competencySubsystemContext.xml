@@ -18,15 +18,20 @@
 	<!--  
 		Cache settin options :
 		maxElementsInMemory : 
-		timeToIdleSeconds : Set the time in seconds to idle for an element before it expires i.e. the maximum amount of time between accesses before an element expires. It is only used if the element is not eternal. Default is 120 seconds.
-		timeToLiveSeconds : Set t he time in seconds to live for an element before it expires, i.e. the maximum time between creation time and when an element expires. It is only used if the element is not eternal. Default is 120 seconds.
-		diskExpiryThreadIntervalSeconds : Set the number of seconds between runs of the disk expiry thread. The default is 120 seconds. 
+		timeToIdleSeconds : Set the time in seconds to idle for an element before it expires i.e. 
+							the maximum amount of time between accesses before an element expires. 
+							It is only used if the element is not eternal. Default is 120 seconds.
+		timeToLiveSeconds : Set t he time in seconds to live for an element before it expires, i.e. 
+							the maximum time between creation time and when an element expires. 
+							It is only used if the element is not eternal. Default is 120 seconds.
+		diskExpiryThreadIntervalSeconds : Set the number of seconds between runs of the disk expiry thread. 
+							The default is 120 seconds. 
 	-->			
 
 	<!--  =============================  -->
 	<!--  CodeSetManager  			  	 -->
 	<!--  =============================  -->			
-	<bean id="codeSetDao" class="com.podosoftware.competency.codeset.dao.jdbc.JdbcCodeSetDao" parent="jdbcDaoSupport" />	
+	<bean id="codeSetDao" class="com.podosoftware.competency.codeset.dao.jdbc.JdbcCodeSetDao" parent="jdbcDaoSupport" depends-on="extendedPropertyDao" p:extendedPropertyDao-ref="extendedPropertyDao" />	
 	
 	<bean id="codeSetCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeSetCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	<bean id="codeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="codeCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
@@ -68,6 +73,8 @@
 	<bean id="competencyDao" class="com.podosoftware.competency.competency.dao.jdbc.JdbcCompetencyDao" parent="jdbcDaoSupport" depends-on="extendedPropertyDao" p:extendedPropertyDao-ref="extendedPropertyDao" />	
 	<bean id="competencyCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="competencyCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	<bean id="essentialElementCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="essentialElementCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="performanceCriteriaCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="performanceCriteriaCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="performanceCriteriaIdsCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="performanceCriteriaIdsCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	
 	
 	<bean id="competencyManager"
@@ -75,6 +82,8 @@
 		depends-on="competencyDao" 
 		p:competencyCache-ref="competencyCache"
 		p:essentialElementCache-ref="essentialElementCache"
+		p:performanceCriteriaCache-ref="performanceCriteriaCache"
+		p:performanceCriteriaIdsCache-ref="performanceCriteriaIdsCache"
 		p:competencyDao-ref="competencyDao"
 		/>			
 		

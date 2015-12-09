@@ -181,5 +181,10 @@ public class DefaultCodeSet extends PropertyAwareSupport implements CodeSet {
 	public int getModelObjectType() {
 		return 50;
 	}
+
+	@Override
+	public String toString() {
+		return "DefaultCodeSet [codeSetId=" + codeSetId + ", name=" + name + ", enabled=" + enabled + "]";
+	}
 	
 }

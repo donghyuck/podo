@@ -3,6 +3,14 @@ package com.podosoftware.competency.competency;
 import architecture.common.cache.Cacheable;
 import architecture.common.model.PropertyAware;
 
+/**
+ * 
+ * An important skill that is needed to do a job.
+ * 
+ * 
+ * @author donghyuck
+ *
+ */
 public interface Competency extends PropertyAware, Cacheable {
 
 	public Integer getObjectType();
@@ -32,5 +40,7 @@ public interface Competency extends PropertyAware, Cacheable {
 	public abstract String getCompetencyUnitCode();
 	
 	public abstract void setCompetencyUnitCode(String competencyUnitCode);
+	
+	public abstract CompetencyType getCompetencyType();
 	
 }

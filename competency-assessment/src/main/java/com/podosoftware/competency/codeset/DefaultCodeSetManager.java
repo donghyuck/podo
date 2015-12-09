@@ -342,7 +342,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 			log.debug("batch processing jobs:" + jobs.size() );
 			jobDao.batchInsertJob(jobs);			
 			log.debug("batch processing compentecy:" + jobs.size() );
-			competencyDao.batchInsertCompetency(competencies);			
+			competencyDao.createCompetency(competencies);			
 			log.debug("batch processing job and competency relations:" + jobs.size() );
 			jobDao.batchInsertJobCompetencyRelationship(relationships);
 		}		
@@ -363,7 +363,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 				elements.add(element);
 			}
 		}
-		competencyDao.batchInsertEssentialElement(elements);
+		competencyDao.createEssentialElement(elements);
 		
 	}
 }

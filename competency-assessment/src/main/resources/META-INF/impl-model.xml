@@ -8,10 +8,8 @@
 	<model id="53" code="COMPETENCY_CATEGORY" />
 	<model id="53" code="COMPETENCY" />
 	<model id="54" code="ESSENTIAL_ELEMENT" />
-	<model id="55" code="PERFORMANCE_CRITERIAL" />
-	<model id="55" code="ABILTITY" />
-	
-	
+	<model id="55" code="PERFORMANCE_CRITERIA" />
+	<model id="56" code="ABILTITY" />	
 	<model id="60" code="JOB" />
 	
 </models>

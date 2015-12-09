@@ -34,10 +34,14 @@ import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyAlreadyExistsException;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.competency.CompetencyNotFoundException;
+import com.podosoftware.competency.competency.CompetencyType;
 import com.podosoftware.competency.competency.DefaultCompetency;
 import com.podosoftware.competency.competency.DefaultEssentialElement;
+import com.podosoftware.competency.competency.DefaultPerformanceCriteria;
 import com.podosoftware.competency.competency.EssentialElement;
 import com.podosoftware.competency.competency.EssentialElementNotFoundException;
+import com.podosoftware.competency.competency.PerformanceCriteria;
+import com.podosoftware.competency.competency.PerformanceCriteriaNotFoundException;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.DefaultJob;
@@ -276,7 +280,8 @@ public class SecureCompetencyMgmtController {
 		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
 		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
 		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,			
-		@RequestParam(value="jobId", defaultValue="0", required=false ) Long jobId,			
+		@RequestParam(value="jobId", defaultValue="0", required=false ) Long jobId,		
+		@RequestParam(value="competencyType", defaultValue="0", required=false ) Integer competencyType,	
 		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
 		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize,		
 		NativeWebRequest request
@@ -289,9 +294,11 @@ public class SecureCompetencyMgmtController {
 			} catch (CompanyNotFoundException e) {
 			}
 		}
+		
+		CompetencyType competencyTypeToUse = CompetencyType.getCompetencyTypeById(competencyType);		
+		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
 		int totalCount = 0 ;
 		List<Competency> items = Collections.EMPTY_LIST;		
-		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
 		if( jobId > 0){
 			try {
 				Job job = jobManager.getJob(jobId);
@@ -313,12 +320,12 @@ public class SecureCompetencyMgmtController {
 					items = competencyManager.getCompetencies(company, classify);				
 			}
 		}else{
-			totalCount = competencyManager.getCompetencyCount(company);
+			totalCount = competencyManager.getCompetencyCount(company, competencyTypeToUse);
 			if( totalCount > 0 ){
 				if( pageSize > 0)
-					items = competencyManager.getCompetencies(company, startIndex, pageSize);
+					items = competencyManager.getCompetencies(company, competencyTypeToUse, startIndex, pageSize);
 				else
-					items = competencyManager.getCompetencies(company);
+					items = competencyManager.getCompetencies(company, competencyTypeToUse);
 			}
 		}
 		ItemList list = new ItemList(items, totalCount);		
@@ -445,5 +452,66 @@ public class SecureCompetencyMgmtController {
 		competencyManager.saveOrUpdate(elementToUse);		
 		return elementToUse;
 	}
+	
+	
+	
+	@RequestMapping(value="/mgmt/competency/performance-criteria/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<PerformanceCriteria> listPerformanceCriteria(
+			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
+	) {
+		if( objectType < 1 || objectId < 1)
+			return Collections.EMPTY_LIST;		
+		return competencyManager.getPerformanceCriterias(objectType, objectId);
+	}
+	
+	
+	@RequestMapping(value="/mgmt/competency/performance-criteria/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public PerformanceCriteria updatePerformanceCriteria(
+			@RequestBody DefaultPerformanceCriteria performanceCriteria
+			) throws PerformanceCriteriaNotFoundException{
+			
+		if(performanceCriteria.getObjectType() < 1 || performanceCriteria.getObjectId() < 1)
+			throw new IllegalArgumentException("PerformanceCriteria not allowed for objectType[" + performanceCriteria.getObjectType() + "] ");	
+		
+		competencyManager.saveOrUpdate(performanceCriteria);		
+		return performanceCriteria;
+	}
+	
+	@RequestMapping(value="/mgmt/competency/performance-criteria/batch/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<PerformanceCriteria> updatePerformanceCriteria(
+			@RequestBody List<DefaultPerformanceCriteria> performanceCriterias
+			) throws PerformanceCriteriaNotFoundException{
+			
+		List<PerformanceCriteria> listToUse = new ArrayList<PerformanceCriteria>();
+		for( DefaultPerformanceCriteria performanceCriteria : performanceCriterias ){
+			if(performanceCriteria.getObjectType() < 1 || performanceCriteria.getObjectId() < 1)
+				throw new IllegalArgumentException("PerformanceCriteria not allowed for objectType[" + performanceCriteria.getObjectType() + "] ");	
+			
+			listToUse.add(performanceCriteria);
+		}
+		competencyManager.saveOrUpdate(listToUse);		
+		return listToUse;
+	}	
+
+	@RequestMapping(value="/mgmt/competency/performance-criteria/batch/remove.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<PerformanceCriteria> removePerformanceCriteria(
+			@RequestBody List<DefaultPerformanceCriteria> performanceCriterias
+			) throws PerformanceCriteriaNotFoundException{
+			
+		List<PerformanceCriteria> listToUse = new ArrayList<PerformanceCriteria>();
+		for( DefaultPerformanceCriteria performanceCriteria : performanceCriterias ){
+			if(performanceCriteria.getObjectType() < 1 || performanceCriteria.getObjectId() < 1)
+				throw new IllegalArgumentException("PerformanceCriteria not allowed for objectType[" + performanceCriteria.getObjectType() + "] ");	
+			
+			listToUse.add(performanceCriteria);
+		}
+		competencyManager.remove(listToUse);		
+		return listToUse;
+	}	
 	
 }

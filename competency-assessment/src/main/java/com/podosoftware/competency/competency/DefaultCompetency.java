@@ -23,6 +23,8 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	
 	private String competencyUnitCode;
 	
+	private CompetencyType competencyType;
+	
 	public DefaultCompetency() {
 		this.objectType = 1;
 		this.objectId = -1L;
@@ -31,6 +33,7 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.description = null;
 		this.level = 0 ;
 		this.competencyUnitCode = null;
+		this.competencyType = CompetencyType.NONE;
 	}
 	
 	public String getCompetencyUnitCode() {
@@ -105,6 +108,15 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.description = description;
 	}
 
+	
+	public CompetencyType getCompetencyType() {
+		return competencyType;
+	}
+
+	public void setCompetencyType(CompetencyType competencyType) {
+		this.competencyType = competencyType;
+	}
+
 	@JsonIgnore
 	public Serializable getPrimaryKeyObject() {
 		return this.getCompetencyId();
@@ -113,6 +125,5 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	public int getModelObjectType() {
 		return 53;
 	}
-
 
 }

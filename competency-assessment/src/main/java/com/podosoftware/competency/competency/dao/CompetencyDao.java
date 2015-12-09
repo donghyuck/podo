@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.podosoftware.competency.competency.Competency;
+import com.podosoftware.competency.competency.CompetencyType;
 import com.podosoftware.competency.competency.EssentialElement;
+import com.podosoftware.competency.competency.PerformanceCriteria;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
 
@@ -22,13 +24,22 @@ public interface CompetencyDao {
 	
 	public abstract void deleteCompetency(Competency competency);
 	
+	public abstract Map<String, Long> getCompetencyIdsWithCompetencyUnitCode(int objectType, long objectId);
+	
 	public abstract int getCompetencyCount(Company company);
 	
 	public abstract List<Long> getCompetencyIds(Company company);
 	
-	public abstract Map<String, Long> getCompetencyIdsWithCompetencyUnitCode(int objectType, long objectId);
-	
 	public abstract List<Long> getCompetencyIds(Company company, int startIndex, int numResults);
+	
+	
+	public abstract int getCompetencyCount(int objectType, long objectId, CompetencyType competencyType);
+	
+	public abstract List<Long> getCompetencyIds(int objectType, long objectId, CompetencyType competencyType);
+	
+	public abstract List<Long> getCompetencyIds(int objectType, long objectId, CompetencyType competencyType, int startIndex, int numResults);
+	
+	
 	
 	/**
 	 * 직무 분류에 따른 역량 수 리턴. 
@@ -79,9 +90,7 @@ public interface CompetencyDao {
 	 * @return
 	 */
 	public abstract List<Long> getCompetencyIds(Job job, int startIndex, int numResults);
-	
-	
-	
+		
 	public abstract void createEssentialElement(EssentialElement essentialElement);
 	
 	public abstract void updateEssentialElement(EssentialElement essentialElement);
@@ -94,8 +103,21 @@ public interface CompetencyDao {
 	
 	public abstract Long nextEssentialElementId();
 	
-	public abstract void batchInsertCompetency(List<Competency> competencies);
+	public abstract void createCompetency(List<Competency> competencies);
 	
-	public abstract void batchInsertEssentialElement(List<EssentialElement> competencies);
+	public abstract void createEssentialElement(List<EssentialElement> competencies);
+
+	
+	public abstract PerformanceCriteria getPerformanceCriteriaById(long performanceCriteriaId);
+	
+	public abstract List<Long> getPerformanceCriteriaIds(int objectType, long objectId );
+	
+	public abstract void createPerformanceCriteria(PerformanceCriteria performanceCriteria);
+	
+	public abstract void updatePerformanceCriteria(PerformanceCriteria performanceCriteria);
+	
+	public abstract void saveOrUpdate(List<PerformanceCriteria> performanceCriterias);
+	
+	public abstract void remove(List<PerformanceCriteria> performanceCriterias);
 	
 }

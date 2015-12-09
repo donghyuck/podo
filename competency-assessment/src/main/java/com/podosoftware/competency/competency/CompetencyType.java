@@ -7,6 +7,7 @@ public enum CompetencyType {
 	FUNCTIONAL(2),
 	JOB(3),
 	LEADERSHIP(4),
+	CORE(5)
 	;
 	
 	
@@ -24,22 +25,25 @@ public enum CompetencyType {
 		StringBuilder builder = new StringBuilder("CompetencyType:");
 		 switch(id)
 	        {
-	        case 0: // '\001'
+	        case 0: // '\000'
 	            builder.append("NONE");
 	            break;
 
-	        case 1: // '\002'
+	        case 1: // '\001'
 	            builder.append("ORGANIZATIONAL");
 	            break;
 	        case 2: // '\002'
 	            builder.append("FUNCTIONAL");
 	            break;
-	        case 3: // '\002'
+	        case 3: // '\003'
 	            builder.append("JOB");
 	            break;
-	        case 4: // '\002'
+	        case 4: // '\004'
 	            builder.append("LEADERSHIP");
-	            break;	      	            
+	            break;	
+	        case 5: // '\005'
+	            builder.append("CORE");
+	            break;		            
 	        default:
 	            builder.append("id=").append(id);
 	            break;
