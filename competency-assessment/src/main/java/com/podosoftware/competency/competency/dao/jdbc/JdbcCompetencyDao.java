@@ -41,12 +41,13 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 
 		public Ability mapRow(ResultSet rs, int rowNum) throws SQLException {		
 			Ability ability = new DefaultAbility();		
-			if(rs.getInt("COMPETENCY_TYPE") > 0) 
-				ability.setAbilityType(AbilityType.getAbilityTypeById(rs.getInt("ABILIYT_TYPE")));				
+			if(rs.getInt("ABILITY_TYPE") > 0) 
+				ability.setAbilityType(AbilityType.getAbilityTypeById(rs.getInt("ABILITY_TYPE")));				
 			ability.setAbilityId(rs.getLong("ABILITY_ID"));
 			ability.setObjectType(rs.getInt("OBJECT_TYPE"));
 			ability.setObjectId(rs.getLong("OBJECT_ID"));
-			ability.setName( rs.getString("NAME")); 			
+			ability.setName( rs.getString("NAME")); 	
+			ability.setDescription( rs.getString("DESCRIPTION")); 	
 			return ability;
 		}		
 	};
@@ -752,7 +753,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 
 	public void updateAbility(Ability ability) {
 		getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ABILITY").getSql(), 
-				new SqlParameterValue( Types.NUMERIC, ability.getObjectType()),
+			//	new SqlParameterValue( Types.NUMERIC, ability.getObjectType()),
 				new SqlParameterValue( Types.NUMERIC, ability.getAbilityType().getId()),
 				new SqlParameterValue( Types.VARCHAR, ability.getName()),
 				new SqlParameterValue( Types.VARCHAR, ability.getDescription()),

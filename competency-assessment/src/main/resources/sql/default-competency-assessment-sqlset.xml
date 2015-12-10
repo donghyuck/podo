@@ -477,8 +477,7 @@
 	UPDATE CA_ABILITY SET
 		ABILITY_TYPE = ?,
 		NAME = ?,
-		DESCRIPTION = ?,	
-		MODIFIED_DATE = ?
+		DESCRIPTION = ?
 	WHERE ABILITY_ID =?		
 	]]></sql-query>		
 	<sql-query name="DELETE_ABILITY" description="DELETE_ABILITY"><![CDATA[
