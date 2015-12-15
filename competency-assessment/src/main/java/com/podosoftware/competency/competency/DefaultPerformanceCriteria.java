@@ -24,8 +24,8 @@ public class DefaultPerformanceCriteria extends PropertyAndDateAwareSupport impl
 		this.performanceCriteriaId = -1L;
 		this.description = null;
 		Date now = new Date();
-		this.setCreationDate(now);
-		this.setModifiedDate(now);		
+		setCreationDate(now);
+		setModifiedDate(now);		
 	}
 
 

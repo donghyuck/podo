@@ -1,9 +1,8 @@
 package com.podosoftware.competency.assessment;
 
-import java.util.Date;
 import java.util.List;
 
-import architecture.common.cache.Cacheable;
+import architecture.common.model.DateAware;
 import architecture.common.model.PropertyAware;
 
 /**
@@ -13,7 +12,7 @@ import architecture.common.model.PropertyAware;
  * @author donghyuck
  *
  */
-public interface RatingScheme extends PropertyAware, Cacheable {
+public interface RatingScheme extends PropertyAware, DateAware {
 	
 	public Integer getObjectType();
 
@@ -43,12 +42,5 @@ public interface RatingScheme extends PropertyAware, Cacheable {
 	
 	public void setRatingLevels(List<RatingLevel> ratingLevels);
 
-	public Date getCreationDate() ;
-
-	public void setCreationDate(Date creationDate) ;
-
-	public Date getModifiedDate() ;
-
-	public void setModifiedDate(Date modifiedDate) ;
 	
 }
