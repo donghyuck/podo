@@ -90,5 +90,15 @@
 		p:abilityCache-ref="abilityCache"
 		p:competencyDao-ref="competencyDao"
 		/>			
-		
+	<!--  =============================  -->
+	<!--  AssessmentManager			  	 -->
+	<!--  =============================  -->	
+	<bean id="assessmentDao" class="com.podosoftware.competency.assessment.dao.jdbc.JdbcAssessmentDao" parent="jdbcDaoSupport" depends-on="extendedPropertyDao" p:extendedPropertyDao-ref="extendedPropertyDao" />	
+	<bean id="ratingSchemeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="ratingSchemeCache"  p:maxElementsInMemory="100"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="assessmentManager"
+		class="com.podosoftware.competency.assessment.DefaultAssessmentManager"
+		depends-on="assessmentDao" 
+		p:ratingSchemeCache-ref="ratingSchemeCache"
+		p:assessmentDao-ref="assessmentDao"
+		/>						
 </beans>
