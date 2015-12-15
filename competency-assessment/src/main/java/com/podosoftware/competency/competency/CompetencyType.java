@@ -12,6 +12,14 @@ public enum CompetencyType {
 	
 	
 	private int id;
+	
+	/**
+	 * 
+	 * 
+	 * 
+	 * 
+	 * @param id
+	 */
 
 	private CompetencyType(int id) {
 		this.id = id;

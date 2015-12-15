@@ -7,6 +7,7 @@ import architecture.common.cache.Cacheable;
 public interface Classification  extends Cacheable{
 
 	
+	
 	public Long getClassifiedMajorityId();
 	
 	public Long getClassifiedMiddleId();

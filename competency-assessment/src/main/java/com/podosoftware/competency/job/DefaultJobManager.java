@@ -21,6 +21,8 @@ import net.sf.ehcache.Element;
 
 public class DefaultJobManager implements JobManager {
 	
+	private Cache jobIdsCache;
+	
 	private Cache jobCache;
 	
 	private JobDao jobDao;
@@ -33,7 +35,25 @@ public class DefaultJobManager implements JobManager {
 		
 	}
 	
-	
+
+
+
+
+	public Cache getJobIdsCache() {
+		return jobIdsCache;
+	}
+
+
+
+
+
+	public void setJobIdsCache(Cache jobIdsCache) {
+		this.jobIdsCache = jobIdsCache;
+	}
+
+
+
+
 
 	public CompetencyManager getCompetencyManager() {
 		return competencyManager;
@@ -109,14 +129,11 @@ public class DefaultJobManager implements JobManager {
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void saveOrUpdate(Job job) throws JobNotFoundException {
-		
-		
+	public void saveOrUpdate(Job job) throws JobNotFoundException {		
 		if( job.getClassification().getClassifiedMajorityId() <= 0 ||
 			job.getClassification().getClassifiedMajorityId() <= 0 || 
 			job.getClassification().getClassifiedMajorityId() <= 0)
 			throw new IllegalArgumentException("Classification can not be null.");
-				
 		Date now = new Date();
 		if( job.getJobId() > 0){			
 			job.setModifiedDate(now);
@@ -124,10 +141,8 @@ public class DefaultJobManager implements JobManager {
 			job.setCreationDate(now);
 			job.setModifiedDate(now);
 		}
-		
 		jobDao.saveOrUpdateJob(job);
 		clearCache( job );
-		
 	}
  
 	public Job getJob(long jobId) throws JobNotFoundException {
@@ -245,5 +260,23 @@ public class DefaultJobManager implements JobManager {
 			}			
 		}		
 		return list;
+	}
+
+
+
+
+
+	@Override
+	public Job getJob(Competency competency) throws JobNotFoundException {
+		long jobId = -1L;
+		if(this.jobIdsCache.get(competency.getCompetencyId())!=null){
+			jobId = (Long)this.jobIdsCache.get(competency.getCompetencyId()).getObjectValue();
+		}else{
+			jobId = jobDao.getJobIdByCompetency(competency);
+			jobIdsCache.put(new Element(competency.getCompetencyId(), jobId));
+		}
+		if( jobId < 1)
+			throw new JobNotFoundException();		
+		return getJob(jobId);
 	}
 }

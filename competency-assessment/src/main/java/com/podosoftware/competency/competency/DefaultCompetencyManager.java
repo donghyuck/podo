@@ -222,9 +222,7 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		for( Long id : ids ){			
 			try {
 				list.add(getEssentialElement(id));
-			} catch (EssentialElementNotFoundException e) {
-				
-			}			
+			} catch (EssentialElementNotFoundException e) {}			
 		}		
 		return list;
 	}

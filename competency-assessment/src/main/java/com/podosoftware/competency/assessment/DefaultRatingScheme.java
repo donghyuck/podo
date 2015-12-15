@@ -1,51 +1,40 @@
-package com.podosoftware.competency.job;
+package com.podosoftware.competency.assessment;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.podosoftware.competency.job.json.CustomJsonClassificationDeserializer;
 
-import architecture.common.cache.CacheSizes;
 import architecture.common.model.json.CustomJsonDateDeserializer;
 import architecture.common.model.json.CustomJsonDateSerializer;
 import architecture.common.model.support.PropertyAwareSupport;
 
-public class DefaultJob extends PropertyAwareSupport implements Job {
+public class DefaultRatingScheme extends PropertyAwareSupport implements RatingScheme{
 
-	private Long jobId;
-
-	private Integer objectType;
-	
-	private Long objectId;
-	
+	private int objectType;
+	private long objectId;
+	private long ratingSchemeId;
 	private String name;
-
 	private String description;
-
+	private int scale;
+	private List<RatingLevel> ratingLevels;
 	private Date creationDate;
-
 	private Date modifiedDate;
-
-	private Classification classification;
-
-	public DefaultJob() {
-		this.jobId = -1L;
-		this.objectType = 0 ;
+	
+	public DefaultRatingScheme() {
+		this.ratingSchemeId = -1L;
+		this.name = null;
+		this.description = null;
+		this.scale = 2;		
+		this.ratingLevels = null;
+		this.objectType = 0;
 		this.objectId = -1L;
 		Date now = new Date();
 		this.creationDate = now;
 		this.modifiedDate = now;
-	}
-
-	public Long getJobId() {
-		return jobId;
-	}
-
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
 	}
 
 	public Integer getObjectType() {
@@ -64,6 +53,14 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		this.objectId = objectId;
 	}
 
+	public Long getRatingSchemeId() {
+		return ratingSchemeId;
+	}
+
+	public void setRatingSchemeId(long ratingSchemeId) {
+		this.ratingSchemeId = ratingSchemeId;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -80,6 +77,22 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		this.description = description;
 	}
 
+	public int getScale() {
+		return scale;
+	}
+
+	public void setScale(int scale) {
+		this.scale = scale;
+	}
+
+	public List<RatingLevel> getRatingLevels() {
+		return ratingLevels;
+	}
+
+	public void setRatingLevels(List<RatingLevel> ratingLevels) {
+		this.ratingLevels = ratingLevels;
+	}
+	
 	@JsonSerialize(using = CustomJsonDateSerializer.class)
 	public Date getCreationDate() {
 		return creationDate;
@@ -99,42 +112,21 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
-
-	public Classification getClassification() {
-		return classification;
-	}
-
-	@JsonDeserialize(using = CustomJsonClassificationDeserializer.class )
-	public void setClassification(Classification classfication) {
-		classification = classfication;
+	
+	@JsonIgnore
+	public int getCachedSize() {
+		return 0;
 	}
 
 	@JsonIgnore
 	public Serializable getPrimaryKeyObject() {
-		return jobId;
-	}
-
-	@Override
-	public int getModelObjectType() {
-		return 60;
+		return ratingSchemeId;
 	}
 
 	@JsonIgnore
-	public int getCachedSize() {
-		int totalSize = CacheSizes.sizeOfLong() 
-		+ CacheSizes.sizeOfInt() 
-		+ CacheSizes.sizeOfLong()
-		+ CacheSizes.sizeOfString(name) 
-		+ CacheSizes.sizeOfString(description)
-		+ CacheSizes.sizeOfDate() + CacheSizes.sizeOfDate();
-		return totalSize;
+	public int getModelObjectType() {
+		return 65;
 	}
-
-	@Override
-	public String toString() {
-		return "DefaultJob [jobId=" + jobId + ", objectType=" + objectType + ", objectId=" + objectId + ", name=" + name
-				+ ", description=" + description + ", creationDate=" + creationDate + ", modifiedDate=" + modifiedDate
-				+ ", classification=" + classification + "]";
-	}
+	
 
 }

@@ -2,6 +2,7 @@ package com.podosoftware.competency.job.dao;
 
 import java.util.List;
 
+import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
 import com.podosoftware.competency.job.JobCompetencyRelationship;
@@ -37,5 +38,5 @@ public interface JobDao {
 	
 	public abstract List<Long> getJobCompetencyIds(Job job);
 	
-	
+	public abstract Long getJobIdByCompetency(Competency competency) ;
 }

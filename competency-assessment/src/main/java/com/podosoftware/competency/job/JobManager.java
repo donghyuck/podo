@@ -29,6 +29,8 @@ public interface JobManager {
 	 */
 	public abstract List<Competency> getJobCompetencies(Job job);
 		
+	public abstract Job getJob(Competency competency) throws JobNotFoundException;
+	
 	public abstract void saveOrUpdate(Job job) throws JobNotFoundException ;
 	
 	public abstract Job getJob(long jobId) throws JobNotFoundException;

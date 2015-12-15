@@ -25,6 +25,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.podosoftware.competency.assessment.AssessmentManager;
+import com.podosoftware.competency.assessment.DefaultRatingScheme;
+import com.podosoftware.competency.assessment.RatingScheme;
+import com.podosoftware.competency.assessment.RatingSchemeNotFoundException;
 import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetManager.CodeItem;
@@ -83,7 +87,10 @@ public class SecureCompetencyMgmtController {
 	@Inject
 	@Qualifier("jobManager")
 	private JobManager jobManager;
-	
+
+	@Inject
+	@Qualifier("assessmentManager")
+	private AssessmentManager assessmentManager;
 	
 	
 	public JobManager getJobManager() {
@@ -118,6 +125,14 @@ public class SecureCompetencyMgmtController {
 		this.competencyManager = competencyManager;
 	}
 	
+
+	public AssessmentManager getAssessmentManager() {
+		return assessmentManager;
+	}
+
+	public void setAssessmentManager(AssessmentManager assessmentManager) {
+		this.assessmentManager = assessmentManager;
+	}
 
 	@RequestMapping(value="/mgmt/competency/codeset/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
@@ -279,6 +294,7 @@ public class SecureCompetencyMgmtController {
 	@RequestMapping(value="/mgmt/competency/list.json", method=RequestMethod.POST)
 	@ResponseBody
 	public ItemList listCompetency(
+		
 		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
 		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
 		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
@@ -331,6 +347,22 @@ public class SecureCompetencyMgmtController {
 					items = competencyManager.getCompetencies(company, competencyTypeToUse);
 			}
 		}
+		
+		DefaultJob emptyJob = new DefaultJob();
+		emptyJob.setClassification(new DefaultClassification());		
+		for(Competency competency : items){
+			if( competency.getCompetencyType() == CompetencyType.JOB || competency.getCompetencyType() == CompetencyType.NONE){
+				try {					
+					((DefaultCompetency)competency).setJob(jobManager.getJob(competency));
+				} catch (JobNotFoundException e) {
+					((DefaultCompetency)competency).setJob(emptyJob);
+				}
+			}else{
+				((DefaultCompetency)competency).setJob(emptyJob);
+			}
+			
+			log.debug(competency.toString());
+		}		
 		ItemList list = new ItemList(items, totalCount);		
 		return list;
 	}
@@ -576,4 +608,32 @@ public class SecureCompetencyMgmtController {
 		competencyManager.removeAbilities(listToUse);		
 		return listToUse;
 	}	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value="/mgmt/competency/assessment/rating-scheme/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<RatingScheme> listRatingScheme(
+			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
+	) {
+		return assessmentManager.getRatingSchemes(objectType, objectId);
+	}
+	
+	
+	@RequestMapping(value="/mgmt/competency/assessment/rating-scheme/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public RatingScheme updateRatingScheme(
+			@RequestBody DefaultRatingScheme ratingScheme
+			) throws RatingSchemeNotFoundException{
+			
+		//if(ability.getObjectType() < 1 || ability.getObjectId() < 1)
+		//	throw new IllegalArgumentException("Ability not allowed for objectType[" + ability.getObjectType() + "] ");			
+		assessmentManager.saveOrUpdateRatingScheme(ratingScheme);
+		return ratingScheme;
+	}
+	
 }

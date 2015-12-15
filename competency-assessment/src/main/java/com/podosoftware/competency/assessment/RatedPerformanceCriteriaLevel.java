@@ -1,4 +1,4 @@
-package com.podosoftware.competency.accessment;
+package com.podosoftware.competency.assessment;
 
 import java.util.Date;
 

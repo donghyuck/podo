@@ -1,5 +1,7 @@
 package com.podosoftware.competency.competency;
 
+import com.podosoftware.competency.job.Job;
+
 import architecture.common.cache.Cacheable;
 import architecture.common.model.PropertyAware;
 
@@ -43,4 +45,6 @@ public interface Competency extends PropertyAware, Cacheable {
 	
 	public abstract CompetencyType getCompetencyType();
 	
+	public abstract Job getJob();
+		
 }

@@ -3,6 +3,8 @@ package com.podosoftware.competency.competency;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.podosoftware.competency.job.Job;
 
 import architecture.common.model.support.PropertyAwareSupport;
 
@@ -25,6 +27,8 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	
 	private CompetencyType competencyType;
 	
+	private Job job;
+	
 	public DefaultCompetency() {
 		this.objectType = 1;
 		this.objectId = -1L;
@@ -34,6 +38,7 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.level = 0 ;
 		this.competencyUnitCode = null;
 		this.competencyType = CompetencyType.NONE;
+		this.job = null;
 	}
 	
 	public String getCompetencyUnitCode() {
@@ -125,5 +130,24 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	public int getModelObjectType() {
 		return 53;
 	}
+
+	@JsonProperty
+	public Job getJob() {
+		return job;
+	}
+
+	@JsonIgnore
+	public void setJob(Job job) {
+		this.job = job;
+	}
+
+	@Override
+	public String toString() {
+		return "DefaultCompetency [competencyId=" + competencyId + ", objectType=" + objectType + ", objectId="
+				+ objectId + ", competencyType=" + competencyType + ", name=" + name + ", description=" + description
+				+ ", level=" + level + ", competencyUnitCode=" + competencyUnitCode + ", job=" + job + "]";
+	}
+	
+	
 
 }

@@ -7,10 +7,12 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
 
+import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.DefaultJob;
@@ -289,5 +291,20 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 				Long.class,
 				new SqlParameterValue( Types.NUMERIC, job.getJobId())		
 		);
+	}
+
+	@Override
+	public Long getJobIdByCompetency(Competency competency) {
+		Long jobId = 0L;
+		if(competency.getCompetencyId() < 1)
+			return jobId;
+		try {
+			jobId = getExtendedJdbcTemplate().queryForObject(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_JOB_ID_BY_COMPETENCY_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId() ) );
+		} catch (DataAccessException e) {
+		}
+		return jobId;
 	}
 }
