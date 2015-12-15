@@ -5,7 +5,7 @@ import java.util.List;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
 
-public interface AccessmentDao {
+public interface AssessmentDao {
 	
 	public abstract List<Long> getRatingSchemeIds( int objectType, long objectId);
 	

@@ -3,7 +3,7 @@ package com.podosoftware.competency.assessment;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.podosoftware.competency.assessment.dao.AccessmentDao;
+import com.podosoftware.competency.assessment.dao.AssessmentDao;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyNotFoundException;
 import com.podosoftware.competency.competency.EssentialElement;
@@ -13,7 +13,7 @@ import net.sf.ehcache.Element;
 
 public class DefaultAssessmentManager implements AssessmentManager {
 
-	private AccessmentDao accessmentDao;
+	private AssessmentDao assessmentDao;
 	
 	protected Cache ratingSchemeCache;
 	
@@ -21,12 +21,12 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		
 	}
 
-	public AccessmentDao getAccessmentDao() {
-		return accessmentDao;
+	public AssessmentDao getAssessmentDao() {
+		return assessmentDao;
 	}
 
-	public void setAccessmentDao(AccessmentDao accessmentDao) {
-		this.accessmentDao = accessmentDao;
+	public void setAssessmentDao(AssessmentDao accessmentDao) {
+		this.assessmentDao = accessmentDao;
 	}
 	
 	public Cache getRatingSchemeCache() {
@@ -38,7 +38,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
  
 	public List<RatingScheme> getRatingSchemes(int objectType, long objectId) {
-		List<Long> ids = accessmentDao.getRatingSchemeIds(objectType, objectId);		
+		List<Long> ids = assessmentDao.getRatingSchemeIds(objectType, objectId);		
 		return loadRatingSchemes(ids);
 	}
  
@@ -48,13 +48,13 @@ public class DefaultAssessmentManager implements AssessmentManager {
 				ratingSchemeCache.remove(ratingScheme.getRatingSchemeId());
 			}
 		}
-		accessmentDao.saveOrUpdateRatingScheme(ratingScheme);
+		assessmentDao.saveOrUpdateRatingScheme(ratingScheme);
 	}
 
 	public RatingScheme getRatingScheme(long ratingSchemeId) throws RatingSchemeNotFoundException {
 		RatingScheme scheme = getRatingSchemeInCache(ratingSchemeId);
 		if(scheme == null){
-			scheme = accessmentDao.getRatingSchemeById(ratingSchemeId);			
+			scheme = assessmentDao.getRatingSchemeById(ratingSchemeId);			
 			if( scheme == null ){				
 				throw new RatingSchemeNotFoundException();
 			}
@@ -64,7 +64,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 	 
 	public int getRatingSchemeCount(int objectType, long objectId) {
-		return accessmentDao.getRatingSchemeCount(objectType, objectId);
+		return assessmentDao.getRatingSchemeCount(objectType, objectId);
 	}
 	
 	private void updateCache( RatingScheme ratingScheme){

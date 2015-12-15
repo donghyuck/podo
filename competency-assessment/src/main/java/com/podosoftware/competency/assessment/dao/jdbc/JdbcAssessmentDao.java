@@ -19,12 +19,12 @@ import com.podosoftware.competency.assessment.DefaultRatingLevel;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
-import com.podosoftware.competency.assessment.dao.AccessmentDao;
+import com.podosoftware.competency.assessment.dao.AssessmentDao;
 
 import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
 import architecture.ee.spring.jdbc.support.ExtendedJdbcDaoSupport;
 
-public class JdbcAccessmentDao extends ExtendedJdbcDaoSupport implements AccessmentDao  {
+public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements AssessmentDao  {
 
 	
 	private String ratingSchemeSequencerName = "RATING_SCHEME";
@@ -60,7 +60,7 @@ public class JdbcAccessmentDao extends ExtendedJdbcDaoSupport implements Accessm
 		}		
 	};
 	
-	public JdbcAccessmentDao() {
+	public JdbcAssessmentDao() {
 	}
 
 	public String getRatingSchemeSequencerName() {
