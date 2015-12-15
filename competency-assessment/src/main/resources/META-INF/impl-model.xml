@@ -3,13 +3,17 @@
 	<rank>1000</rank>
 
 	<model id="50" code="CODESET" />
-	<model id="51" code="CODESET_VALUE" />
-	
-	<model id="53" code="COMPETENCY_CATEGORY" />
+	<model id="51" code="CODESET_VALUE" />	
+	<model id="52" code="COMPETENCY_CATEGORY" />
 	<model id="53" code="COMPETENCY" />
 	<model id="54" code="ESSENTIAL_ELEMENT" />
 	<model id="55" code="PERFORMANCE_CRITERIA" />
 	<model id="56" code="ABILITY" />	
 	<model id="60" code="JOB" />
+	
+	<model id="65" code="RATING_SCHEME" />
+	<model id="66" code="RATING_LEVEL" />
+	<model id="70" code="ASSESSMENT" />
+	
 	
 </models>

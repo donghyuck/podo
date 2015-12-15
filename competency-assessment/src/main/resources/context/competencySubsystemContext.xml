@@ -56,11 +56,13 @@
 	<bean id="jobDao" class="com.podosoftware.competency.job.dao.jdbc.JdbcJobDao" parent="jdbcDaoSupport" depends-on="extendedPropertyDao" p:extendedPropertyDao-ref="extendedPropertyDao" />	
 	
 	<bean id="jobCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="jobCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+	<bean id="jobIdsCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="jobIdsCache"  p:maxElementsInMemory="5000"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	
 	<bean id="jobManager"
 		class="com.podosoftware.competency.job.DefaultJobManager"
 		depends-on="jobDao" 
 		p:jobCache-ref="jobCache"
+		p:jobIdsCache-ref="jobIdsCache"
 		p:jobDao-ref="jobDao"
 		p:codeSetManager-ref="codeSetManager"
 		p:competencyManager-ref="competencyManager"

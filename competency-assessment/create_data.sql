@@ -8,6 +8,10 @@ Insert into V2_SEQUENCER (SEQUENCER_ID,NAME,VALUE) values (56,'ABILITY',1);
 
 Insert into V2_SEQUENCER (SEQUENCER_ID,NAME,VALUE) values (60,'JOB',1);
 
+Insert into V2_SEQUENCER (SEQUENCER_ID,NAME,VALUE) values (65,'RATING_SCHEME',1);
+Insert into V2_SEQUENCER (SEQUENCER_ID,NAME,VALUE) values (66,'RATING_LEVEL',1);
+
+
 
 
 // data setting 
