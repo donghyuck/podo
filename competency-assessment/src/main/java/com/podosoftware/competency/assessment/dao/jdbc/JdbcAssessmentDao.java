@@ -137,7 +137,6 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_RATING_SCHEME_BY_ID").getSql(), 
 					ratingSchemeMapper, 
 					new SqlParameterValue(Types.NUMERIC, ratingSchemeId ) );
-			
 			scheme.setProperties(getRatingSchemeProperties(ratingSchemeId));
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if(e.getActualSize() > 1)

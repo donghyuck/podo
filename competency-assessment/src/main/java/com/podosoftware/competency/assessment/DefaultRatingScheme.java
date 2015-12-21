@@ -3,9 +3,16 @@ package com.podosoftware.competency.assessment;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.podosoftware.competency.assessment.json.JsonRatingLevelsDeserializer;
+import com.podosoftware.competency.assessment.json.JsonRatingLevelsSerializer;
 
+import architecture.common.model.json.JsonMapPropertyDeserializer;
+import architecture.common.model.json.JsonMapPropertySerializer;
 import architecture.common.model.support.PropertyAndDateAwareSupport;
 
 public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements RatingScheme {
@@ -79,12 +86,24 @@ public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements 
 		this.scale = scale;
 	}
 
+	@JsonSerialize(using = JsonRatingLevelsSerializer.class)	
 	public List<RatingLevel> getRatingLevels() {
 		return ratingLevels;
 	}
 
+	@JsonDeserialize(using = JsonRatingLevelsDeserializer.class)	
 	public void setRatingLevels(List<RatingLevel> ratingLevels) {
 		this.ratingLevels = ratingLevels;
+	}
+	
+	@JsonDeserialize(using = JsonMapPropertyDeserializer.class)	
+	public void setProperties(Map<String, String> properties) {
+		super.setProperties(properties);
+	}
+
+	@JsonSerialize(using = JsonMapPropertySerializer.class)	
+	public Map<String, String> getProperties() {
+		return super.getProperties();
 	}
 	
 	@JsonIgnore
