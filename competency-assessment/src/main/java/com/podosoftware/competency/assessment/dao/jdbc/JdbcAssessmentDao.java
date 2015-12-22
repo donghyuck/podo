@@ -138,6 +138,8 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					ratingSchemeMapper, 
 					new SqlParameterValue(Types.NUMERIC, ratingSchemeId ) );
 			scheme.setProperties(getRatingSchemeProperties(ratingSchemeId));
+			scheme.setRatingLevels(getRatingLevels(ratingSchemeId));
+			
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if(e.getActualSize() > 1)
 	        {
@@ -192,8 +194,14 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					);
 			if(ratingScheme.getProperties().size() > 0){				
 				setRatingSchemeProperties(ratingScheme.getRatingSchemeId(), ratingScheme.getProperties());				
-			}			
+			}
+			for(RatingLevel rl : ratingScheme.getRatingLevels())
+				rl.setRatingSchemeId(ratingScheme.getRatingSchemeId());
 		}
+		
+		if(ratingScheme.getRatingLevels().size() > 0)
+			saveOrUpdateRatingLevels(ratingScheme.getRatingLevels());
+		
 	} 
 	
 	public void saveOrUpdateRatingLevels(List<RatingLevel> ratingLevels){	
