@@ -2,7 +2,7 @@ package com.podosoftware.competency.assessment;
 
 import java.util.Date;
 
-public interface Accessment {
+public interface Assessment {
 
 	public abstract long getAccessmentId();
 

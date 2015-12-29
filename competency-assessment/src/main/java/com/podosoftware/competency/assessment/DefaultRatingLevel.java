@@ -6,11 +6,18 @@ import architecture.common.cache.CacheSizes;
 
 public class DefaultRatingLevel implements RatingLevel {
 
-	private long ratingSchemeId;
+	private Long ratingSchemeId;
 	private Long ratingLevelId;
 	private String title;
 	private int score;
 	
+	public DefaultRatingLevel(Long ratingSchemeId, Long ratingLevelId, String title, int score) {
+		this.ratingSchemeId = ratingSchemeId;
+		this.ratingLevelId = ratingLevelId;
+		this.title = title;
+		this.score = score;
+	}
+
 	public DefaultRatingLevel() {
 		this.ratingSchemeId = -1L;
 		this.ratingLevelId = -1L;
@@ -52,4 +59,12 @@ public class DefaultRatingLevel implements RatingLevel {
 				CacheSizes.sizeOfString(title);
 		return size;
 	}
+
+	@Override
+	public String toString() {
+		return "DefaultRatingLevel [ratingSchemeId=" + ratingSchemeId + ", ratingLevelId=" + ratingLevelId + ", title="
+				+ title + ", score=" + score + "]";
+	}
+	
+	
 }
