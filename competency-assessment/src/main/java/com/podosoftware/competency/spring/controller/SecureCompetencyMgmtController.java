@@ -637,7 +637,7 @@ public class SecureCompetencyMgmtController {
 		return ratingScheme;
 	}
 
-	@RequestMapping(value="/mgmt/competency/assessment/assessment-scheme/list.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment-scheme/list.json", method=RequestMethod.POST)
 	@ResponseBody
 	public List<AssessmentScheme> listAssessmentScheme(
 			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
@@ -647,7 +647,7 @@ public class SecureCompetencyMgmtController {
 	}
 	
 	
-	@RequestMapping(value="/mgmt/competency/assessment/assessment-scheme/update.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment-scheme/update.json", method=RequestMethod.POST)
 	@ResponseBody
 	public AssessmentScheme updateAssessmentScheme(
 			@RequestBody DefaultAssessmentScheme assessmentScheme
