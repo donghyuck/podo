@@ -2,45 +2,53 @@ package com.podosoftware.competency.assessment;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.podosoftware.competency.assessment.json.JsonRatingLevelsDeserializer;
-import com.podosoftware.competency.assessment.json.JsonRatingLevelsSerializer;
 
 import architecture.common.model.json.JsonMapPropertyDeserializer;
 import architecture.common.model.json.JsonMapPropertySerializer;
 import architecture.common.model.support.PropertyAndDateAwareSupport;
 
-public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements RatingScheme {
+public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport implements AssessmentScheme {
 
+	private long assessmentSchemeId;
 	private int objectType;
 	private long objectId;
-	private long ratingSchemeId;
+	private RatingScheme ratingScheme;
 	private String name;
 	private String description;
-	private int scale;
-	private List<RatingLevel> ratingLevels;
+	private boolean multipleApplyAllowed;
 	
-	public DefaultRatingScheme() {
-		this.ratingSchemeId = -1L;
+	public DefaultAssessmentScheme() {
+		this.assessmentSchemeId = -1L;
+		this.ratingScheme = null;
 		this.name = null;
 		this.description = null;
-		this.scale = 2;		
-		this.ratingLevels = null;
 		this.objectType = 0;
 		this.objectId = -1L;
+		this.multipleApplyAllowed = false;
 		Date now = new Date();
 		setCreationDate(now);
 		setModifiedDate(now);	
 	}
 
-	public DefaultRatingScheme(long ratingSchemeId) {
-		this();
-		this.ratingSchemeId = ratingSchemeId;
+	public boolean isMultipleApplyAllowed() {
+		return multipleApplyAllowed;
+	}
+
+	public void setMultipleApplyAllowed(boolean multipleApplyAllowed) {
+		this.multipleApplyAllowed = multipleApplyAllowed;
+	}
+
+	public long getAssessmentSchemeId() {
+		return assessmentSchemeId;
+	}
+
+	public void setAssessmentSchemeId(long assessmentSchemeId) {
+		this.assessmentSchemeId = assessmentSchemeId;
 	}
 
 	public int getObjectType() {
@@ -60,14 +68,12 @@ public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements 
 	}
 
 
-
-
-	public long getRatingSchemeId() {
-		return ratingSchemeId;
+	public RatingScheme getRatingScheme() {
+		return ratingScheme;
 	}
 
-	public void setRatingSchemeId(long ratingSchemeId) {
-		this.ratingSchemeId = ratingSchemeId;
+	public void setRatingScheme(RatingScheme ratingScheme) {
+		this.ratingScheme = ratingScheme;
 	}
 
 	public String getName() {
@@ -85,24 +91,6 @@ public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements 
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public int getScale() {
-		return scale;
-	}
-
-	public void setScale(int scale) {
-		this.scale = scale;
-	}
-
-	@JsonSerialize(using = JsonRatingLevelsSerializer.class)	
-	public List<RatingLevel> getRatingLevels() {
-		return ratingLevels;
-	}
-
-	@JsonDeserialize(using = JsonRatingLevelsDeserializer.class)	
-	public void setRatingLevels(List<RatingLevel> ratingLevels) {
-		this.ratingLevels = ratingLevels;
-	}
 	
 	@JsonDeserialize(using = JsonMapPropertyDeserializer.class)	
 	public void setProperties(Map<String, String> properties) {
@@ -115,19 +103,19 @@ public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements 
 	}
 	
 	@JsonIgnore
-	public int getCachedSize() {
-		return 0;
-	}
-
-	@JsonIgnore
 	public Serializable getPrimaryKeyObject() {
-		return ratingSchemeId;
+		return this.assessmentSchemeId;
 	}
 
 	@JsonIgnore
 	public int getModelObjectType() {
-		return 65;
+		return 71;
 	}
-	
+
+	@JsonIgnore
+	public int getCachedSize() {
+		return 71 ;
+	}
+
 
 }

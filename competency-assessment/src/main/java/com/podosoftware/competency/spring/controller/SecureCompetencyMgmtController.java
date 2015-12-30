@@ -26,7 +26,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.podosoftware.competency.assessment.AssessmentManager;
+import com.podosoftware.competency.assessment.AssessmentScheme;
+import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
+import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
 import com.podosoftware.competency.assessment.RatingSchemeNotFoundException;
 import com.podosoftware.competency.codeset.CodeSet;
@@ -609,11 +612,7 @@ public class SecureCompetencyMgmtController {
 		return listToUse;
 	}	
 	
-	
-	
-	
-	
-	
+		
 	@RequestMapping(value="/mgmt/competency/assessment/rating-scheme/list.json", method=RequestMethod.POST)
 	@ResponseBody
 	public List<RatingScheme> listRatingScheme(
@@ -629,11 +628,31 @@ public class SecureCompetencyMgmtController {
 	public RatingScheme updateRatingScheme(
 			@RequestBody DefaultRatingScheme ratingScheme
 			) throws RatingSchemeNotFoundException{
-			
-		//if(ability.getObjectType() < 1 || ability.getObjectId() < 1)
-		//	throw new IllegalArgumentException("Ability not allowed for objectType[" + ability.getObjectType() + "] ");			
+		for( RatingLevel rl : ratingScheme.getRatingLevels()){
+			if( rl.getRatingSchemeId() < 1 ){
+				rl.setRatingSchemeId(ratingScheme.getRatingSchemeId());
+			}
+		}
 		assessmentManager.saveOrUpdateRatingScheme(ratingScheme);
 		return ratingScheme;
 	}
+
+	@RequestMapping(value="/mgmt/competency/assessment/assessment-scheme/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<AssessmentScheme> listAssessmentScheme(
+			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
+	) {
+		return assessmentManager.getAssessmentSchemes(objectType, objectId);
+	}
 	
+	
+	@RequestMapping(value="/mgmt/competency/assessment/assessment-scheme/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public AssessmentScheme updateAssessmentScheme(
+			@RequestBody DefaultAssessmentScheme assessmentScheme
+			) {
+		assessmentManager.saveOrUpdateAssessmentScheme(assessmentScheme);
+		return assessmentScheme;
+	}
 }
