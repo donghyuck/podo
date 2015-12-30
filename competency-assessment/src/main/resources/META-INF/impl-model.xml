@@ -14,6 +14,6 @@
 	<model id="65" code="RATING_SCHEME" />
 	<model id="66" code="RATING_LEVEL" />
 	<model id="70" code="ASSESSMENT" />
-	
+	<model id="71" code="ASSESSMENT_SCHEME" />
 	
 </models>
