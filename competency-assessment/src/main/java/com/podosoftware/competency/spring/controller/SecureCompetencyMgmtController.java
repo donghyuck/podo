@@ -652,6 +652,9 @@ public class SecureCompetencyMgmtController {
 	public AssessmentScheme updateAssessmentScheme(
 			@RequestBody DefaultAssessmentScheme assessmentScheme
 			) {
+		
+		log.debug(assessmentScheme);
+		
 		assessmentManager.saveOrUpdateAssessmentScheme(assessmentScheme);
 		return assessmentScheme;
 	}
