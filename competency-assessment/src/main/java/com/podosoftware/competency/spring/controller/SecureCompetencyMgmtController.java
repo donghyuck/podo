@@ -140,7 +140,8 @@ public class SecureCompetencyMgmtController {
 	@RequestMapping(value="/mgmt/competency/codeset/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<CodeSet> listCodeSet(
-		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+		@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId,
 		@RequestParam(value="codeSetId", defaultValue="0", required=false ) Integer codeSetId
 			){		
 		
@@ -151,12 +152,10 @@ public class SecureCompetencyMgmtController {
 				return codeSetManager.getCodeSets(codeset);
 			} catch (CodeSetNotFoundException e) {
 			}
-		}
-		
-		if( companyId > 0 ){
-			return codeSetManager.getCodeSets(new CompanyTemplate(companyId));
-		}	
-		
+		}		
+		if( objectType == 1 && objectId > 0L ){
+			return codeSetManager.getCodeSets(new CompanyTemplate(objectId));
+		}			
 		return Collections.EMPTY_LIST;
 	}
 	
