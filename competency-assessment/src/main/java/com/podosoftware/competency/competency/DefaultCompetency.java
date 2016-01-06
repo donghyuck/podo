@@ -25,6 +25,8 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	
 	private String competencyUnitCode;
 	
+	private String competencyGroupCode;
+	
 	private CompetencyType competencyType;
 	
 	private Job job;
@@ -37,10 +39,25 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		this.description = null;
 		this.level = 0 ;
 		this.competencyUnitCode = null;
+		this.competencyGroupCode = null;
 		this.competencyType = CompetencyType.NONE;
 		this.job = null;
 	}
 	
+	
+	
+	public String getCompetencyGroupCode() {
+		return competencyGroupCode;
+	}
+
+
+
+	public void setCompetencyGroupCode(String competencyGroupCode) {
+		this.competencyGroupCode = competencyGroupCode;
+	}
+
+
+
 	public String getCompetencyUnitCode() {
 		return competencyUnitCode;
 	}

@@ -80,6 +80,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 			competency.setDescription( rs.getString("DESCRIPTION")); 		
 			competency.setLevel(rs.getInt("COMPETENCY_LEVEL"));
 			competency.setCompetencyUnitCode(rs.getString("COMPETENCY_UNIT_CODE"));
+			competency.setCompetencyGroupCode(rs.getString("COMPETENCY_GROUP_CODE"));
 			return competency;
 		}		
 	};	
@@ -276,9 +277,10 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					new SqlParameterValue( Types.NUMERIC, competency.getObjectType() ),
 					new SqlParameterValue( Types.NUMERIC, competency.getObjectId() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getName() ),
-					new SqlParameterValue( Types.VARCHAR, competency.getDescription() ),
+					new SqlParameterValue( Types.VARCHAR, competency.getDescription()),
 					new SqlParameterValue( Types.VARCHAR, competency.getLevel()),
-					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyUnitCode())
+					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyUnitCode()),
+					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyGroupCode())
 			);
 			
 			if(competency.getProperties().size() > 0)
@@ -298,7 +300,8 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					new SqlParameterValue( Types.VARCHAR, competency.getDescription() ),
 					new SqlParameterValue( Types.VARCHAR, competency.getLevel()),
 					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyUnitCode()),
-					new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId() )
+					new SqlParameterValue( Types.VARCHAR, competency.getCompetencyGroupCode()),
+					new SqlParameterValue( Types.NUMERIC, competency.getCompetencyId())
 			);
 			setCompetencyProperties(competency.getCompetencyId(), competency.getProperties());
 		} catch (DataAccessException e) {

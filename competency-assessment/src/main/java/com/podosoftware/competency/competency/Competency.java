@@ -43,6 +43,10 @@ public interface Competency extends PropertyAware, Cacheable {
 	
 	public abstract void setCompetencyUnitCode(String competencyUnitCode);
 	
+	public abstract String getCompetencyGroupCode();
+	
+	public abstract void setCompetencyGroupCode(String competencyGroupCode);
+	
 	public abstract CompetencyType getCompetencyType();
 	
 	public abstract Job getJob();

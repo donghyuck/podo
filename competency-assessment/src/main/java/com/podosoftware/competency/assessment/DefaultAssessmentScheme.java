@@ -7,6 +7,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.podosoftware.competency.assessment.json.RatingSchemeJsonDeserializer;
 
 import architecture.common.model.json.JsonMapPropertyDeserializer;
 import architecture.common.model.json.JsonMapPropertySerializer;
@@ -72,6 +73,7 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 		return ratingScheme;
 	}
 
+	@JsonDeserialize(using=RatingSchemeJsonDeserializer.class)
 	public void setRatingScheme(RatingScheme ratingScheme) {
 		this.ratingScheme = ratingScheme;
 	}
