@@ -95,6 +95,7 @@ public interface CodeSetManager {
 			items = new HashMap<String, CodeItem>();
 		}
 
+		
 		public CodeItem(String type, String name, String code, String etc1, Map<String, CodeItem> items) {
 			super();
 			this.type = type;

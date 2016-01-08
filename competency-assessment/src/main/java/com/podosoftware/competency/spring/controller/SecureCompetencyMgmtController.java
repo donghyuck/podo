@@ -137,6 +137,7 @@ public class SecureCompetencyMgmtController {
 		this.assessmentManager = assessmentManager;
 	}
 
+	
 	@RequestMapping(value="/mgmt/competency/codeset/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<CodeSet> listCodeSet(

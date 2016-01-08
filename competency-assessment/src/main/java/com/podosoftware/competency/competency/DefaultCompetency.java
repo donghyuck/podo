@@ -148,7 +148,6 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		return 53;
 	}
 
-	@JsonProperty
 	public Job getJob() {
 		return job;
 	}
@@ -157,6 +156,7 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	public void setJob(Job job) {
 		this.job = job;
 	}
+	
 
 	@Override
 	public String toString() {
@@ -165,6 +165,4 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 				+ ", level=" + level + ", competencyUnitCode=" + competencyUnitCode + ", job=" + job + "]";
 	}
 	
-	
-
 }
