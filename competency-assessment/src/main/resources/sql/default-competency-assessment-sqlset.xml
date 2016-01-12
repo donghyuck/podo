@@ -195,6 +195,80 @@
 	ORDER BY NAME ASC
 	]]></sql-query>		
 	
+	
+	<sql-query name="FIND_COMPETENCY_IDS_BY_INPUT" description="FIND_COMPETENCY_IDS_BY_INPUT"><![CDATA[
+    SELECT
+        T1.COMPETENCY_ID
+    FROM
+        CA_COMPETENCY T1,
+        CA_JOB T2,
+        CA_JOB_COMPETENCY_REL T3
+    WHERE
+    	T1.OBJECT_TYPE = ? AND
+    	T1.OBJECT_ID = ? AND
+        T1.COMPETENCY_ID = T3.COMPETENCY_ID (+) AND
+        T3.JOB_ID = T2.JOB_ID(+)
+	]]><dynamic><![CDATA[	
+	<#if groupCode??>
+	AND T1.COMPETENCY_GROUP_CODE = '${groupCode}'
+	</#if>		
+	<#if (level > 0) >
+	AND T1.COMPETENCY_LEVEL = ${level}
+	</#if>	
+	<#if name?? >
+	AND T1.NAME LIKE '%${name}%'
+	</#if>			
+	<#if (majorityId > 0) >
+	AND T2.L_CLASSIFIED_ID = ${majorityId}
+	</#if>		
+	<#if (middleId > 0) >
+	AND T2.M_CLASSIFIED_ID = ${middleId}
+	</#if>		
+	<#if (minorityId > 0) >
+	AND T2.S_CLASSIFIED_ID = ${minorityId}
+	</#if>	
+	<#if (jobId > 0) >
+	AND T2.JOB_ID = ${jobId}
+	</#if>			
+	]]></dynamic><![CDATA[
+	ORDER BY T1.NAME ASC
+	]]></sql-query>	
+		
+	<sql-query name="COUNT_COMPETENCY_IDS_BY_INPUT" description="COUNT_COMPETENCY_IDS_BY_INPUT"><![CDATA[
+    SELECT
+        COUNT(T1.COMPETENCY_ID)
+    FROM
+        CA_COMPETENCY T1,
+        CA_JOB T2,
+        CA_JOB_COMPETENCY_REL T3
+    WHERE
+    	T1.OBJECT_TYPE = ? AND
+    	T1.OBJECT_ID = ? AND
+        T1.COMPETENCY_ID = T3.COMPETENCY_ID (+) AND
+        T3.JOB_ID = T2.JOB_ID(+)
+	]]><dynamic><![CDATA[	
+	<#if groupCode??>
+	AND T1.COMPETENCY_GROUP_CODE = '${groupCode}'
+	</#if>		
+	<#if name?? >
+	AND T1.NAME LIKE '%${name}%'
+	</#if>			
+	<#if (majorityId > 0) >
+	AND T2.L_CLASSIFIED_ID = ${majorityId}
+	</#if>		
+	<#if (middleId > 0) >
+	AND T2.M_CLASSIFIED_ID = ${middleId}
+	</#if>		
+	<#if (minorityId > 0) >
+	AND T2.S_CLASSIFIED_ID = ${minorityId}
+	</#if>	
+	<#if (jobId > 0) >
+	AND T2.JOB_ID = ${jobId}
+	</#if>			
+	]]></dynamic><![CDATA[
+	ORDER BY T1.NAME ASC
+	]]></sql-query>				
+	
 	<sql-query name="SELECT_ESSENTIAL_ELEMENT_IDS_BY_COMPETENCY_ID" description="SELECT_ESSENTIAL_ELEMENT_IDS_BY_COMPETENCY_ID"><![CDATA[
 	SELECT ESSENTIAL_ELEMENT_ID FROM CA_ESSENTIAL_ELEMENT
 	WHERE COMPETENCY_ID = ?
