@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
@@ -303,7 +304,10 @@ public class SecureCompetencyMgmtController {
 		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
 		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,			
 		@RequestParam(value="jobId", defaultValue="0", required=false ) Long jobId,		
-		@RequestParam(value="competencyType", defaultValue="0", required=false ) Integer competencyType,	
+		@RequestParam(value="competencyName", defaultValue="", required=false ) String competencyName,
+		@RequestParam(value="competencyLevel", defaultValue="0", required=false ) Integer competencyLevel,
+		@RequestParam(value="competencyType", defaultValue="0", required=false ) Integer competencyType,
+		@RequestParam(value="competencyGroupCode", defaultValue="", required=false ) String competencyGroupCode,
 		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
 		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize,		
 		NativeWebRequest request
@@ -317,10 +321,24 @@ public class SecureCompetencyMgmtController {
 			}
 		}
 		
-		CompetencyType competencyTypeToUse = CompetencyType.getCompetencyTypeById(competencyType);		
-		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
+		CompetencyType competencyTypeToUse = CompetencyType.getCompetencyTypeById(competencyType);				
+		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);		
+		String competencyNameToUse = StringUtils.isEmpty(competencyName)?null:competencyName;
+		String competencyGroupCodeToUse = StringUtils.isEmpty(competencyGroupCode)?null:competencyGroupCode;
+		
 		int totalCount = 0 ;
-		List<Competency> items = Collections.EMPTY_LIST;		
+		List<Competency> items = Collections.EMPTY_LIST;	
+		
+		
+		totalCount = competencyManager.getCompetencyCount(company, competencyGroupCodeToUse, competencyLevel, competencyNameToUse, classify, jobId);
+		if( totalCount > 0 ){
+			if( pageSize > 0)
+				items = competencyManager.findCompetency(company, competencyGroupCodeToUse, competencyLevel, competencyNameToUse, classify, jobId, startIndex, pageSize);
+			else
+				items = competencyManager.findCompetency(company, competencyGroupCodeToUse, competencyLevel, competencyNameToUse, classify, jobId);				
+		}
+		
+		/**
 		if( jobId > 0){
 			try {
 				Job job = jobManager.getJob(jobId);
@@ -366,6 +384,7 @@ public class SecureCompetencyMgmtController {
 			
 			log.debug(competency.toString());
 		}		
+		*/
 		ItemList list = new ItemList(items, totalCount);		
 		return list;
 	}

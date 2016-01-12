@@ -232,9 +232,6 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 				new int[] {Types.NUMERIC, Types.NUMERIC}, 
 				Long.class);
 	}
-
-	
-	
 	
 	public void batchInsertJob(List<Job> jobs) {
 		final List<Job> inserts = jobs;		
