@@ -2,9 +2,11 @@ package com.podosoftware.competency.competency;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.json.JsonJobDeserializer;
 
 import architecture.common.model.support.PropertyAwareSupport;
 
@@ -152,11 +154,14 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		return job;
 	}
 
+
 	@JsonIgnore
+	@JsonDeserialize(using = JsonJobDeserializer.class)	
 	public void setJob(Job job) {
 		this.job = job;
 	}
-	
+
+
 
 	@Override
 	public String toString() {

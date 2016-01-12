@@ -578,6 +578,50 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 				Long.class);
 	}
 
+	
+
+	public List<Long> getCompetencyIds(int objectType, long objectId, String groupCode, int level, String name, Classification classify, long jobId) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.FIND_COMPETENCY_IDS_BY_INPUT", getCompetencyAdditionalParameter(groupCode, level, name, classify, jobId)).getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, objectType ),
+				new SqlParameterValue( Types.NUMERIC, objectId ) );
+	}
+	
+	public List<Long> getCompetencyIds(int objectType, long objectId, String groupCode, int level, String name, Classification classify, long jobId, int startIndex, int numResults) {
+		return getExtendedJdbcTemplate().queryScrollable(
+				getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.FIND_COMPETENCY_IDS_BY_INPUT", getCompetencyAdditionalParameter(groupCode, level, name, classify, jobId)).getSql(), 
+				startIndex, 
+				numResults, 
+				new Object[]{ objectType, objectId }, 
+				new int[] {Types.NUMERIC, Types.NUMERIC }, 
+				Long.class);
+	}
+
+		
+
+	@Override
+	public int getCompetencyCount(int objectType, long objectId, String groupCode, int level, String name, Classification classify , long jobId) {
+		return getExtendedJdbcTemplate().queryForObject( 
+				getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.COUNT_COMPETENCY_IDS_BY_INPUT", getCompetencyAdditionalParameter(groupCode, level, name, classify, jobId)).getSql(), 
+				Integer.class,
+				new SqlParameterValue( Types.NUMERIC, objectType ),
+				new SqlParameterValue( Types.NUMERIC, objectId )
+			);
+	} 
+	
+	private Map<String, Object> getCompetencyAdditionalParameter(String groupCode, int level, String name, Classification classify, long jobId){
+		Map<String, Object> additionalParameters = new HashMap<String, Object>();		
+		additionalParameters.put("majorityId", classify.getClassifiedMajorityId());
+		additionalParameters.put("middleId", classify.getClassifiedMiddleId());
+		additionalParameters.put("minorityId", classify.getClassifiedMinorityId());		
+		additionalParameters.put("groupCode", groupCode );
+		additionalParameters.put("level", level );
+		additionalParameters.put("name", name);		
+		additionalParameters.put("jobId", jobId);		
+		return  additionalParameters;
+	}
+	
 	public PerformanceCriteria getPerformanceCriteriaById(long performanceCriteriaId) {
 		PerformanceCriteria performanceCriteria = getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_PERFORMANCE_CRITERIAL_BY_ID").getSql(), 
 				performanceCriteriaMapper,
@@ -827,6 +871,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					}
 			});	
 		}
-	} 
-	
+	}
+
+
 }

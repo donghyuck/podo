@@ -41,6 +41,12 @@ public interface CompetencyDao {
 	public abstract List<Long> getCompetencyIds(int objectType, long objectId, CompetencyType competencyType, int startIndex, int numResults);
 	
 	
+	public abstract List<Long> getCompetencyIds(int objectType, long objectId, String groupCode, int level, String name, Classification classify, long jobId);
+	
+	public abstract List<Long> getCompetencyIds(int objectType, long objectId, String groupCode, int level, String name, Classification classify, long jobId, int startIndex, int numResults);
+	
+	public abstract int getCompetencyCount(int objectType, long objectId, String groupCode, int level, String name, Classification classify, long jobId);
+	
 	
 	/**
 	 * 직무 분류에 따른 역량 수 리턴. 

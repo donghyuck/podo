@@ -33,7 +33,36 @@ public interface CompetencyManager {
 	
 	public abstract List<Competency> getCompetencies(Company company, Classification classify) ;
 	
-	public abstract List<Competency> getCompetencies(Company company, Classification classify, int startIndex, int numResults) ;		
+	public abstract List<Competency> getCompetencies(Company company, Classification classify, int startIndex, int numResults) ;	
+	
+	
+		
+	/**
+	 * 
+	 * @param company
+	 * @param groupCode
+	 * @param level
+	 * @param name
+	 * @param classify
+	 * @return
+	 */
+	public abstract List<Competency> findCompetency(Company company, String groupCode, int level, String name, Classification classify, long jobId, int startIndex, int numResults) ;		
+		
+	public abstract List<Competency> findCompetency(Company company, String groupCode, int level, String name, Classification classify, long jobId);
+	
+	/**
+	 * 
+	 * @param company
+	 * @param groupCode
+	 * @param level
+	 * @param name
+	 * @param classify
+	 * @return
+	 */
+	public abstract int getCompetencyCount(Company company, String groupCode, int level, String name, Classification classify, long jobId);
+	
+	
+	
 	
 	public abstract void updateCompetency(Competency competency) throws CompetencyNotFoundException ;
 	

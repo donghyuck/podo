@@ -278,6 +278,24 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	public int getCompetencyCount(Company company, CompetencyType competencyType) {
 		return competencyDao.getCompetencyCount(1, company.getCompanyId(), competencyType);
 	}
+	
+
+	@Override
+	public List<Competency> findCompetency(Company company, String groupCode, int level, String name, Classification classify, long jobId, int startIndex, int numResults) {
+		List<Long> ids = competencyDao.getCompetencyIds(1, company.getCompanyId(), groupCode, level, name, classify, jobId, startIndex, numResults);
+		return loadCompetencies(ids);
+	}
+
+	public List<Competency> findCompetency(Company company, String groupCode, int level, String name, Classification classify, long jobId) {
+		List<Long> ids = competencyDao.getCompetencyIds(1, company.getCompanyId(), groupCode, level, name, classify, jobId);
+		return loadCompetencies(ids);
+	}
+	
+	@Override
+	public int getCompetencyCount(Company company, String groupCode, int level, String name, Classification classify, long jobId) {
+		return competencyDao.getCompetencyCount(1, company.getCompanyId(), groupCode, level, name, classify, jobId);
+	}
+	
 
 	private List<Competency> loadCompetencies(List<Long> ids){
 		ArrayList<Competency> list = new ArrayList<Competency>(ids.size());
@@ -490,5 +508,6 @@ public class DefaultCompetencyManager implements CompetencyManager {
 			}
 		}
 	}
+
 
 }
