@@ -6,7 +6,13 @@ import architecture.common.cache.Cacheable;
 
 public interface Classification  extends Cacheable{
 
+	public Long getClassifyType();
 	
+	public void setClassifyType(Long classifyType);
+	
+	public String getClassifyTypeName();
+	
+	public void setClassifyTypeName(String classifyTypeName);
 	
 	public Long getClassifiedMajorityId();
 	
@@ -27,6 +33,7 @@ public interface Classification  extends Cacheable{
 	public String getClassifiedMiddleName();
 	
 	public String getClassifiedMinorityName();
+	
 		
 	public void setClassifiedMajorityName(String classifiedMajorityName);
 	

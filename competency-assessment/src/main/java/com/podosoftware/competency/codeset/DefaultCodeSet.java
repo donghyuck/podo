@@ -33,6 +33,7 @@ public class DefaultCodeSet extends PropertyAwareSupport implements CodeSet {
     private Date modifiedDate;
     private List<Code> codes;    
     private boolean hasChildren;
+    private String groupCode;	
     
 	public DefaultCodeSet() {
 		this.codeSetId = -1L;
@@ -44,6 +45,7 @@ public class DefaultCodeSet extends PropertyAwareSupport implements CodeSet {
 		this.hasChildren = false;
 		this.code = null;
 		this.codes = Collections.EMPTY_LIST;
+		this.groupCode = null;
 	}	
 	
 	public DefaultCodeSet(long codeGroupId) {
@@ -176,6 +178,16 @@ public class DefaultCodeSet extends PropertyAwareSupport implements CodeSet {
 	@JsonIgnore
 	public Serializable getPrimaryKeyObject() {
 		return codeSetId;
+	}
+	
+	
+
+	public String getGroupCode() {
+		return groupCode;
+	}
+
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
 	}
 
 	public int getModelObjectType() {

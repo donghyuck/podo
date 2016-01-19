@@ -58,7 +58,7 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 			job.setJobId(rs.getLong("JOB_ID"));
 			job.setObjectType(rs.getInt("OBJECT_TYPE"));
 			job.setObjectId(rs.getLong("OBJECT_ID"));
-			job.setClassification(new DefaultClassification(rs.getLong("L_CLASSIFIED_ID"),rs.getLong("M_CLASSIFIED_ID"),rs.getLong("S_CLASSIFIED_ID")));
+			job.setClassification(new DefaultClassification(rs.getLong("CLASSIFY_TYPE"), rs.getLong("L_CLASSIFIED_ID"),rs.getLong("M_CLASSIFIED_ID"),rs.getLong("S_CLASSIFIED_ID")));
 			job.setName(rs.getString("NAME"));
 			job.setDescription(rs.getString("DESCRIPTION"));
 			job.setCreationDate(rs.getDate("CREATION_DATE"));
@@ -127,6 +127,7 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 	public void saveOrUpdateJob(Job job) {
 		if(job.getJobId() > 0){
 			getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_JOB").getSql(), 
+					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifyType() ),
 					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifiedMajorityId() ),
 					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifiedMiddleId()),
 					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifiedMinorityId()),
@@ -143,6 +144,7 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 					new SqlParameterValue( Types.NUMERIC, job.getJobId() ),
 					new SqlParameterValue( Types.NUMERIC, job.getObjectType() ),
 					new SqlParameterValue( Types.NUMERIC, job.getObjectId() ),
+					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifyType() ),
 					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifiedMajorityId() ),
 					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifiedMiddleId()),
 					new SqlParameterValue( Types.NUMERIC, job.getClassification().getClassifiedMinorityId()),
@@ -245,13 +247,14 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 						ps.setLong(1, job.getJobId() );
 						ps.setInt(2, job.getObjectType() );
 						ps.setLong(3, job.getObjectId());
-						ps.setLong(4, job.getClassification().getClassifiedMajorityId() );
-						ps.setLong(5, job.getClassification().getClassifiedMiddleId());
-						ps.setLong(6, job.getClassification().getClassifiedMinorityId());
-						ps.setString( 7, job.getName() );
-						ps.setString( 8, job.getDescription() );
-						ps.setTimestamp(9, new java.sql.Timestamp(job.getCreationDate().getTime()));
-						ps.setTimestamp(10, new java.sql.Timestamp(job.getModifiedDate().getTime()));
+						ps.setLong(4, job.getClassification().getClassifyType() );
+						ps.setLong(5, job.getClassification().getClassifiedMajorityId() );
+						ps.setLong(6, job.getClassification().getClassifiedMiddleId());
+						ps.setLong(7, job.getClassification().getClassifiedMinorityId());
+						ps.setString( 8, job.getName() );
+						ps.setString( 9, job.getDescription() );
+						ps.setTimestamp(10, new java.sql.Timestamp(job.getCreationDate().getTime()));
+						ps.setTimestamp(11, new java.sql.Timestamp(job.getModifiedDate().getTime()));
 					}					
 					public int getBatchSize() {
 						return inserts.size();

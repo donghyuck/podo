@@ -138,6 +138,22 @@ public class SecureCompetencyMgmtController {
 		this.assessmentManager = assessmentManager;
 	}
 
+	@RequestMapping(value="/mgmt/competency/codeset/group/list.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public List<CodeSet> listCodeSet(
+		@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+		@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId,
+		@RequestParam(value="name", defaultValue="0", required=false ) String name
+			){		
+		
+		User user = SecurityHelper.getUser();		
+		if( StringUtils.isNotEmpty(name) ){
+			return codeSetManager.getCodeSets(objectType, objectId, name);
+		}		
+		return Collections.EMPTY_LIST;
+	}
+	
+	
 	
 	@RequestMapping(value="/mgmt/competency/codeset/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
@@ -300,6 +316,7 @@ public class SecureCompetencyMgmtController {
 	public ItemList listCompetency(
 		
 		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="classifiyType", defaultValue="0", required=false ) Long classifiyType,
 		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
 		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
 		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,			
@@ -322,7 +339,7 @@ public class SecureCompetencyMgmtController {
 		}
 		
 		CompetencyType competencyTypeToUse = CompetencyType.getCompetencyTypeById(competencyType);				
-		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);		
+		Classification classify = new DefaultClassification(classifiyType, classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);		
 		String competencyNameToUse = StringUtils.isEmpty(competencyName)?null:competencyName;
 		String competencyGroupCodeToUse = StringUtils.isEmpty(competencyGroupCode)?null:competencyGroupCode;
 		
@@ -337,6 +354,20 @@ public class SecureCompetencyMgmtController {
 			else
 				items = competencyManager.findCompetency(company, competencyGroupCodeToUse, competencyLevel, competencyNameToUse, classify, jobId);				
 		}
+		
+		DefaultJob emptyJob = new DefaultJob();
+		emptyJob.setClassification(new DefaultClassification());		
+		for(Competency competency : items){
+			if( competency.getCompetencyType() == CompetencyType.JOB || competency.getCompetencyType() == CompetencyType.NONE){
+				try {					
+					((DefaultCompetency)competency).setJob(jobManager.getJob(competency));
+				} catch (JobNotFoundException e) {
+					((DefaultCompetency)competency).setJob(emptyJob);
+				}
+			}else{
+				((DefaultCompetency)competency).setJob(emptyJob);
+			}			
+		}	
 		
 		/**
 		if( jobId > 0){
@@ -424,6 +455,7 @@ public class SecureCompetencyMgmtController {
 	@ResponseBody
 	public ItemList listJob(
 		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="classifyType", defaultValue="0", required=false ) Long classifyType,
 		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
 		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
 		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,					
@@ -443,8 +475,11 @@ public class SecureCompetencyMgmtController {
 		List<Job> items = Collections.EMPTY_LIST;
 		int totalCount = 0 ;
 		
-		Classification classify = new DefaultClassification(classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
-		if( classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
+		Classification classify = new DefaultClassification(classifyType, classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
+		
+		//log.debug(classify);
+		
+		if( classify.getClassifyType() >0 || classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
 		{
 			totalCount = jobManager.getJobCount(company, classify);
 			if( totalCount > 0 ){
@@ -478,7 +513,7 @@ public class SecureCompetencyMgmtController {
 		
 		jobManager.saveOrUpdate(jobToUse);
 		
-		return jobToUse;
+		return jobManager.getJob(jobToUse.getJobId());
 	}
 	
 	@RequestMapping(value="/mgmt/competency/job/competencies/list.json", method=RequestMethod.POST)

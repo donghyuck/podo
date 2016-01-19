@@ -22,6 +22,12 @@ public interface CodeSetManager {
 		
 	public List<CodeSet> getRecrusiveCodesets(CodeSet codeset);
 	
+	
+	public int getCodeSetCount(int objectType, long objectId, String groupCode);
+	
+	public List<CodeSet> getCodeSets(int objectType, long objectId, String groupCode);	
+	
+	
 	public int getCodeSetCount(Company company);
 		
 	public int getCodeSetCount(CodeSet codeset);
@@ -52,6 +58,9 @@ public interface CodeSetManager {
 	public CodeSet createCodeSet(CodeSet codeset, String name, String desctiption);
 	
 	public CodeSetTreeWalker getCodeSetTreeWalker(Company company);
+	
+	
+	
 	
 	
 	

@@ -17,6 +17,10 @@ public interface EssentialElement extends PropertyAware, Cacheable {
 	
 	public void setName(String name);
 
+	public String getDescription();
+	
+	public void setDescription(String description);
+	
 	public String getCapabilityStandard();
 	
 	public void setCapabilityStandard(String capabilityStandard);

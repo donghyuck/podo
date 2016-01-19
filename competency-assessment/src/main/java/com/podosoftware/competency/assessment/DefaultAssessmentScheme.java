@@ -22,6 +22,8 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 	private String name;
 	private String description;
 	private boolean multipleApplyAllowed;
+	private boolean feedbackEnabled;
+	
 	
 	public DefaultAssessmentScheme() {
 		this.assessmentSchemeId = -1L;
@@ -31,10 +33,25 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 		this.objectType = 0;
 		this.objectId = -1L;
 		this.multipleApplyAllowed = false;
+		this.feedbackEnabled = false;
 		Date now = new Date();
 		setCreationDate(now);
 		setModifiedDate(now);	
 	}
+	
+	
+
+	public boolean isFeedbackEnabled() {
+		return feedbackEnabled;
+	}
+
+
+
+	public void setFeedbackEnabled(boolean feedbackEnabled) {
+		this.feedbackEnabled = feedbackEnabled;
+	}
+
+
 
 	public boolean isMultipleApplyAllowed() {
 		return multipleApplyAllowed;

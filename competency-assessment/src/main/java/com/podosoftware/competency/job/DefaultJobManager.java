@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import net.sf.ehcache.Element;
 
 public class DefaultJobManager implements JobManager {
 	
+	private Log log = LogFactory.getLog(getClass());
 	private Cache jobIdsCache;
 	
 	private Cache jobCache;
@@ -35,17 +38,9 @@ public class DefaultJobManager implements JobManager {
 		
 	}
 	
-
-
-
-
 	public Cache getJobIdsCache() {
 		return jobIdsCache;
 	}
-
-
-
-
 
 	public void setJobIdsCache(Cache jobIdsCache) {
 		this.jobIdsCache = jobIdsCache;
@@ -130,7 +125,7 @@ public class DefaultJobManager implements JobManager {
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdate(Job job) throws JobNotFoundException {		
-		if( job.getClassification().getClassifiedMajorityId() <= 0 ||
+		if( job.getClassification().getClassifyType() <= 0 ||
 			job.getClassification().getClassifiedMajorityId() <= 0 || 
 			job.getClassification().getClassifiedMajorityId() <= 0)
 			throw new IllegalArgumentException("Classification can not be null.");
@@ -147,6 +142,9 @@ public class DefaultJobManager implements JobManager {
  
 	public Job getJob(long jobId) throws JobNotFoundException {
 		Job job = getJobInCache(jobId);
+		
+		log.debug("job in cache : " + job );
+		
 		if(job == null){
 			job = jobDao.getJobById(jobId);
 			if( job == null ){				
@@ -159,7 +157,15 @@ public class DefaultJobManager implements JobManager {
 	}	
 	
 	private void fetchClassification(Job job){
+		
+		log.debug("fetch job classify " + job.getClassification());
+		
 		Classification classification = job.getClassification();			
+		try {
+			CodeSet codeset = getCodeSetManager().getCodeSet(classification.getClassifyType());
+			classification.setClassifyTypeName(codeset.getName());
+		} catch (CodeSetNotFoundException e) {
+		}
 		try {
 			CodeSet codeset = getCodeSetManager().getCodeSet(classification.getClassifiedMajorityId());
 			classification.setClassifiedMajorityName(codeset.getName());
@@ -184,6 +190,7 @@ public class DefaultJobManager implements JobManager {
 	private Job getJobInCache(Long jobId){
 		if( jobCache.get(jobId) == null )
 			return null;		
+		
 		return (Job)jobCache.get(jobId).getValue(); 
 	}
 	
@@ -275,8 +282,13 @@ public class DefaultJobManager implements JobManager {
 			jobId = jobDao.getJobIdByCompetency(competency);
 			jobIdsCache.put(new Element(competency.getCompetencyId(), jobId));
 		}
+		
+		log.debug("get job by " + jobId );
+		
 		if( jobId < 1)
-			throw new JobNotFoundException();		
+			throw new JobNotFoundException();	
+		
+		
 		return getJob(jobId);
 	}
 }

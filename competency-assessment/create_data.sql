@@ -34,3 +34,15 @@ update V2_SEQUENCER set value = 1 where name = 'CODESET' ;
 update V2_SEQUENCER set value = 1 where name = 'COMPETENCY' ;
 
 update V2_SEQUENCER set value = 1 where name = 'ESSENTIAL_ELEMENT' ;
+
+// 
+
+	INSERT INTO CA_COMPETENCY (
+		COMPETENCY_ID,
+		COMPETENCY_TYPE,
+		OBJECT_TYPE,
+		OBJECT_ID,
+		NAME,
+		COMPETENCY_LEVEL,		
+		COMPETENCY_GROUP_CODE	
+	) VALUES ( 8256, 0, 1, 1, '의사소통능력', 0, '01' )	

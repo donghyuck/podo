@@ -150,13 +150,13 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		return 53;
 	}
 
+	@JsonGetter
 	public Job getJob() {
 		return job;
 	}
 
 
 	@JsonIgnore
-	@JsonDeserialize(using = JsonJobDeserializer.class)	
 	public void setJob(Job job) {
 		this.job = job;
 	}

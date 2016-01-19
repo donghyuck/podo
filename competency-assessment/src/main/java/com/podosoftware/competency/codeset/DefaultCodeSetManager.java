@@ -132,6 +132,28 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		return codeSetDao.getCodeSetCount(codeset.getObjectType(), codeset.getObjectId(), codeset.getCodeSetId());
 	}
 
+	
+
+	@Override
+	public int getCodeSetCount(int objectType, long objectId, String groupCode) {
+		return codeSetDao.getCodeSetCount(objectType, objectId, groupCode);
+	}
+
+	@Override
+	public List<CodeSet> getCodeSets(int objectType, long objectId, String groupCode) {
+		List<Long> codesetIds =  codeSetDao.getCodeSetIds(objectType, objectId, groupCode);
+		List<CodeSet> codesets = new ArrayList<CodeSet>(codesetIds.size());		
+		for(long codesetId:codesetIds){
+			CodeSet codeset;
+			try {
+				codeset = getCodeSet(codesetId);
+				codesets.add(codeset);
+			} catch (CodeSetNotFoundException e) {				
+			}			
+		}		
+		return codesets;
+	}
+		
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public CodeSet createCodeSet(Company company, String name, String description) {		
@@ -311,7 +333,7 @@ public class DefaultCodeSetManager implements CodeSetManager {
 						job.setJobId(jobDao.nextJobId());
 						job.setObjectType(codeSet.getObjectType());
 						job.setObjectId(codeSet.getObjectId());
-						job.setClassification(new DefaultClassification(newCodeSet.getCodeSetId(), newCodeSet2.getCodeSetId(), newCodeSet3.getCodeSetId() ));
+						job.setClassification(new DefaultClassification(0L, newCodeSet.getCodeSetId(), newCodeSet2.getCodeSetId(), newCodeSet3.getCodeSetId() ));
 						job.setName(item4.getName());
 						jobs.add(job);						
 						for( CodeItem item5 : item4.getItems().values()){		
@@ -366,4 +388,5 @@ public class DefaultCodeSetManager implements CodeSetManager {
 		competencyDao.createEssentialElement(elements);
 		
 	}
+
 }

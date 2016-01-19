@@ -9,12 +9,16 @@ import architecture.common.cache.CacheSizes;
 
 public class DefaultClassification implements Classification {
 
+	private Long classifyType;
+	
 	private Long classifiedMajorityId;
 
 	private Long classifiedMiddleId;
 
 	private Long classifiedMinorityId;
 
+	private String classifyTypeName;
+	
 	private String classifiedMajorityName;
 
 	private String classifiedMiddleName;
@@ -22,19 +26,37 @@ public class DefaultClassification implements Classification {
 	private String classifiedMinorityName;
 
 	public DefaultClassification() {
-		
+		this.classifyType = -1L;
 		this.classifiedMajorityId = -1L;
 		this.classifiedMiddleId = -1L;
 		this.classifiedMinorityId = -1L;
 		
 	}
 
-	public DefaultClassification(Long classifiedMajorityId, Long classifiedMiddleId, Long classifiedMinorityId) {
+	public DefaultClassification(Long classifyType, Long classifiedMajorityId, Long classifiedMiddleId, Long classifiedMinorityId) {
+		this.classifyType = classifyType;
 		this.classifiedMajorityId = classifiedMajorityId;
 		this.classifiedMiddleId = classifiedMiddleId;
 		this.classifiedMinorityId = classifiedMinorityId;
 	}
 
+
+
+	public Long getClassifyType() {
+		return classifyType;
+	}
+
+	public void setClassifyType(Long classifyType) {
+		this.classifyType = classifyType;
+	}
+
+	public String getClassifyTypeName() {
+		return classifyTypeName;
+	}
+
+	public void setClassifyTypeName(String classifyTypeName) {
+		this.classifyTypeName = classifyTypeName;
+	}
 
 	public Long getClassifiedMajorityId() {
 		return classifiedMajorityId;
@@ -87,6 +109,7 @@ public class DefaultClassification implements Classification {
 	@JsonIgnore
 	public Map<String, Long> toMap(){
 		Map<String, Long> additionalParameters = new HashMap<String, Long>(4);
+		additionalParameters.put("classifyType", this.classifyType);
 		additionalParameters.put("majorityId", this.classifiedMajorityId);
 		additionalParameters.put("middleId", this.classifiedMiddleId);
 		additionalParameters.put("minorityId", this.classifiedMinorityId);
@@ -102,6 +125,15 @@ public class DefaultClassification implements Classification {
 				+ CacheSizes.sizeOfString(classifiedMiddleName)
 				+ CacheSizes.sizeOfString(classifiedMinorityName);
 		return totalSize;
+	}
+
+	@Override
+	public String toString() {
+		return "DefaultClassification [classifyType=" + classifyType + ", classifiedMajorityId=" + classifiedMajorityId
+				+ ", classifiedMiddleId=" + classifiedMiddleId + ", classifiedMinorityId=" + classifiedMinorityId
+				+ ", classifyTypeName=" + classifyTypeName + ", classifiedMajorityName=" + classifiedMajorityName
+				+ ", classifiedMiddleName=" + classifiedMiddleName + ", classifiedMinorityName="
+				+ classifiedMinorityName + "]";
 	}
 
 }

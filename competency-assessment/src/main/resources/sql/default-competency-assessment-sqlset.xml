@@ -11,6 +11,7 @@
 		OBJECT_ID,
 		PARENT_CODESET_ID,
 		NAME,
+		GROUP_CODE,
 		CODE,
 		DESCRIPTION,
 		CREATION_DATE,
@@ -26,11 +27,12 @@
 		OBJECT_ID,
 		PARENT_CODESET_ID,
 		NAME,
-		CODE,
+		GROUP_CODE,
+		CODE,		
 		DESCRIPTION,
 		CREATION_DATE,
 		MODIFIED_DATE
-	) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)		
+	) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)		
 	]]></sql-query>			
 
 	<sql-query name="UPDATE_CODESET" description="UPDATE_CODESET"><![CDATA[
@@ -38,6 +40,7 @@
 	SET
 		PARENT_CODESET_ID = ?,
 		NAME = ?,
+		GROUP_CODE = ?,
 		CODE = ?,
 		DESCRIPTION = ?,
 		MODIFIED_DATE = ? 
@@ -46,13 +49,17 @@
 	]]></sql-query>		
 		
 	<sql-query name="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID" description="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID"><![CDATA[
-	SELECT COUNT(CODESET_ID) FROM CA_CODESET 
+	SELECT 
+		COUNT(CODESET_ID) 
+	FROM CA_CODESET 
 	WHERE OBJECT_TYPE = ? AND OBJECT_ID = ?		
 	]]></sql-query>			
 
 
 	<sql-query name="SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID" description="SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID"><![CDATA[
-	SELECT CODESET_ID FROM CA_CODESET 
+	SELECT 
+		CODESET_ID 	
+	FROM CA_CODESET 
 	WHERE 
 		OBJECT_TYPE = ? AND 
 		OBJECT_ID = ? 
@@ -62,8 +69,13 @@
 	]]></sql-query>	
 	
 	<sql-query name="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CODESET_ID" description="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_CODESET_ID"><![CDATA[
-	SELECT COUNT(CODESET_ID) FROM CA_CODESET 
-	WHERE OBJECT_TYPE = ? AND OBJECT_ID = ?	AND CODESET_ID =? AND PARENT_CODESET_ID = ?	
+	SELECT 
+		COUNT(CODESET_ID) 
+	FROM CA_CODESET 
+	WHERE OBJECT_TYPE = ? AND 
+		OBJECT_ID = ? AND 
+		CODESET_ID =? AND 
+		PARENT_CODESET_ID = ?	
 	]]></sql-query>			
 
 
@@ -78,8 +90,36 @@
 		NAME ASC	
 	]]></sql-query>	
 				
+				
+	<sql-query name="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_GROUP_CODE" description="COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_GROUP_CODE"><![CDATA[
+	SELECT 
+		COUNT(CODESET_ID) 	
+	FROM CA_CODESET 
+	WHERE OBJECT_TYPE = ? AND 
+		OBJECT_ID = ? AND 
+		CODESET_ID =? AND 
+		GROUP_CODE = ?	
+	]]></sql-query>			
+
+
+	<sql-query name="SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_GROUP_CODE" description="SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_GROUP_CODE"><![CDATA[
+	SELECT 
+		CODESET_ID 	
+	FROM CA_CODESET 
+	WHERE 
+		OBJECT_TYPE = ? AND 
+		OBJECT_ID = ? AND 
+		GROUP_CODE = ?	
+	ORDER BY 
+		CREATION_DATE, 
+		NAME ASC	
+	]]></sql-query>					
+				
+				
 	<sql-query name="SELECT_ROOT_CODESET" description="SELECT_ROOT_CODESET"><![CDATA[
-	SELECT CODESET_ID, CREATION_DATE FROM CA_CODESET 
+	SELECT 
+		CODESET_ID, CREATION_DATE 	
+	FROM CA_CODESET 
 	WHERE 
 		OBJECT_TYPE = ? AND 
 		OBJECT_ID = ?	AND 
@@ -88,7 +128,10 @@
 	]]></sql-query>			
 	
 	<sql-query name="SELECT_CHILD_CODESET" description="SELECT_CHILD_CODESET"><![CDATA[
-	SELECT CODESET_ID, PARENT_COMMENT_ID FROM CA_CODESET 
+	SELECT 
+		CODESET_ID, 
+		PARENT_COMMENT_ID 
+	FROM CA_CODESET 
 	WHERE 
 		OBJECT_TYPE = ? AND 
 		OBJECT_ID = ?	AND 
@@ -97,6 +140,11 @@
 		CREATION_DATE, 
 		CODESET_ID ASC	
 	]]></sql-query>		
+
+
+
+
+
 
 	<sql-query name="CREATE_COMPETENCY" description="CREATE_COMPETENCY"><![CDATA[
 	INSERT INTO CA_COMPETENCY (
@@ -289,7 +337,8 @@
 	<sql-query name="UPDATE_ESSENTIAL_ELEMENT" description="UPDATE_ESSENTIAL_ELEMENT"><![CDATA[
 	UPDATE CA_ESSENTIAL_ELEMENT
 	SET NAME = ? ,
-		COMPETENCY_LEVEL = ?	
+		DESCRIPTION = ? ,
+		COMPETENCY_LEVEL = ?			
 	WHERE ESSENTIAL_ELEMENT_ID = ?
 	]]></sql-query>		
 	
@@ -298,8 +347,9 @@
 		COMPETENCY_ID,
 		ESSENTIAL_ELEMENT_ID,
 		NAME,
+		DESCRIPTION,
 		COMPETENCY_LEVEL	
-	) VALUES (?,?,?,?)	
+	) VALUES (?,?,?,?,?)	
 	]]></sql-query>		
 	
 	<sql-query name="COUNT_ESSENTIAL_ELEMENT_BY_COMPETENCY_ID" description="COUNT_ESSENTIAL_ELEMENT_BY_COMPETENCY_ID"><![CDATA[
@@ -307,12 +357,13 @@
 	WHERE COMPETENCY_ID = ?
 	]]></sql-query>							
 					
-					
+	<!--  CA_JOB -->				
 	<sql-query name="INSERT_JOB" description="INSERT_JOB"><![CDATA[
 	INSERT INTO CA_JOB (
 		JOB_ID,
 		OBJECT_TYPE,
 		OBJECT_ID,
+		CLASSIFY_TYPE,
 		L_CLASSIFIED_ID,
 		M_CLASSIFIED_ID,
 		S_CLASSIFIED_ID,
@@ -322,7 +373,7 @@
  		MODIFIED_DATE		
 	) VALUES (
 		?,?,?,?,?,
-		?,?,?,?,?
+		?,?,?,?,?,?
 	)
 	]]></sql-query>				
 				
@@ -343,6 +394,9 @@
 	WHERE OBJECT_TYPE = ? 
 	AND OBJECT_ID = ?	
 	]]><dynamic><![CDATA[
+	<#if (classifyType > 0) >
+	AND CLASSIFY_TYPE = ${classifyType}
+	</#if>	
 	<#if (majorityId > 0) >
 	AND L_CLASSIFIED_ID = ${majorityId}
 	</#if>		
@@ -361,6 +415,9 @@
 	OBJECT_TYPE = ? 
 	AND OBJECT_ID = ?
 	]]><dynamic><![CDATA[
+	<#if (classifyType > 0) >
+	AND CLASSIFY_TYPE = ${classifyType}
+	</#if>	
 	<#if (majorityId > 0) >
 	AND L_CLASSIFIED_ID = ${majorityId}
 	</#if>		
@@ -379,6 +436,7 @@
 		JOB_ID,
 		OBJECT_TYPE,
 		OBJECT_ID,
+		CLASSIFY_TYPE,
 		L_CLASSIFIED_ID,
 		M_CLASSIFIED_ID,
 		S_CLASSIFIED_ID,
@@ -393,6 +451,7 @@
 	
 	<sql-query name="UPDATE_JOB" description="UPDATE_JOB"><![CDATA[
 	UPDATE CA_JOB SET
+		CLASSIFY_TYPE = ?,
 		L_CLASSIFIED_ID = ?,
 		M_CLASSIFIED_ID = ?,
 		S_CLASSIFIED_ID = ?,
@@ -456,6 +515,9 @@
 		T1.OBJECT_TYPE = ?
 		AND T1.OBJECT_ID = ?			
 	]]><dynamic><![CDATA[
+	<#if (classifyType > 0) >
+	AND CLASSIFY_TYPE = ${classifyType}
+	</#if>	
 	<#if (majorityId > 0) >
 	AND L_CLASSIFIED_ID = ${majorityId}
 	</#if>		
@@ -479,6 +541,9 @@
 		T1.OBJECT_TYPE = ?
 		AND T1.OBJECT_ID = ?			
 	]]><dynamic><![CDATA[
+	<#if (classifyType > 0) >
+	AND CLASSIFY_TYPE = ${classifyType}
+	</#if>		
 	<#if (majorityId > 0) >
 	AND L_CLASSIFIED_ID = ${majorityId}
 	</#if>		
@@ -491,6 +556,8 @@
 	]]></dynamic><![CDATA[
 	AND T1.JOB_ID = T2.JOB_ID 
 	]]></sql-query>	
+	
+	
 	
 	<sql-query name="CREATE_PERFORMANCE_CRITERIA" description="CREATE_PERFORMANCE_CRITERIA"><![CDATA[
 	INSERT INTO CA_PERFORMANCE_CRITERIA (

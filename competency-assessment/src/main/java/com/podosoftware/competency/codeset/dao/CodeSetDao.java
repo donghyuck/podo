@@ -27,4 +27,9 @@ public interface CodeSetDao {
 	
 	public CodeSetTreeWalker getCodeSetTreeWalker(int objectType, long objectId);
 	
+	
+	public List<Long> getCodeSetIds(int objectType, long objectId, String groupCode);
+	
+	public int getCodeSetCount(int objectType, long objectId, String groupCode);
+	
 }

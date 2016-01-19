@@ -20,9 +20,8 @@ public class CustomJsonClassificationDeserializer extends JsonDeserializer<Class
 			throws IOException, JsonProcessingException {
 		ObjectCodec oc = jsonParser.getCodec();
 		JsonNode node = oc.readTree(jsonParser);
-		
 		Classification classify = new DefaultClassification();
-		
+		classify.setClassifyType(node.get("classifyType").longValue());		
 		classify.setClassifiedMajorityId(node.get("classifiedMajorityId").longValue());		
 		classify.setClassifiedMiddleId(node.get("classifiedMiddleId").longValue());
 		classify.setClassifiedMinorityId(node.get("classifiedMinorityId").longValue());

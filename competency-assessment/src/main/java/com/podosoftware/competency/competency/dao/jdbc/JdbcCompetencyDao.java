@@ -92,6 +92,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 			element.setCompetencyId(rs.getLong("COMPETENCY_ID"));
 			element.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
 			element.setName(rs.getString("NAME"));
+			element.setDescription(rs.getString("DESCRIPTION"));
 			element.setLevel(rs.getInt("COMPETENCY_LEVEL"));			
 			return element;
 		}		
@@ -376,6 +377,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 					new SqlParameterValue( Types.NUMERIC, essentialElement.getCompetencyId() ),
 					new SqlParameterValue( Types.NUMERIC, essentialElement.getEssentialElementId()),
 					new SqlParameterValue( Types.VARCHAR, essentialElement.getName() ),
+					new SqlParameterValue( Types.VARCHAR, essentialElement.getDescription() ),
 					new SqlParameterValue( Types.NUMERIC, essentialElement.getLevel() )
 			);
 			
@@ -393,6 +395,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 		try {
 			getExtendedJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ESSENTIAL_ELEMENT").getSql(), 
 					new SqlParameterValue( Types.VARCHAR, essentialElement.getName() ),
+					new SqlParameterValue( Types.VARCHAR, essentialElement.getDescription() ),
 					new SqlParameterValue( Types.VARCHAR, essentialElement.getLevel()),
 					new SqlParameterValue( Types.NUMERIC, essentialElement.getEssentialElementId())
 			);

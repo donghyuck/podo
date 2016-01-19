@@ -52,4 +52,8 @@ public interface CodeSet extends PropertyAware, Cacheable{
 
 	public void setCode(String code);
 	
+	public String getGroupCode();
+
+	public void setGroupCode(String code);
+	
 }

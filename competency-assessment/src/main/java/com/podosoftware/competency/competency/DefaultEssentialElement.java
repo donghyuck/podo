@@ -18,10 +18,13 @@ public class DefaultEssentialElement extends PropertyAwareSupport implements Ess
 	
 	private Integer level;
 	
+	private String description;
+	
 	public DefaultEssentialElement() {
 		competencyId = -1L;
 		essentialElementId = -1L;
 		name = null;
+		this.description = null;
 		level = 0;
 	}
 
@@ -64,6 +67,16 @@ public class DefaultEssentialElement extends PropertyAwareSupport implements Ess
 
 	public void setCapabilityStandard(String capabilityStandard) {
 		this.capabilityStandard = capabilityStandard;
+	}
+	
+	
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@JsonIgnore

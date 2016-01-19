@@ -32,4 +32,9 @@ public interface AssessmentScheme extends PropertyAware, DateAware {
 	public boolean isMultipleApplyAllowed() ;
 
 	public void setMultipleApplyAllowed(boolean multipleApplyAllowed) ;
+	
+	public boolean isFeedbackEnabled() ;
+
+	public void setFeedbackEnabled(boolean feedbackEnabled) ;
+	
 }

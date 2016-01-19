@@ -45,10 +45,10 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 			g.setCodeSetId(rs.getLong("CODESET_ID"));
 			g.setObjectType(rs.getInt("OBJECT_TYPE"));
 			g.setObjectId(rs.getLong("OBJECT_ID"));
-			g.setParentCodeSetId(rs.getLong("PARENT_CODESET_ID"));
-			
+			g.setParentCodeSetId(rs.getLong("PARENT_CODESET_ID"));			
 			g.setName(rs.getString("NAME"));			
 			g.setCode(rs.getString("CODE"));
+			g.setGroupCode(rs.getString("GROUP_CODE"));
 			g.setDescription(rs.getString("DESCRIPTION"));
 			g.setCreationDate( rs.getDate("CREATION_DATE") ); 
 			g.setModifiedDate( rs.getDate("MODIFIED_DATE") ); 		
@@ -152,10 +152,11 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 						CodeSet c = updates.get(i);		
 						ps.setLong(1, c.getParentCodeSetId());
 						ps.setString(2, c.getName());
-						ps.setString(3, c.getCode());
-						ps.setString(4, c.getDescription());
-						ps.setDate(5, new java.sql.Date(c.getModifiedDate().getTime()));
-						ps.setLong(6, c.getCodeSetId());
+						ps.setString(3, c.getGroupCode());
+						ps.setString(4, c.getCode());
+						ps.setString(5, c.getDescription());
+						ps.setDate(6, new java.sql.Date(c.getModifiedDate().getTime()));
+						ps.setLong(7, c.getCodeSetId());
 					}					
 					public int getBatchSize() {
 						return updates.size();
@@ -196,6 +197,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 					new SqlParameterValue (Types.NUMERIC, codeset.getObjectId()),	
 					new SqlParameterValue (Types.NUMERIC, codeset.getParentCodeSetId()),	
 					new SqlParameterValue (Types.VARCHAR, codeset.getName()),	
+					new SqlParameterValue (Types.VARCHAR, codeset.getGroupCode()),
 					new SqlParameterValue (Types.VARCHAR, codeset.getCode()),
 					new SqlParameterValue (Types.VARCHAR, codeset.getDescription()),	
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getCreationDate()),	
@@ -208,6 +210,7 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_CODESET").getSql(),
 					new SqlParameterValue (Types.NUMERIC, codeset.getParentCodeSetId()),	
 					new SqlParameterValue (Types.VARCHAR, codeset.getName()),	
+					new SqlParameterValue (Types.VARCHAR, codeset.getGroupCode()),
 					new SqlParameterValue (Types.VARCHAR, codeset.getCode()),
 					new SqlParameterValue (Types.VARCHAR, codeset.getDescription()),			
 					new SqlParameterValue (Types.TIMESTAMP, codeset.getModifiedDate()),
@@ -320,6 +323,25 @@ public class JdbcCodeSetDao extends ExtendedJdbcDaoSupport implements CodeSetDao
 				new SqlParameterValue(Types.NUMERIC, objectType ),
 				new SqlParameterValue(Types.NUMERIC, objectId ),
 				new SqlParameterValue(Types.NUMERIC, codeSetId ));
+	}
+
+	@Override
+	public List<Long> getCodeSetIds(int objectType, long objectId, String groupCode) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_CODESET_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_GROUP_CODE").getSql(), 
+				Long.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ),
+				new SqlParameterValue(Types.VARCHAR, groupCode ));
+	}
+
+	@Override
+	public int getCodeSetCount(int objectType, long objectId, String groupCode) {
+		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_CODESET_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_GROUP_CODE").getSql(), 
+				Integer.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ),
+				new SqlParameterValue(Types.VARCHAR, groupCode ));
 	}
 
 	
