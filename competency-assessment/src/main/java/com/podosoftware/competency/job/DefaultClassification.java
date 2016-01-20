@@ -29,8 +29,7 @@ public class DefaultClassification implements Classification {
 		this.classifyType = -1L;
 		this.classifiedMajorityId = -1L;
 		this.classifiedMiddleId = -1L;
-		this.classifiedMinorityId = -1L;
-		
+		this.classifiedMinorityId = -1L;		
 	}
 
 	public DefaultClassification(Long classifyType, Long classifiedMajorityId, Long classifiedMiddleId, Long classifiedMinorityId) {

@@ -1,5 +1,7 @@
 package com.podosoftware.competency.assessment;
 
+import java.util.List;
+
 import architecture.common.model.DateAware;
 import architecture.common.model.PropertyAware;
 
@@ -37,4 +39,11 @@ public interface AssessmentScheme extends PropertyAware, DateAware {
 
 	public void setFeedbackEnabled(boolean feedbackEnabled) ;
 	
+	public void setJobSelections(List<JobSelection> jobSelections);
+	
+	public List<JobSelection> getJobSelections();
+	
+	public void setCompetencySelections(List<CompetencySelection> competencySelections);
+	
+	public List<CompetencySelection> getCompetencySelections();	
 }

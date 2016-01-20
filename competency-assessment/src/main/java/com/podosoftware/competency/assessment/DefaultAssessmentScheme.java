@@ -1,7 +1,9 @@
 package com.podosoftware.competency.assessment;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,7 +25,8 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 	private String description;
 	private boolean multipleApplyAllowed;
 	private boolean feedbackEnabled;
-	
+	private List<CompetencySelection> competencySelections;
+	private List<JobSelection> jobSelections;
 	
 	public DefaultAssessmentScheme() {
 		this.assessmentSchemeId = -1L;
@@ -34,6 +37,8 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 		this.objectId = -1L;
 		this.multipleApplyAllowed = false;
 		this.feedbackEnabled = false;
+		this.jobSelections = Collections.EMPTY_LIST;
+		this.competencySelections = Collections.EMPTY_LIST;
 		Date now = new Date();
 		setCreationDate(now);
 		setModifiedDate(now);	
@@ -135,6 +140,31 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 	public int getCachedSize() {
 		return 71 ;
 	}
+
+
+
+	public List<CompetencySelection> getCompetencySelections() {
+		return competencySelections;
+	}
+
+
+
+	public void setCompetencySelections(List<CompetencySelection> competencySelections) {
+		this.competencySelections = competencySelections;
+	}
+
+
+
+	public List<JobSelection> getJobSelections() {
+		return jobSelections;
+	}
+
+
+
+	public void setJobSelections(List<JobSelection> jobSelections) {
+		this.jobSelections = jobSelections;
+	}
+
 
 
 }

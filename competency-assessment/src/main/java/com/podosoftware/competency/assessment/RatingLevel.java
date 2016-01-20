@@ -45,6 +45,7 @@ public interface RatingLevel extends Cacheable {
 	 * 
 	 * @param title 진단 평정 척도 레벨 예시
 	 */
+	
 	public void setTitle(String title);
 	
 	/**

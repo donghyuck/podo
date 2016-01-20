@@ -19,6 +19,7 @@ import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingLevel;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
+import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
 import com.podosoftware.competency.assessment.dao.AssessmentDao;
@@ -81,6 +82,24 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 			return level;
 		}		
 	};
+
+	
+	private final RowMapper<JobSelection> jobSelectionMapper = new RowMapper<JobSelection>(){		
+		public JobSelection mapRow(ResultSet rs, int rowNum) throws SQLException {	
+			JobSelection jobSelection = new JobSelection();
+			jobSelection.setSelectionId(rs.getLong("SELECTION_ID"));
+			jobSelection.setObjectType(rs.getInt("OBJECT_TYPE"));
+			jobSelection.setObjectId(rs.getLong("OBJECT_ID"));
+			jobSelection.setClassifyType(rs.getLong("CLASSIFY_TYPE"));
+			jobSelection.setClassifiedMajorityId(rs.getLong("L_CLASSIFIED_ID"));
+			jobSelection.setClassifiedMiddleId(rs.getLong("M_CLASSIFIED_ID"));
+			jobSelection.setClassifiedMinorityId(rs.getLong("S_CLASSIFIED_ID"));
+			jobSelection.setJobId( rs.getLong("JOB_ID") ); 
+			return jobSelection;
+		}		
+	};
+
+	
 	
 	public JdbcAssessmentDao() {
 	}
@@ -180,6 +199,14 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 
 	public Long nextRatingLevelId() {
 		return getNextId(ratingLevelSequencerName);
+	}
+
+	public Long nextJobSelectionId() {
+		return getNextId("ASSESSMENT_JOB_SELECTION");
+	}
+	
+	public Long nextCompetencySelectionId() {
+		return getNextId("ASSESSMENT_COMPETENCY_SELECTION");
 	}
 	
 	public List<Long> getRatingSchemeIds(int objectType, long objectId) {
@@ -303,7 +330,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_RATING_LEVEL").getSql(), 
 				new BatchPreparedStatementSetter() {					
 					public void setValues(PreparedStatement ps, int i) throws SQLException {
-						RatingLevel level= inserts.get(i);
+						RatingLevel level= updates.get(i);
 						ps.setString(1,  level.getTitle());
 						ps.setInt(2, level.getScore());
 						ps.setLong(3, level.getRatingLevelId());
@@ -392,4 +419,108 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 			}
 		}	
 	}	
+
+	
+	public List<Long> getAssessmentJobSelectionIds(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_JOB_SELECTION_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ));
+	}
+
+
+	public int getAssessmentJobSelectionCount(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_ASSESSMENT_JOB_SELECTION_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Integer.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ));
+	}
+
+	public JobSelection getAssessmentJobSelectionById(long selectionId) {
+		JobSelection jobSel = null;
+		try {
+			jobSel = getExtendedJdbcTemplate().queryForObject(
+					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_JOB_SELECTION_BY_ID").getSql(), 
+					jobSelectionMapper, 
+					new SqlParameterValue(Types.NUMERIC, selectionId ) );					
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if(e.getActualSize() > 1)
+	        {
+	            log.warn((new StringBuilder()).append("Multiple occurrances of the same JobSelection ID found: ").append(selectionId).toString());
+	            throw e;
+	        }
+		} catch (DataAccessException e) {
+			 String message = (new StringBuilder()).append("Failure attempting to load JobSelection by ID : ").append(selectionId).append(".").toString();
+			 log.fatal(message, e);
+		}			
+		return jobSel;
+	}
+	
+	
+	public void removeAssessmentJobSelections(final List<JobSelection> jobSelections){	
+		getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.REMOVE_ASSESSMENT_JOB_SELECTION").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobSelection selection= jobSelections.get(i);
+						ps.setLong(1, selection.getSelectionId());	
+					}					
+					public int getBatchSize() {
+						return jobSelections.size();
+					}
+				});	
+	}
+	
+	public void saveOrUpdateAssessmentJobSelection(List<JobSelection> jobSelections){	
+		final List<JobSelection> inserts = new ArrayList<JobSelection>();		
+		final List<JobSelection> updates = new ArrayList<JobSelection>();				
+		for(JobSelection jobSel : jobSelections){
+			if(jobSel.getSelectionId() > 0){
+				updates.add(jobSel);
+			}else{
+				jobSel.setSelectionId(this.nextJobSelectionId());
+				inserts.add(jobSel);
+			}
+		}	
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT_JOB_SELECTION").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobSelection jobSel= inserts.get(i);
+						ps.setLong(1, jobSel.getClassifyType());	
+						ps.setLong(2, jobSel.getClassifiedMajorityId());
+						ps.setLong(3, jobSel.getClassifiedMiddleId());
+						ps.setLong(4, jobSel.getClassifiedMinorityId());
+						ps.setLong(5, jobSel.getJobId());
+						ps.setLong(6, jobSel.getSelectionId());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}	
+		if(updates.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT_JOB_SELECTION").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobSelection jobSel= inserts.get(i);
+						ps.setLong(1, jobSel.getSelectionId());	
+						ps.setInt(2, jobSel.getObjectType());	
+						ps.setLong(3, jobSel.getObjectId());	
+						ps.setLong(4, jobSel.getClassifyType());	
+						ps.setLong(5, jobSel.getClassifiedMajorityId());
+						ps.setLong(6, jobSel.getClassifiedMiddleId());
+						ps.setLong(7, jobSel.getClassifiedMinorityId());
+						ps.setLong(8, jobSel.getJobId());
+					}					
+					public int getBatchSize() {
+						return updates.size();
+					}
+				});		
+		}			
+	}
+	
 }
