@@ -101,12 +101,15 @@
 	
 	<bean id="assessmentSchemeCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="assessmentSchemeCache"  p:maxElementsInMemory="100"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
 	
+	<bean id="assessmentJobSelectionCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean" p:cacheName="assessmentJobSelectionCache"  p:maxElementsInMemory="100"  p:diskPersistent="false" p:overflowToDisk="false"  p:timeToIdle="600"  p:timeToLive="3600" p:eternal="false"  p:diskExpiryThreadIntervalSeconds="0" p:statisticsEnabled="true" />
+		
 	<bean id="assessmentManager"
 		class="com.podosoftware.competency.assessment.DefaultAssessmentManager"
 		depends-on="assessmentDao" 
 		p:assessmentCache-ref="assessmentCache"
 		p:ratingSchemeCache-ref="ratingSchemeCache"
 		p:assessmentSchemeCache-ref="assessmentSchemeCache"
+		p:assessmentJobSelectionCache-ref="assessmentJobSelectionCache"
 		p:assessmentDao-ref="assessmentDao"
 		/>						
 </beans>

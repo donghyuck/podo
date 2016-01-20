@@ -26,11 +26,8 @@ public class JsonRatingLevelsDeserializer extends JsonDeserializer<List<RatingLe
 
 	public List<RatingLevel> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
 			throws IOException, JsonProcessingException {
-
-		List<RatingLevel> list = new ArrayList<RatingLevel>();
-		
+		List<RatingLevel> list = new ArrayList<RatingLevel>();		
 		ObjectCodec oc = jsonParser.getCodec();
-
 		JsonNode node = oc.readTree(jsonParser);
 		Iterator<JsonNode> iter = node.elements();
 		while( iter.hasNext() ){

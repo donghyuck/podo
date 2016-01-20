@@ -9,6 +9,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.podosoftware.competency.assessment.json.JobSelectionsJsonDeserializer;
 import com.podosoftware.competency.assessment.json.RatingSchemeJsonDeserializer;
 
 import architecture.common.model.json.JsonMapPropertyDeserializer;
@@ -25,7 +26,6 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 	private String description;
 	private boolean multipleApplyAllowed;
 	private boolean feedbackEnabled;
-	private List<CompetencySelection> competencySelections;
 	private List<JobSelection> jobSelections;
 	
 	public DefaultAssessmentScheme() {
@@ -38,7 +38,6 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 		this.multipleApplyAllowed = false;
 		this.feedbackEnabled = false;
 		this.jobSelections = Collections.EMPTY_LIST;
-		this.competencySelections = Collections.EMPTY_LIST;
 		Date now = new Date();
 		setCreationDate(now);
 		setModifiedDate(now);	
@@ -141,30 +140,13 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 		return 71 ;
 	}
 
-
-
-	public List<CompetencySelection> getCompetencySelections() {
-		return competencySelections;
-	}
-
-
-
-	public void setCompetencySelections(List<CompetencySelection> competencySelections) {
-		this.competencySelections = competencySelections;
-	}
-
-
-
 	public List<JobSelection> getJobSelections() {
 		return jobSelections;
 	}
 
-
-
+	@JsonDeserialize(using=JobSelectionsJsonDeserializer.class)
 	public void setJobSelections(List<JobSelection> jobSelections) {
 		this.jobSelections = jobSelections;
 	}
-
-
 
 }

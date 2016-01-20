@@ -18,6 +18,8 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	protected Cache assessmentCache;
 	
+	protected Cache assessmentJobSelectionCache;
+	
 	public DefaultAssessmentManager() {
 		
 	}
@@ -54,6 +56,14 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		this.ratingSchemeCache = ratingSchemeCache;
 	}
  
+	public Cache getAssessmentJobSelectionCache() {
+		return assessmentJobSelectionCache;
+	}
+
+	public void setAssessmentJobSelectionCache(Cache assessmentJobSelectionCache) {
+		this.assessmentJobSelectionCache = assessmentJobSelectionCache;
+	}
+
 	public List<RatingScheme> getRatingSchemes(int objectType, long objectId) {
 		List<Long> ids = assessmentDao.getRatingSchemeIds(objectType, objectId);		
 		return loadRatingSchemes(ids);
@@ -171,4 +181,21 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		}
 		return null;
 	}
+	
+	
+	private void updateCache( JobSelection jobSelection){
+		if( assessmentJobSelectionCache.get(jobSelection.getSelectionId()) != null ){
+			assessmentJobSelectionCache.remove(jobSelection.getSelectionId());
+		}
+		assessmentJobSelectionCache.put(new Element(jobSelection.getSelectionId(), jobSelection));
+	}
+	
+	private JobSelection getAssessmentJobSelectionInCache(long jobSelectionId){
+		if(assessmentJobSelectionCache.get(jobSelectionId)!=null){
+			return (JobSelection) assessmentJobSelectionCache.get(jobSelectionId).getValue();
+		}
+		return null;
+	}
+	
+	
 }

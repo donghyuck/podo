@@ -43,7 +43,4 @@ public interface AssessmentScheme extends PropertyAware, DateAware {
 	
 	public List<JobSelection> getJobSelections();
 	
-	public void setCompetencySelections(List<CompetencySelection> competencySelections);
-	
-	public List<CompetencySelection> getCompetencySelections();	
 }

@@ -25,6 +25,4 @@ public class RatingSchemeJsonDeserializer extends JsonDeserializer<RatingScheme>
 		DefaultRatingScheme scheme = new DefaultRatingScheme(node.get("ratingSchemeId").asLong(-1L));
 		return scheme;
 	}
-
-	
 }

@@ -50,6 +50,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 			scheme.setDescription(rs.getString("DESCRIPTION"));
 			scheme.setRatingScheme(new DefaultRatingScheme(rs.getLong("RATING_SCHEME_ID")));
 			scheme.setMultipleApplyAllowed(rs.getInt("MULTIPLE_APPLY_ALLOWED") == 1 ? true : false );
+			scheme.setFeedbackEnabled(rs.getInt("FEEDBACK_ENABLED") == 1 ? true : false );
 			scheme.setCreationDate( rs.getDate("CREATION_DATE") ); 
 			scheme.setModifiedDate( rs.getDate("MODIFIED_DATE") );
 			return scheme;
@@ -393,6 +394,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getDescription()),	
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getRatingScheme().getRatingSchemeId()),
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isMultipleApplyAllowed() ? 1 : 0 ),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isFeedbackEnabled() ? 1 : 0 ),
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate()),
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getAssessmentSchemeId())
 					);
@@ -411,6 +413,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getDescription()),	
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getRatingScheme().getRatingSchemeId()),
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isMultipleApplyAllowed() ? 1 : 0 ),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isFeedbackEnabled() ? 1 : 0 ),
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getCreationDate()),	
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate())				
 					);
