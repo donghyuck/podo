@@ -111,5 +111,7 @@
 		p:assessmentSchemeCache-ref="assessmentSchemeCache"
 		p:assessmentJobSelectionCache-ref="assessmentJobSelectionCache"
 		p:assessmentDao-ref="assessmentDao"
+		p:codeSetManager-ref="codeSetManager"
+		p:jobManager-ref="jobManager"
 		/>						
 </beans>
