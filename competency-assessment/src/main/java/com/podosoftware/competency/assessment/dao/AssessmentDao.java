@@ -6,6 +6,7 @@ import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
+import com.podosoftware.competency.assessment.Subject;
 
 public interface AssessmentDao {
 	
@@ -52,7 +53,31 @@ public interface AssessmentDao {
 	
 	public void removeAssessmentJobSelections(final List<JobSelection> jobSelections);
 	
-	public void saveOrUpdateAssessmentJobSelection(List<JobSelection> jobSelections);
+	public void saveOrUpdateAssessmentJobSelections(List<JobSelection> jobSelections);
+	
+	
+	
+	/**
+	 * 파라메터 objectType, objectId 에 해당하는 대상자 객체 ID 를 리턴한다.
+	 * @param objectType
+	 * @param objectId
+	 * @return
+	 */
+	public List<Long> getAssessmentSubjectIds(int objectType, long objectId);
+	
+	/**
+	 * 파라메터 objectType, objectId 에 해당하는 대상자 객체 수를 리턴한다.
+	 * @param objectType
+	 * @param objectId
+	 * @return
+	 */
+	public int getAssessmentSubjectCount(int objectType, long objectId);	
+	
+	public Subject getAssessmentSubjectById(long subjectId) ;
+	
+	public void removeAssessmentSubjects(final List<Subject> jobSelections);
+	
+	public void saveOrUpdateAssessmentSubjects(List<Subject> jobSelections);
 	
 	
 }

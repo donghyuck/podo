@@ -12,7 +12,8 @@ import architecture.common.model.support.PropertyAwareSupport;
 
 
 public class DefaultCompetency extends PropertyAwareSupport implements Competency  {
-
+    
+        
 	private Integer objectType;
 	
 	private Long objectId;
@@ -150,19 +151,17 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 		return 53;
 	}
 
-	@JsonGetter
-	public Job getJob() {
-		return job;
-	}
-
-
 	@JsonIgnore
+	@JsonDeserialize(using = JsonJobDeserializer.class )
 	public void setJob(Job job) {
 		this.job = job;
 	}
 
-
-
+	@JsonGetter
+	public Job getJob() {
+		return job;
+	}
+	
 	@Override
 	public String toString() {
 		return "DefaultCompetency [competencyId=" + competencyId + ", objectType=" + objectType + ", objectId="

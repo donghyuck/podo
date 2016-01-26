@@ -27,6 +27,7 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 	private boolean multipleApplyAllowed;
 	private boolean feedbackEnabled;
 	private List<JobSelection> jobSelections;
+	private List<Subject> subjects;
 	
 	public DefaultAssessmentScheme() {
 		this.assessmentSchemeId = -1L;
@@ -38,6 +39,7 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 		this.multipleApplyAllowed = false;
 		this.feedbackEnabled = false;
 		this.jobSelections = Collections.EMPTY_LIST;
+		this.subjects = Collections.EMPTY_LIST;
 		Date now = new Date();
 		setCreationDate(now);
 		setModifiedDate(now);	
@@ -143,10 +145,28 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 	public List<JobSelection> getJobSelections() {
 		return jobSelections;
 	}
+	
+	public List<Subject> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(List<Subject> subjects) {
+		this.subjects = subjects;
+	}
 
 	@JsonDeserialize(using=JobSelectionsJsonDeserializer.class)
 	public void setJobSelections(List<JobSelection> jobSelections) {
 		this.jobSelections = jobSelections;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "AssessmentScheme [assessmentSchemeId=" + assessmentSchemeId + ", objectType=" + objectType
+				+ ", objectId=" + objectId + ", ratingScheme=" + ratingScheme + ", name=" + name + ", description="
+				+ description + ", multipleApplyAllowed=" + multipleApplyAllowed + ", feedbackEnabled="
+				+ feedbackEnabled + ", jobSelections=" + jobSelections + ", subjects=" + subjects + "]";
 	}
 
 }

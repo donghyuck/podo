@@ -18,7 +18,7 @@ public class JsonJobDeserializer extends JsonDeserializer<Job> {
 	public Job deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		ObjectCodec oc = jp.getCodec();
 		
-		return oc.readValue(jp, DefaultJob.class);
+		return new DefaultJob();// oc.readValue(jp, DefaultJob.class);
 	}
 
 }

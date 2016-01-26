@@ -144,6 +144,9 @@ public class DefaultCompetencyManager implements CompetencyManager {
 		if( competency.getCompetencyId() > 0)
 		{
 			competencyDao.updateCompetency(competency);		
+			if( competencyCache.get(competency.getCompetencyId()) != null ){
+				competencyCache.remove(competency.getCompetencyId());
+			}
 			updateCache( getCompetency(competency.getCompetencyId() ));
 		}
 	}

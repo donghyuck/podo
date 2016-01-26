@@ -22,6 +22,7 @@ import com.podosoftware.competency.assessment.DefaultRatingScheme;
 import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
+import com.podosoftware.competency.assessment.Subject;
 import com.podosoftware.competency.assessment.dao.AssessmentDao;
 
 import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
@@ -35,8 +36,11 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 	private String ratingSchemeSequencerName = "RATING_SCHEME";
 	private String ratingLevelSequencerName = "RATING_LEVEL";	
+	
 	private String ratingSchemePropertyTableName = "CA_RATING_SCHEME_PROPERTY";
 	private String ratingSchemePropertyPrimaryColumnName = "RATING_SCHEME_ID";
+	
+	private String assessmentSubjectSequencerName = "ASSESSMENT_SUBJECT";
 	
 	private ExtendedPropertyDao extendedPropertyDao;
 	
@@ -100,6 +104,17 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 		}		
 	};
 
+	private final RowMapper<Subject> subjectMapper = new RowMapper<Subject>(){		
+		public Subject mapRow(ResultSet rs, int rowNum) throws SQLException {	
+			Subject jobSelection = new Subject();			
+			jobSelection.setSubjectId(rs.getLong("SUBJECT_ID"));
+			jobSelection.setObjectType(rs.getInt("OBJECT_TYPE"));
+			jobSelection.setObjectId(rs.getLong("OBJECT_ID"));
+			jobSelection.setSubjectObjectType(rs.getInt("SUBJECT_OBJECT_TYPE"));
+			jobSelection.setSubjectObjectId(rs.getLong("SUBJECT_OBJECT_ID"));
+			return jobSelection;
+		}		
+	};
 	
 	
 	public JdbcAssessmentDao() {
@@ -209,6 +224,11 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	public Long nextCompetencySelectionId() {
 		return getNextId("ASSESSMENT_COMPETENCY_SELECTION");
 	}
+	
+	public long nextAssessmentSubjectId(){
+		return getNextId(assessmentSubjectSequencerName);
+	}
+	
 	
 	public List<Long> getRatingSchemeIds(int objectType, long objectId) {
 		return getExtendedJdbcTemplate().queryForList(
@@ -368,7 +388,9 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_SCHEME_BY_ID").getSql(), 
 					assessmentSchemeMapper, 
 					new SqlParameterValue(Types.NUMERIC, assessmentSchemeId ) );
-			scheme.setProperties(getAssessmentSchemeProperties(assessmentSchemeId));						
+			
+			scheme.setProperties(getAssessmentSchemeProperties(assessmentSchemeId));	
+			
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if(e.getActualSize() > 1)
 	        {
@@ -440,21 +462,126 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				new SqlParameterValue(Types.NUMERIC, objectId ));
 	}
 
-	public JobSelection getAssessmentJobSelectionById(long selectionId) {
-		JobSelection jobSel = null;
+	public JobSelection getAssessmentJobSelectionById(long subjectId) {
+		JobSelection sjb = null;
 		try {
-			jobSel = getExtendedJdbcTemplate().queryForObject(
+			sjb = getExtendedJdbcTemplate().queryForObject(
 					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_JOB_SELECTION_BY_ID").getSql(), 
 					jobSelectionMapper, 
+					new SqlParameterValue(Types.NUMERIC, subjectId ) );					
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if(e.getActualSize() > 1)
+	        {
+	            log.warn((new StringBuilder()).append("Multiple occurrances of the same JobSelection ID found: ").append(subjectId).toString());
+	            throw e;
+	        }
+		} catch (DataAccessException e) {
+			 String message = (new StringBuilder()).append("Failure attempting to load JobSelection by ID : ").append(subjectId).append(".").toString();
+			 log.fatal(message, e);
+		}			
+		return sjb;
+	}
+	
+	
+	/**************/
+	
+	public void removeAssessmentSubjects(final List<Subject> subjects){	
+		getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.REMOVE_ASSESSMENT_SUBJECT").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						Subject sbj= subjects.get(i);
+						ps.setLong(1, sbj.getSubjectId());	
+					}					
+					public int getBatchSize() {
+						return subjects.size();
+					}
+				});	
+	}
+	
+	public void saveOrUpdateAssessmentSubjects(List<Subject> subjects){	
+		final List<Subject> inserts = new ArrayList<Subject>();		
+		final List<Subject> updates = new ArrayList<Subject>();				
+		for(Subject jobSel : subjects){
+			if(jobSel.getSubjectId() > 0){
+				updates.add(jobSel);
+			}else{
+				jobSel.setSubjectId(this.nextAssessmentSubjectId());
+				inserts.add(jobSel);
+			}
+		}	
+		if(updates.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT_SUBJECT").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						Subject sbj= updates.get(i);
+						ps.setLong(1, sbj.getSubjectObjectType());	
+						ps.setLong(2, sbj.getSubjectObjectId());
+						ps.setLong(3, sbj.getSubjectId());
+					}					
+					public int getBatchSize() {
+						return updates.size();
+					}
+				});		
+		}	
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT_SUBJECT").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						Subject sbj= inserts.get(i);
+						ps.setLong(1, sbj.getSubjectId());	
+						ps.setInt(2, sbj.getObjectType());	
+						ps.setLong(3, sbj.getObjectId());	
+						ps.setLong(4, sbj.getSubjectObjectType());	
+						ps.setLong(5, sbj.getSubjectObjectId());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}			
+	}
+
+	
+	
+	
+	
+	
+	
+
+	public List<Long> getAssessmentSubjectIds(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_SUBJECT_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ));
+	}
+
+
+	public int getAssessmentSubjectCount(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_ASSESSMENT_SUBJECT_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Integer.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ));
+	}
+
+	public Subject getAssessmentSubjectById(long selectionId) {
+		Subject jobSel = null;
+		try {
+			jobSel = getExtendedJdbcTemplate().queryForObject(
+					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_SUBJECT_BY_ID").getSql(), 
+					subjectMapper, 
 					new SqlParameterValue(Types.NUMERIC, selectionId ) );					
 		} catch (IncorrectResultSizeDataAccessException e) {
 			if(e.getActualSize() > 1)
 	        {
-	            log.warn((new StringBuilder()).append("Multiple occurrances of the same JobSelection ID found: ").append(selectionId).toString());
+	            log.warn((new StringBuilder()).append("Multiple occurrances of the same subject ID found: ").append(selectionId).toString());
 	            throw e;
 	        }
 		} catch (DataAccessException e) {
-			 String message = (new StringBuilder()).append("Failure attempting to load JobSelection by ID : ").append(selectionId).append(".").toString();
+			 String message = (new StringBuilder()).append("Failure attempting to load subject by ID : ").append(selectionId).append(".").toString();
 			 log.fatal(message, e);
 		}			
 		return jobSel;
@@ -475,7 +602,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				});	
 	}
 	
-	public void saveOrUpdateAssessmentJobSelection(List<JobSelection> jobSelections){	
+	public void saveOrUpdateAssessmentJobSelections(List<JobSelection> jobSelections){	
 		final List<JobSelection> inserts = new ArrayList<JobSelection>();		
 		final List<JobSelection> updates = new ArrayList<JobSelection>();				
 		for(JobSelection jobSel : jobSelections){
@@ -486,12 +613,12 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				inserts.add(jobSel);
 			}
 		}	
-		if(inserts.size() > 0){
+		if(updates.size() > 0){
 			getExtendedJdbcTemplate().batchUpdate(				
 				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT_JOB_SELECTION").getSql(), 
 				new BatchPreparedStatementSetter() {					
 					public void setValues(PreparedStatement ps, int i) throws SQLException {
-						JobSelection jobSel= inserts.get(i);
+						JobSelection jobSel= updates.get(i);
 						ps.setLong(1, jobSel.getClassifyType());	
 						ps.setLong(2, jobSel.getClassifiedMajorityId());
 						ps.setLong(3, jobSel.getClassifiedMiddleId());
@@ -500,11 +627,11 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 						ps.setLong(6, jobSel.getSelectionId());
 					}					
 					public int getBatchSize() {
-						return inserts.size();
+						return updates.size();
 					}
 				});		
 		}	
-		if(updates.size() > 0){
+		if(inserts.size() > 0){
 			getExtendedJdbcTemplate().batchUpdate(				
 				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT_JOB_SELECTION").getSql(), 
 				new BatchPreparedStatementSetter() {					
@@ -520,10 +647,9 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 						ps.setLong(8, jobSel.getJobId());
 					}					
 					public int getBatchSize() {
-						return updates.size();
+						return inserts.size();
 					}
 				});		
 		}			
 	}
-	
 }

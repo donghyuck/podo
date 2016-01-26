@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentScheme;
+import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
 import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
 import com.podosoftware.competency.assessment.RatingLevel;
@@ -705,11 +706,10 @@ public class SecureCompetencyMgmtController {
 	@ResponseBody
 	public AssessmentScheme updateAssessmentScheme(
 			@RequestBody DefaultAssessmentScheme assessmentScheme
-			) {
+			) throws AssessmentSchemeNotFoundException {
 		
 		log.debug(assessmentScheme);
-		
 		assessmentManager.saveOrUpdateAssessmentScheme(assessmentScheme);
-		return assessmentScheme;
+		return assessmentManager.getAssessmentScheme( assessmentScheme.getAssessmentSchemeId() );
 	}
 }

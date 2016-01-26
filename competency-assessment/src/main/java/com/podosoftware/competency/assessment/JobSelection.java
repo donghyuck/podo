@@ -1,5 +1,6 @@
 package com.podosoftware.competency.assessment;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import architecture.common.cache.Cacheable;
@@ -139,7 +140,7 @@ public class JobSelection implements Cacheable {
 	}
 
 
-
+	@JsonGetter
 	public String getClassifyTypeName() {
 		return classifyTypeName;
 	}
@@ -151,7 +152,7 @@ public class JobSelection implements Cacheable {
 	}
 
 
-
+	@JsonGetter
 	public String getClassifiedMajorityName() {
 		return classifiedMajorityName;
 	}
@@ -163,7 +164,7 @@ public class JobSelection implements Cacheable {
 	}
 
 
-
+	@JsonGetter
 	public String getClassifiedMiddleName() {
 		return classifiedMiddleName;
 	}
@@ -175,7 +176,7 @@ public class JobSelection implements Cacheable {
 	}
 
 
-
+	@JsonGetter
 	public String getClassifiedMinorityName() {
 		return classifiedMinorityName;
 	}
@@ -199,7 +200,7 @@ public class JobSelection implements Cacheable {
 	}
 
 
-
+	@JsonGetter
 	public String getJobName() {
 		return jobName;
 	}
@@ -216,5 +217,29 @@ public class JobSelection implements Cacheable {
 		return 0;
 	}
 
+	@Override
+	public boolean equals(Object obj) {		
+		if( obj instanceof JobSelection){
+			JobSelection job2 = (JobSelection) obj;
+			if( job2.getSelectionId() > 0 && this.selectionId == job2.getSelectionId())
+				return true;
+			else 
+				return false;
+		}else {
+			return super.equals(obj);
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "JobSelection [selectionId=" + selectionId + ", objectType=" + objectType + ", objectId=" + objectId
+				+ ", classifyType=" + classifyType + ", classifiedMajorityId=" + classifiedMajorityId
+				+ ", classifiedMiddleId=" + classifiedMiddleId + ", classifiedMinorityId=" + classifiedMinorityId
+				+ ", classifyTypeName=" + classifyTypeName + ", classifiedMajorityName=" + classifiedMajorityName
+				+ ", classifiedMiddleName=" + classifiedMiddleName + ", classifiedMinorityName="
+				+ classifiedMinorityName + ", jobId=" + jobId + ", jobName=" + jobName + "]";
+	}
+
+	
 
 }

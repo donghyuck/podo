@@ -3,14 +3,34 @@ package com.podosoftware.competency.assessment;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.podosoftware.competency.assessment.dao.AssessmentDao;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.podosoftware.competency.assessment.dao.AssessmentDao;
+import com.podosoftware.competency.codeset.CodeSetManager;
+import com.podosoftware.competency.codeset.CodeSetNotFoundException;
+import com.podosoftware.competency.job.JobManager;
+import com.podosoftware.competency.job.JobNotFoundException;
+
+import architecture.common.user.CompanyManager;
+import architecture.common.user.CompanyNotFoundException;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 public class DefaultAssessmentManager implements AssessmentManager {
 
+	private Log log = LogFactory.getLog(getClass());
 	private AssessmentDao assessmentDao;
+	
+	private JobManager jobManager ;
+	
+	private CodeSetManager codeSetManager;
+	
+	private CompanyManager companyManager;
+	
 	
 	protected Cache ratingSchemeCache;
 	
@@ -20,8 +40,35 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	protected Cache assessmentJobSelectionCache;
 	
+	protected Cache assessmentSubjectCache;
+	
+	
 	public DefaultAssessmentManager() {
 		
+	}
+
+	public CompanyManager getCompanyManager() {
+		return companyManager;
+	}
+
+	public void setCompanyManager(CompanyManager companyManager) {
+		this.companyManager = companyManager;
+	}
+
+	public JobManager getJobManager() {
+		return jobManager;
+	}
+
+	public void setJobManager(JobManager jobManager) {
+		this.jobManager = jobManager;
+	}
+
+	public CodeSetManager getCodeSetManager() {
+		return codeSetManager;
+	}
+
+	public void setCodeSetManager(CodeSetManager codeSetManager) {
+		this.codeSetManager = codeSetManager;
 	}
 
 	public AssessmentDao getAssessmentDao() {
@@ -69,6 +116,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return loadRatingSchemes(ids);
 	}
  
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdateRatingScheme(RatingScheme ratingScheme) {
 		if(ratingScheme.getRatingSchemeId() > 0 ){
 			if( ratingSchemeCache.get(ratingScheme.getRatingSchemeId()) != null ){
@@ -78,6 +126,9 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		assessmentDao.saveOrUpdateRatingScheme(ratingScheme);
 	}
 
+	/**
+	 * 
+	 */
 	public RatingScheme getRatingScheme(long ratingSchemeId) throws RatingSchemeNotFoundException {
 		RatingScheme scheme = getRatingSchemeInCache(ratingSchemeId);
 		if(scheme == null){
@@ -129,30 +180,73 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return assessmentDao.getAssessmentSchemeCount(objectType, objectId);
 	}
 
-	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdateAssessmentScheme(AssessmentScheme assessmentScheme) {
+		
+		AssessmentScheme dbAssessmentScheme = null;
+		
+		
+		try {
+			dbAssessmentScheme = getAssessmentScheme(assessmentScheme.getAssessmentSchemeId());
+		} catch (AssessmentSchemeNotFoundException e1) {
+		}
+		List<JobSelection> jobSelections = assessmentScheme.getJobSelections();
+		List<JobSelection> jobDeletes = new ArrayList<JobSelection>();
+		List<JobSelection> dbJobSelections  = dbAssessmentScheme.getJobSelections();
+		for( JobSelection jobSelection : dbJobSelections){
+			if( !jobSelections.contains(jobSelection))
+				jobDeletes.add(jobSelection);
+		}
+		List<Subject> subjects = assessmentScheme.getSubjects();
+		List<Subject> subjectDeletes = new ArrayList<Subject>();
+		List<Subject> dbSubjects  = dbAssessmentScheme.getSubjects();
+		for( Subject sbj : dbSubjects){
+			if( !subjects.contains(sbj))
+				subjectDeletes.add(sbj);
+		}
+		assessmentDao.saveOrUpdateAssessmentScheme(assessmentScheme);
+		if( jobSelections.size() > 0)
+			assessmentDao.saveOrUpdateAssessmentJobSelections(jobSelections);
+		if( jobDeletes.size() > 0)
+			assessmentDao.removeAssessmentJobSelections(jobDeletes);
+		if( subjects.size() > 0)
+			assessmentDao.saveOrUpdateAssessmentSubjects(subjects);
+		if( subjectDeletes.size() > 0)
+			assessmentDao.removeAssessmentSubjects(subjectDeletes);	
+		
 		if(assessmentScheme.getAssessmentSchemeId() > 0 ){
 			if( assessmentSchemeCache.get(assessmentScheme.getAssessmentSchemeId()) != null ){
 				assessmentSchemeCache.remove(assessmentScheme.getAssessmentSchemeId());
 			}
 		}
-		assessmentDao.saveOrUpdateAssessmentScheme(assessmentScheme);		
 	}
 
+	
+	/**
+	 * 
+	 */
 	public AssessmentScheme getAssessmentScheme(long assessmentSchemeId) throws AssessmentSchemeNotFoundException {
 		AssessmentScheme scheme = getAssessmentSchemeInCache(assessmentSchemeId);
 		if(scheme == null){
-			scheme = assessmentDao.getAssessmentSchemeById(assessmentSchemeId);			
-			
+			scheme = assessmentDao.getAssessmentSchemeById(assessmentSchemeId);		
 			RatingScheme ratingScheme;
 			try {
 				ratingScheme = getRatingScheme(scheme.getRatingScheme().getRatingSchemeId());
 				scheme.setRatingScheme(ratingScheme);
 			} catch (RatingSchemeNotFoundException e) {
 			}
+			
+			List<JobSelection> selections = getJobSelections(scheme.getModelObjectType(), scheme.getAssessmentSchemeId());
+			scheme.setJobSelections(selections);			
 			if( scheme == null ){				
 				throw new AssessmentSchemeNotFoundException();
 			}
+			
+			
+			List<Subject> subjects = getSubjects(scheme.getModelObjectType(), scheme.getAssessmentSchemeId());
+			scheme.setSubjects(subjects);
+			
+			
 			updateCache(scheme);
 		}
 		return scheme;	
@@ -183,6 +277,82 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 	
 	
+	
+	public JobSelection getJobSelection(long jobSelectionId) throws JobSelectionNotFoundException {
+		JobSelection selection = null; // = getAssessmentJobSelectionInCache(jobSelectionId);
+		if(selection == null){
+			selection = assessmentDao.getAssessmentJobSelectionById(jobSelectionId);
+			//updateCache(selection);
+		}
+		if( selection == null ){				
+			throw new JobSelectionNotFoundException();
+		}
+		// cache problem ... 
+		log.debug(  "name is not set" + StringUtils.isEmpty(selection.getClassifiedMajorityName())  );
+		if(selection.getClassifyType() > 0 && StringUtils.isEmpty(selection.getClassifyTypeName()) ){
+			try {
+				selection.setClassifyTypeName(codeSetManager.getCodeSet(selection.getClassifyType()).getName());
+			} catch (CodeSetNotFoundException e) {
+			}
+		}		
+		
+		if(selection.getClassifiedMajorityId() > 0 && StringUtils.isEmpty(selection.getClassifiedMajorityName()) ){
+			try {
+				selection.setClassifiedMajorityName(codeSetManager.getCodeSet(selection.getClassifiedMajorityId()).getName());
+			} catch (CodeSetNotFoundException e) {
+			}
+		}
+		if(selection.getClassifiedMiddleId() > 0 && StringUtils.isEmpty(selection.getClassifiedMiddleName()) ){
+			try {
+				selection.setClassifiedMiddleName(codeSetManager.getCodeSet(selection.getClassifiedMiddleId()).getName());
+			} catch (CodeSetNotFoundException e) {
+			}				
+		}
+		if(selection.getClassifiedMinorityId() > 0 && StringUtils.isEmpty(selection.getClassifiedMinorityName()) ){
+			try {
+				selection.setClassifiedMinorityName(codeSetManager.getCodeSet(selection.getClassifiedMinorityId()).getName());
+			} catch (CodeSetNotFoundException e) {
+			}
+		}
+		if(selection.getJobId() > 0 && StringUtils.isEmpty(selection.getJobName()) ){
+			try {
+				selection.setJobName(jobManager.getJob(selection.getJobId()).getName());
+			} catch (JobNotFoundException e) {
+			}
+		}
+			
+		log.debug(selection);	
+		return selection;	
+	}
+
+	
+	private List<JobSelection> loadJobSelections(List<Long> ids){
+		ArrayList<JobSelection> list = new ArrayList<JobSelection>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJobSelection(id));
+			} catch (JobSelectionNotFoundException e) {}			
+		}		
+		return list;		
+	}
+	 
+	public void saveOrUpdateJobSelections(List<JobSelection> jobSelections) {
+		assessmentDao.saveOrUpdateAssessmentJobSelections(jobSelections);
+		for(JobSelection selection : jobSelections){
+			if(assessmentJobSelectionCache.get(selection.getSelectionId())!=null)
+				assessmentJobSelectionCache.remove(selection.getSelectionId());
+		}
+	}
+ 
+	public List<JobSelection> getJobSelections(int objectType, long objectId) {
+		return loadJobSelections(assessmentDao.getAssessmentJobSelectionIds(objectType, objectId));
+	}
+ 
+	public int getJobSelectionCount(int objectType, long objectId) {
+		return assessmentDao.getAssessmentJobSelectionCount(objectType, objectId);
+	}
+
+
 	private void updateCache( JobSelection jobSelection){
 		if( assessmentJobSelectionCache.get(jobSelection.getSelectionId()) != null ){
 			assessmentJobSelectionCache.remove(jobSelection.getSelectionId());
@@ -198,4 +368,67 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 	
 	
+
+	public Subject getSubject(long subjectId) throws SubjectNotFoundException {
+		Subject sbj = null; // = getAssessmentJobSelectionInCache(jobSelectionId);
+		if(sbj == null){
+			sbj = assessmentDao.getAssessmentSubjectById(subjectId);
+			//updateCache(selection);
+		}
+		if( sbj == null ){				
+			throw new SubjectNotFoundException();
+		}
+		// cache problem ... 
+		
+		if(sbj.getSubjectObjectType() == 1 && sbj.getSubjectObjectId() > 0  && StringUtils.isEmpty(sbj.getSubjectObjectName()) ){
+			try {
+				sbj.setSubjectObjectName(companyManager.getCompany(sbj.getSubjectObjectId()).getDisplayName() ) ;
+			} catch (CompanyNotFoundException e) {
+			}
+		}		
+		
+		log.debug(sbj);	
+		return sbj;	
+	}
+	
+	public void saveOrUpdateSubjects(List<Subject> subjects) {
+		assessmentDao.saveOrUpdateAssessmentSubjects(subjects);
+		for(Subject sbj : subjects){
+			if(assessmentSubjectCache.get(sbj.getSubjectId())!=null)
+				assessmentSubjectCache.remove(sbj.getSubjectId());
+		}
+	}
+
+	@Override
+	public List<Subject> getSubjects(int objectType, long objectId) {
+		return loadSubjects(assessmentDao.getAssessmentSubjectIds(objectType, objectId));
+	}
+ 
+	public int getSubjectCount(int objectType, long objectId) {
+		return assessmentDao.getAssessmentSubjectCount(objectType, objectId);
+	}
+	
+	private List<Subject> loadSubjects(List<Long> ids){
+		ArrayList<Subject> list = new ArrayList<Subject>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getSubject(id));
+			} catch (SubjectNotFoundException e) {}			
+		}		
+		return list;		
+	}
+	
+	private void updateCache( Subject jobSelection){
+		if( assessmentSubjectCache.get(jobSelection.getSubjectId()) != null ){
+			assessmentSubjectCache.remove(jobSelection.getSubjectId());
+		}
+		assessmentSubjectCache.put(new Element(jobSelection.getSubjectId(), jobSelection));
+	}
+	
+	private Subject getAccessmentSubjectInCache(long jobSelectionId){
+		if(assessmentSubjectCache.get(jobSelectionId)!=null){
+			return (Subject) assessmentSubjectCache.get(jobSelectionId).getValue();
+		}
+		return null;
+	}
 }
