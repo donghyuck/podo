@@ -3,7 +3,7 @@ package com.podosoftware.competency.assessment;
 import java.util.Date;
 
 public class AssessmentPlan {
-
+	
 	private String name;
 	private String description;
 	private long assessmentSchemeId;
