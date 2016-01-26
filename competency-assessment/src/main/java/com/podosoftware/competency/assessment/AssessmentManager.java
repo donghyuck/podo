@@ -11,7 +11,8 @@ public interface AssessmentManager {
 	public abstract void saveOrUpdateRatingScheme(RatingScheme ragintScheme);
 	
 	public abstract RatingScheme getRatingScheme(long ratingSchemeId) throws RatingSchemeNotFoundException ;
-		
+	
+			
 	public abstract List<AssessmentScheme> getAssessmentSchemes(int objectType, long objectId);
 	
 	public abstract int getAssessmentSchemeCount(int objectType, long objectId);
@@ -19,6 +20,7 @@ public interface AssessmentManager {
 	public abstract void saveOrUpdateAssessmentScheme(AssessmentScheme assessmentScheme);
 	
 	public abstract AssessmentScheme getAssessmentScheme(long assessmentSchemeId) throws AssessmentSchemeNotFoundException ;
+	
 	
 	public abstract void saveOrUpdateJobSelections(List<JobSelection> jobSelectinos);
 	
@@ -32,6 +34,16 @@ public interface AssessmentManager {
 	public abstract List<Subject> getSubjects(int objectType, long objectId);
 	
 	public abstract int getSubjectCount(int objectType, long objectId);
+	
+		
+	public abstract List<Assessment> getAssessments(int objectType, long objectId);
+	
+	public abstract int getAssessmentCount(int objectType, long objectId);
+	
+	public abstract void saveOrUpdateAssessment(Assessment assessment);
+	
+	public abstract Assessment getAssessment(long assessment) throws AssessmentNotFoundException ;
+	
 	
 	
 }

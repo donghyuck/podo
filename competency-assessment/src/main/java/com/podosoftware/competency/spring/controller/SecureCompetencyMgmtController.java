@@ -26,14 +26,20 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentManager;
+import com.podosoftware.competency.assessment.AssessmentNotFoundException;
+import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
+import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
+import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
 import com.podosoftware.competency.assessment.RatingSchemeNotFoundException;
+import com.podosoftware.competency.assessment.Subject;
 import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetManager.CodeItem;
@@ -337,8 +343,7 @@ public class SecureCompetencyMgmtController {
 				company = companyManager.getCompany(companyId);
 			} catch (CompanyNotFoundException e) {
 			}
-		}
-		
+		}		
 		CompetencyType competencyTypeToUse = CompetencyType.getCompetencyTypeById(competencyType);				
 		Classification classify = new DefaultClassification(classifiyType, classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);		
 		String competencyNameToUse = StringUtils.isEmpty(competencyName)?null:competencyName;
@@ -346,8 +351,6 @@ public class SecureCompetencyMgmtController {
 		
 		int totalCount = 0 ;
 		List<Competency> items = Collections.EMPTY_LIST;	
-		
-		
 		totalCount = competencyManager.getCompetencyCount(company, competencyGroupCodeToUse, competencyLevel, competencyNameToUse, classify, jobId);
 		if( totalCount > 0 ){
 			if( pageSize > 0)
@@ -355,7 +358,6 @@ public class SecureCompetencyMgmtController {
 			else
 				items = competencyManager.findCompetency(company, competencyGroupCodeToUse, competencyLevel, competencyNameToUse, classify, jobId);				
 		}
-		
 		DefaultJob emptyJob = new DefaultJob();
 		emptyJob.setClassification(new DefaultClassification());		
 		for(Competency competency : items){
@@ -368,55 +370,7 @@ public class SecureCompetencyMgmtController {
 			}else{
 				((DefaultCompetency)competency).setJob(emptyJob);
 			}			
-		}	
-		
-		/**
-		if( jobId > 0){
-			try {
-				Job job = jobManager.getJob(jobId);
-				totalCount = competencyManager.getCompetencyCount(job);
-				if( totalCount > 0 ){
-					if( pageSize > 0)
-						items = competencyManager.getCompetencies(job, startIndex, pageSize);
-					else
-						items = competencyManager.getCompetencies(job);				
-				}
-			} catch (JobNotFoundException e) { }
-		}else if( classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
-		{
-			totalCount = competencyManager.getCompetencyCount(company, classify);
-			if( totalCount > 0 ){
-				if( pageSize > 0)
-					items = competencyManager.getCompetencies(company, classify, startIndex, pageSize);
-				else
-					items = competencyManager.getCompetencies(company, classify);				
-			}
-		}else{
-			totalCount = competencyManager.getCompetencyCount(company, competencyTypeToUse);
-			if( totalCount > 0 ){
-				if( pageSize > 0)
-					items = competencyManager.getCompetencies(company, competencyTypeToUse, startIndex, pageSize);
-				else
-					items = competencyManager.getCompetencies(company, competencyTypeToUse);
-			}
 		}
-		
-		DefaultJob emptyJob = new DefaultJob();
-		emptyJob.setClassification(new DefaultClassification());		
-		for(Competency competency : items){
-			if( competency.getCompetencyType() == CompetencyType.JOB || competency.getCompetencyType() == CompetencyType.NONE){
-				try {					
-					((DefaultCompetency)competency).setJob(jobManager.getJob(competency));
-				} catch (JobNotFoundException e) {
-					((DefaultCompetency)competency).setJob(emptyJob);
-				}
-			}else{
-				((DefaultCompetency)competency).setJob(emptyJob);
-			}
-			
-			log.debug(competency.toString());
-		}		
-		*/
 		ItemList list = new ItemList(items, totalCount);		
 		return list;
 	}
@@ -667,7 +621,56 @@ public class SecureCompetencyMgmtController {
 		return listToUse;
 	}	
 	
+
+	
+	@RequestMapping(value="/mgmt/competency/assessment/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public List<Assessment> listAssessmentPlan(
+			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
+			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
+	) {
+		return assessmentManager.getAssessments(objectType, objectId);
+	}
+	
+	@RequestMapping(value="/mgmt/competency/assessment/create.json", method=RequestMethod.POST)
+	@ResponseBody
+	public Assessment createAssessmentPlan( @RequestBody DefaultAssessment assessmentScheme ) throws AssessmentNotFoundException {		
+		log.debug(assessmentScheme);
+		assessmentManager.saveOrUpdateAssessment(assessmentScheme);
+		return assessmentManager.getAssessment( assessmentScheme.getAssessmentId() );
+	}
+	
+	
+	@RequestMapping(value="/mgmt/competency/assessment/update.json", method=RequestMethod.POST)
+	@ResponseBody
+	public Assessment updateAssessmentPlan(
+			@RequestBody AssessmentPlan assessmentPlan
+			) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
+		log.debug(assessmentPlan);		
+		AssessmentScheme assessmentScheme = assessmentManager.getAssessmentScheme(assessmentPlan.getAssessmentSchemeId());
 		
+		DefaultAssessment assessment = new DefaultAssessment();			
+		assessment.setName(assessmentPlan.getName());
+		assessment.setDescription(assessmentPlan.getDescription());
+		assessment.setStartDate(assessmentPlan.getStartDate());
+		assessment.setEndDate(assessmentPlan.getEndDate());		
+		assessment.setFeedbackEnabled(assessmentScheme.isFeedbackEnabled());
+		assessment.setMultipleApplyAllowed(assessmentScheme.isMultipleApplyAllowed());
+		assessment.setRatingScheme(assessmentScheme.getRatingScheme());
+		
+		
+		assessment.setJobSelections(assessmentScheme.getJobSelections());
+		assessment.setSubjects(assessmentScheme.getSubjects());
+		
+		
+		assessmentManager.saveOrUpdateAssessment(assessment);		
+		
+		return assessmentManager.getAssessment( assessment.getAssessmentId() );
+	}
+	
+	
+	
+	
 	@RequestMapping(value="/mgmt/competency/assessment/rating-scheme/list.json", method=RequestMethod.POST)
 	@ResponseBody
 	public List<RatingScheme> listRatingScheme(
@@ -691,8 +694,11 @@ public class SecureCompetencyMgmtController {
 		assessmentManager.saveOrUpdateRatingScheme(ratingScheme);
 		return ratingScheme;
 	}
+	
+	
+	
 
-	@RequestMapping(value="/mgmt/competency/assessment-scheme/list.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment/scheme/list.json", method=RequestMethod.POST)
 	@ResponseBody
 	public List<AssessmentScheme> listAssessmentScheme(
 			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
@@ -702,12 +708,11 @@ public class SecureCompetencyMgmtController {
 	}
 	
 	
-	@RequestMapping(value="/mgmt/competency/assessment-scheme/update.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment/scheme/update.json", method=RequestMethod.POST)
 	@ResponseBody
 	public AssessmentScheme updateAssessmentScheme(
 			@RequestBody DefaultAssessmentScheme assessmentScheme
-			) throws AssessmentSchemeNotFoundException {
-		
+			) throws AssessmentSchemeNotFoundException {		
 		log.debug(assessmentScheme);
 		assessmentManager.saveOrUpdateAssessmentScheme(assessmentScheme);
 		return assessmentManager.getAssessmentScheme( assessmentScheme.getAssessmentSchemeId() );

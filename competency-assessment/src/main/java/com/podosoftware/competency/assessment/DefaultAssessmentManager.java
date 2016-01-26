@@ -31,7 +31,6 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	private CompanyManager companyManager;
 	
-	
 	protected Cache ratingSchemeCache;
 	
 	protected Cache assessmentSchemeCache;
@@ -251,32 +250,6 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		}
 		return scheme;	
 	}
-
-	private List<AssessmentScheme> loadAssessmentSchemes(List<Long> ids){
-		ArrayList<AssessmentScheme> list = new ArrayList<AssessmentScheme>(ids.size());
-		for( Long id : ids ){			
-			try {
-				list.add(getAssessmentScheme(id));
-			} catch (AssessmentSchemeNotFoundException e) {}			
-		}		
-		return list;		
-	}
-	
-	private void updateCache( AssessmentScheme assessmentScheme){
-		if( assessmentSchemeCache.get(assessmentScheme.getAssessmentSchemeId()) != null ){
-			assessmentSchemeCache.remove(assessmentScheme.getAssessmentSchemeId());
-		}
-		assessmentSchemeCache.put(new Element(assessmentScheme.getAssessmentSchemeId(), assessmentScheme));
-	}
-	
-	private AssessmentScheme getAssessmentSchemeInCache(long assessmentSchemeId){
-		if(assessmentSchemeCache.get(assessmentSchemeId)!=null){
-			return (AssessmentScheme) assessmentSchemeCache.get(assessmentSchemeId).getValue();
-		}
-		return null;
-	}
-	
-	
 	
 	public JobSelection getJobSelection(long jobSelectionId) throws JobSelectionNotFoundException {
 		JobSelection selection = null; // = getAssessmentJobSelectionInCache(jobSelectionId);
@@ -326,15 +299,6 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	
-	private List<JobSelection> loadJobSelections(List<Long> ids){
-		ArrayList<JobSelection> list = new ArrayList<JobSelection>(ids.size());
-		for( Long id : ids ){			
-			try {
-				list.add(getJobSelection(id));
-			} catch (JobSelectionNotFoundException e) {}			
-		}		
-		return list;		
-	}
 	 
 	public void saveOrUpdateJobSelections(List<JobSelection> jobSelections) {
 		assessmentDao.saveOrUpdateAssessmentJobSelections(jobSelections);
@@ -408,6 +372,145 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return assessmentDao.getAssessmentSubjectCount(objectType, objectId);
 	}
 	
+	
+	
+	
+ 
+	public List<Assessment> getAssessments(int objectType, long objectId) {
+		List<Long> ids = assessmentDao.getAssessmentIds(objectType, objectId);		
+		return loadAssessments(ids);
+	}
+
+ 
+	public int getAssessmentCount(int objectType, long objectId) {
+		return assessmentDao.getAssessmentCount(objectType, objectId);
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveOrUpdateAssessment(Assessment assessment) {	
+		
+		
+		boolean isNew = true;
+		if( assessment.getAssessmentId() > 0){
+			isNew = false;
+		}
+
+		assessmentDao.saveOrUpdateAssessment(assessment);
+		
+		Assessment dbAssessment = new DefaultAssessment();	
+		if( !isNew ){
+			try {
+				dbAssessment = getAssessment(assessment.getAssessmentId());
+			} catch (AssessmentNotFoundException e1) {}
+		}
+		
+		List<JobSelection> jobSelections = assessment.getJobSelections();
+		List<Subject> subjects = assessment.getSubjects();
+		
+		if(isNew){
+			jobSelections = new ArrayList<JobSelection>();
+			subjects = new ArrayList<Subject>();
+			for(JobSelection js : assessment.getJobSelections() ){
+				jobSelections.add(
+					new JobSelection(
+						-1L, 
+						assessment.getModelObjectType(), 
+						assessment.getAssessmentId(), 
+						js.getClassifyType(), 
+						js.getClassifiedMajorityId(), 
+						js.getClassifiedMiddleId(), 
+						js.getClassifiedMinorityId(), 
+						js.getJobId()));
+			}
+			for(Subject sbj : assessment.getSubjects() ){
+				subjects.add(new Subject(
+						-1L, 
+						assessment.getModelObjectType(),
+						assessment.getAssessmentId(),
+						sbj.getSubjectObjectType(),
+						sbj.getSubjectObjectId()
+				));
+			}
+		}else{
+			jobSelections = assessment.getJobSelections();
+			subjects = assessment.getSubjects();			
+		}
+		
+		if(!isNew){
+			List<JobSelection> jobDeletes = new ArrayList<JobSelection>();
+			List<Subject> subjectDeletes = new ArrayList<Subject>();
+			List<JobSelection> dbJobSelections  = dbAssessment.getJobSelections();
+			List<Subject> dbSubjects  = dbAssessment.getSubjects();	
+			for( JobSelection jobSelection : dbJobSelections){
+				if( !jobSelections.contains(jobSelection))
+					jobDeletes.add(jobSelection);
+			}			
+			for( Subject sbj : dbSubjects){
+				if( !subjects.contains(sbj))
+					subjectDeletes.add(sbj);
+			}	
+			assessmentDao.removeAssessmentJobSelections(jobDeletes);
+			assessmentDao.removeAssessmentSubjects(subjectDeletes);
+		}
+		
+		if( jobSelections.size() > 0){
+			assessmentDao.saveOrUpdateAssessmentJobSelections(jobSelections);
+		}
+		if( subjects.size() > 0){
+			assessmentDao.saveOrUpdateAssessmentSubjects(subjects);
+		}
+		if( !isNew && assessment.getAssessmentId() > 0 ){
+			if( assessmentCache.get(assessment.getAssessmentId()) != null ){
+				assessmentCache.remove(assessment.getAssessmentId());
+			}
+		}
+	}
+ 
+	public Assessment getAssessment(long assessmentSchemeId) throws AssessmentNotFoundException {
+		Assessment scheme = getAssessmentInCache(assessmentSchemeId);
+		if(scheme == null){
+			scheme = assessmentDao.getAssessmentById(assessmentSchemeId);		
+			RatingScheme ratingScheme;
+			try {
+				ratingScheme = getRatingScheme(scheme.getRatingScheme().getRatingSchemeId());
+				scheme.setRatingScheme(ratingScheme);
+			} catch (RatingSchemeNotFoundException e) {
+			}
+			
+			List<JobSelection> selections = getJobSelections(scheme.getModelObjectType(), scheme.getAssessmentId());
+			scheme.setJobSelections(selections);			
+			if( scheme == null ){				
+				throw new AssessmentNotFoundException();
+			}
+			List<Subject> subjects = getSubjects(scheme.getModelObjectType(), scheme.getAssessmentId());
+			scheme.setSubjects(subjects);
+			updateCache(scheme);
+		}
+		return scheme;	
+	}
+
+	
+
+	private List<JobSelection> loadJobSelections(List<Long> ids){
+		ArrayList<JobSelection> list = new ArrayList<JobSelection>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJobSelection(id));
+			} catch (JobSelectionNotFoundException e) {}			
+		}		
+		return list;		
+	}
+	
+	private List<Assessment> loadAssessments(List<Long> ids){
+		ArrayList<Assessment> list = new ArrayList<Assessment>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getAssessment(id));
+			} catch (AssessmentNotFoundException e) {}			
+		}		
+		return list;		
+	}	
+	
 	private List<Subject> loadSubjects(List<Long> ids){
 		ArrayList<Subject> list = new ArrayList<Subject>(ids.size());
 		for( Long id : ids ){			
@@ -428,6 +531,47 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	private Subject getAccessmentSubjectInCache(long jobSelectionId){
 		if(assessmentSubjectCache.get(jobSelectionId)!=null){
 			return (Subject) assessmentSubjectCache.get(jobSelectionId).getValue();
+		}
+		return null;
+	}
+
+	
+
+	private List<AssessmentScheme> loadAssessmentSchemes(List<Long> ids){
+		ArrayList<AssessmentScheme> list = new ArrayList<AssessmentScheme>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getAssessmentScheme(id));
+			} catch (AssessmentSchemeNotFoundException e) {}			
+		}		
+		return list;		
+	}
+	
+	private void updateCache( AssessmentScheme assessmentScheme){
+		if( assessmentSchemeCache.get(assessmentScheme.getAssessmentSchemeId()) != null ){
+			assessmentSchemeCache.remove(assessmentScheme.getAssessmentSchemeId());
+		}
+		assessmentSchemeCache.put(new Element(assessmentScheme.getAssessmentSchemeId(), assessmentScheme));
+	}
+	
+	private AssessmentScheme getAssessmentSchemeInCache(long assessmentSchemeId){
+		if(assessmentSchemeCache.get(assessmentSchemeId)!=null){
+			return (AssessmentScheme) assessmentSchemeCache.get(assessmentSchemeId).getValue();
+		}
+		return null;
+	}
+	
+	
+	private void updateCache( Assessment assessment){
+		if( assessmentCache.get(assessment.getAssessmentId()) != null ){
+			assessmentCache.remove(assessment.getAssessmentId());
+		}
+		assessmentCache.put(new Element(assessment.getAssessmentId(), assessment));
+	}
+	
+	private Assessment getAssessmentInCache(long assessmentId){
+		if(assessmentCache.get(assessmentId)!=null){
+			return (Assessment) assessmentCache.get(assessmentId).getValue();
 		}
 		return null;
 	}

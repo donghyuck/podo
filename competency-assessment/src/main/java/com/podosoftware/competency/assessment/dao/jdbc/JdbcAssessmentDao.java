@@ -15,7 +15,10 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
 
+import com.podosoftware.competency.assessment.Assessment;
+import com.podosoftware.competency.assessment.Assessment.State;
 import com.podosoftware.competency.assessment.AssessmentScheme;
+import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingLevel;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
@@ -31,18 +34,43 @@ import architecture.ee.spring.jdbc.support.ExtendedJdbcDaoSupport;
 public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements AssessmentDao  {
 
 	private String assessmentSchemeSequencerName = "ASSESSMENT_SCHEME";
-	private String assessmentSchemePropertyTableName = "CA_ASSESSMENT_SCHEME_PROPERTY";
+	private String assessmentSchemePropertyTableName = "CA_ASSESSMENT_PLAN_PROPERTY";
 	private String assessmentSchemePropertyPrimaryColumnName = "ASSESSMENT_SCHEME_ID";
+
+	private String assessmentSequencerName = "ASSESSMENT";
+	private String assessmentPropertyTableName = "CA_ASSESSMENT_SCHEME_PROPERTY";
+	private String assessmentPropertyPrimaryColumnName = "ASSESSMENT_ID";	
+	
 	
 	private String ratingSchemeSequencerName = "RATING_SCHEME";
-	private String ratingLevelSequencerName = "RATING_LEVEL";	
-	
+	private String ratingLevelSequencerName = "RATING_LEVEL";		
 	private String ratingSchemePropertyTableName = "CA_RATING_SCHEME_PROPERTY";
 	private String ratingSchemePropertyPrimaryColumnName = "RATING_SCHEME_ID";
 	
 	private String assessmentSubjectSequencerName = "ASSESSMENT_SUBJECT";
 	
 	private ExtendedPropertyDao extendedPropertyDao;
+	
+	private final RowMapper<Assessment> assessmentMapper = new RowMapper<Assessment>(){		
+		public Assessment mapRow(ResultSet rs, int rowNum) throws SQLException {				
+			DefaultAssessment scheme = new DefaultAssessment();
+			scheme.setAssessmentId(rs.getLong("ASSESSMENT_ID"));
+			scheme.setObjectType(rs.getInt("OBJECT_TYPE"));
+			scheme.setObjectId(rs.getLong("OBJECT_ID"));
+			scheme.setName(rs.getString("NAME"));
+			scheme.setDescription(rs.getString("DESCRIPTION"));
+			scheme.setState(State.valueOf(rs.getString("STATE").toUpperCase()));
+			scheme.setRatingScheme(new DefaultRatingScheme(rs.getLong("RATING_SCHEME_ID")));
+			scheme.setMultipleApplyAllowed(rs.getInt("MULTIPLE_APPLY_ALLOWED") == 1 ? true : false );
+			scheme.setFeedbackEnabled(rs.getInt("FEEDBACK_ENABLED") == 1 ? true : false );
+			scheme.setCreationDate( rs.getDate("CREATION_DATE") ); 
+			scheme.setModifiedDate( rs.getDate("MODIFIED_DATE") );
+			scheme.setStartDate( rs.getDate("START_DATE") ); 
+			scheme.setEndDate( rs.getDate("END_DATE") );
+			return scheme;
+		}		
+	};
+	
 	
 	private final RowMapper<AssessmentScheme> assessmentSchemeMapper = new RowMapper<AssessmentScheme>(){		
 		public AssessmentScheme mapRow(ResultSet rs, int rowNum) throws SQLException {				
@@ -193,7 +221,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 
 	public Map<String, String> getAssessmentSchemeProperties(long assessmentSchemeId) {
-		return extendedPropertyDao.getProperties(ratingSchemePropertyTableName, ratingSchemePropertyPrimaryColumnName, assessmentSchemeId);
+		return extendedPropertyDao.getProperties(ratingSchemePropertyTableName, assessmentSchemePropertyPrimaryColumnName, assessmentSchemeId);
 	}
 
 	public void setAssessmentSchemeProperties(long assessmentSchemeId, Map<String, String> props) {
@@ -204,6 +232,24 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 		extendedPropertyDao.deleteProperties(assessmentSchemePropertyTableName, assessmentSchemePropertyPrimaryColumnName, assessmentSchemeId);
 	}	
 	
+	
+	public Map<String, String> getAssessmentProperties(long assessmentId) {
+		return extendedPropertyDao.getProperties(assessmentPropertyTableName, assessmentPropertyPrimaryColumnName, assessmentId);
+	}
+
+	public void setAssessmentProperties(long assessmentId, Map<String, String> props) {
+		extendedPropertyDao.updateProperties(assessmentPropertyTableName, assessmentPropertyPrimaryColumnName, assessmentId, props);
+	}
+	
+	public void deleteAssessmentProperties(long assessmentId){
+		extendedPropertyDao.deleteProperties(assessmentPropertyTableName, assessmentPropertyPrimaryColumnName, assessmentId);
+	}	
+	
+	
+	
+	public Long nextAssessmentId() {
+		return getNextId(assessmentSequencerName);
+	}
 
 	public Long nextAssessmentSchemeId() {
 		return getNextId(assessmentSchemeSequencerName);
@@ -363,6 +409,97 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 		}			
 	}
 
+	/**** ASSESSMENT PLAN ******/
+	
+	public List<Long> getAssessmentIds(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ));
+	}
+
+	@Override
+	public int getAssessmentCount(int objectType, long objectId) {
+		return getExtendedJdbcTemplate().queryForObject(getBoundSql("COMPETENCY_ACCESSMENT.COUNT_ASSESSMENT_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 
+				Integer.class,
+				new SqlParameterValue(Types.NUMERIC, objectType ),
+				new SqlParameterValue(Types.NUMERIC, objectId ));
+	}
+
+	@Override
+	public Assessment getAssessmentById(long assessmentId) {
+		Assessment scheme = null;
+		try {
+			scheme = getExtendedJdbcTemplate().queryForObject(
+					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_BY_ID").getSql(), 
+					assessmentMapper, 
+					new SqlParameterValue(Types.NUMERIC, assessmentId ) );
+			
+			scheme.setProperties(getAssessmentProperties(assessmentId));	
+			
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if(e.getActualSize() > 1)
+	        {
+	            log.warn((new StringBuilder()).append("Multiple occurrances of the same assessment ID found: ").append(assessmentId).toString());
+	            throw e;
+	        }
+		} catch (DataAccessException e) {
+			 String message = (new StringBuilder()).append("Failure attempting to load assessment by ID : ").append(assessmentId).append(".").toString();
+			 log.fatal(message, e);
+		}			
+		return scheme;
+	}
+
+	public void saveOrUpdateAssessment(Assessment assessmentScheme) {
+		Date now = new Date();
+		if(assessmentScheme.getAssessmentId() > 0){
+			// update 
+			assessmentScheme.setModifiedDate(now);	
+			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT").getSql(),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getObjectType()),	
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getObjectId()),	
+					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getName()),						
+					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getDescription()),	
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getRatingScheme().getRatingSchemeId()),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isMultipleApplyAllowed() ? 1 : 0 ),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isFeedbackEnabled() ? 1 : 0 ),					
+					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getState().name()),
+					new SqlParameterValue (Types.DATE, assessmentScheme.getStartDate()),
+					new SqlParameterValue (Types.DATE, assessmentScheme.getEndDate()),
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate()),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getAssessmentId())
+					);
+			deleteAssessmentProperties(assessmentScheme.getAssessmentId());
+			setAssessmentProperties(assessmentScheme.getAssessmentId(), assessmentScheme.getProperties());							
+		}else{
+			// insert ..
+			assessmentScheme.setAssessmentId(nextAssessmentId());
+			assessmentScheme.setCreationDate(now);
+			assessmentScheme.setModifiedDate(now);	
+			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT").getSql(),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getAssessmentId()),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getObjectType()),	
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getObjectId()),	
+					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getName()),						
+					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getDescription()),	
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getRatingScheme().getRatingSchemeId()),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isMultipleApplyAllowed() ? 1 : 0 ),
+					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isFeedbackEnabled() ? 1 : 0 ),					
+					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getState().name()),
+					new SqlParameterValue (Types.DATE, assessmentScheme.getStartDate()),
+					new SqlParameterValue (Types.DATE, assessmentScheme.getEndDate()),					
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getCreationDate()),	
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate())				
+					);
+			if(assessmentScheme.getProperties().size() > 0){				
+				setAssessmentProperties(assessmentScheme.getAssessmentId(), assessmentScheme.getProperties());				
+			}
+		}	
+	}		
+	
+	
+	/**** ASSESSMENT SCHEME ******/
 	@Override
 	public List<Long> getAssessmentSchemeIds(int objectType, long objectId) {
 		return getExtendedJdbcTemplate().queryForList(
@@ -440,7 +577,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate())				
 					);
 			if(assessmentScheme.getProperties().size() > 0){				
-				setRatingSchemeProperties(assessmentScheme.getAssessmentSchemeId(), assessmentScheme.getProperties());				
+				setAssessmentSchemeProperties(assessmentScheme.getAssessmentSchemeId(), assessmentScheme.getProperties());				
 			}
 		}	
 	}	
@@ -545,12 +682,6 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	}
 
 	
-	
-	
-	
-	
-	
-
 	public List<Long> getAssessmentSubjectIds(int objectType, long objectId) {
 		return getExtendedJdbcTemplate().queryForList(
 				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_SUBJECT_IDS_BY_OBJECT_TYPE_AND_OBJECT_ID").getSql(), 

@@ -134,12 +134,12 @@ public class DefaultAssessmentScheme extends PropertyAndDateAwareSupport impleme
 
 	@JsonIgnore
 	public int getModelObjectType() {
-		return 71;
+		return 70;
 	}
 
 	@JsonIgnore
 	public int getCachedSize() {
-		return 71 ;
+		return 70 ;
 	}
 
 	public List<JobSelection> getJobSelections() {

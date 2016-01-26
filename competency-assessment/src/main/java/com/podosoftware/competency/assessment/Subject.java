@@ -27,6 +27,18 @@ public class Subject implements Cacheable  {
 		subjectObjectId = -1L;
 	}
 
+	
+	
+	public Subject(long subjectId, int objectType, long objectId, int subjectObjectType, long subjectObjectId) {
+		this.subjectId = subjectId;
+		this.objectType = objectType;
+		this.objectId = objectId;
+		this.subjectObjectType = subjectObjectType;
+		this.subjectObjectId = subjectObjectId;
+	}
+
+
+
 	public long getSubjectId() {
 		return subjectId;
 	}
