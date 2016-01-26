@@ -16,6 +16,7 @@
 	<model id="70" code="ASSESSMENT" />
 	<model id="71" code="ASSESSMENT_SCHEME" />
 	<model id="72" code="ASSESSMENT_JOB_SELECTION" />
+	<model id="73" code="ASSESSMENT_SUBJECT" />	
 	
 	
 </models>

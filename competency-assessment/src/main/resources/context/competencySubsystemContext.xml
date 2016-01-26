@@ -113,5 +113,6 @@
 		p:assessmentDao-ref="assessmentDao"
 		p:codeSetManager-ref="codeSetManager"
 		p:jobManager-ref="jobManager"
+		p:companyManager-ref="companyManager"
 		/>						
 </beans>
