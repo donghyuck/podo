@@ -180,12 +180,12 @@ public class DefaultAssessment extends PropertyAndDateAwareSupport implements As
 
 	@JsonIgnore
 	public int getModelObjectType() {
-		return 71;
+		return 70;
 	}
 
 	@JsonIgnore
 	public int getCachedSize() {
-		return 71 ;
+		return 70 ;
 	}
 
 	public List<JobSelection> getJobSelections() {
@@ -204,4 +204,16 @@ public class DefaultAssessment extends PropertyAndDateAwareSupport implements As
 	public void setJobSelections(List<JobSelection> jobSelections) {
 		this.jobSelections = jobSelections;
 	}
+
+
+	@Override
+	public String toString() {
+		return "DefaultAssessment [assessmentId=" + assessmentId + ", objectType=" + objectType + ", objectId="
+				+ objectId + ", ratingScheme=" + ratingScheme + ", name=" + name + ", description=" + description
+				+ ", multipleApplyAllowed=" + multipleApplyAllowed + ", feedbackEnabled=" + feedbackEnabled
+				+ ", jobSelections=" + jobSelections + ", subjects=" + subjects + ", startDate=" + startDate
+				+ ", endDate=" + endDate + ", state=" + state + ", modifiedDate=" + getModifiedDate() + ", creationDate=" + getCreationDate()  + "]";
+	}
+	
+	
 }
