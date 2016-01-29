@@ -256,6 +256,42 @@ public class DefaultJobManager implements JobManager {
 		return list;
 	}
 
+
+	@Override
+	public int getJobCount(int objectType, long objectId, Classification classify) {
+		return jobDao.getJobCount(objectType, objectId, classify);
+	}
+
+
+	@Override
+	public List<Job> getJobs(int objectType, long objectId, Classification classify) {
+		List<Long> ids = jobDao.getJobIds(objectType, objectId, classify);
+		ArrayList<Job> list = new ArrayList<Job>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJob(id));
+			} catch (JobNotFoundException e) {
+				
+			}			
+		}		
+		return list;
+	}
+	
+	public List<Job> getJobs(int objectType, long objectId, Classification classify, int startIndex, int numResults) {
+		List<Long> ids = jobDao.getJobIds(objectType, objectId, classify, startIndex, numResults);
+		ArrayList<Job> list = new ArrayList<Job>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJob(id));
+			} catch (JobNotFoundException e) {
+				
+			}			
+		}		
+		return list;
+	}
+	
+	
+	
 	@Override
 	public List<Competency> getJobCompetencies(Job job) {
 		List<Long> ids = jobDao.getJobCompetencyIds(job);
@@ -268,10 +304,6 @@ public class DefaultJobManager implements JobManager {
 		}		
 		return list;
 	}
-
-
-
-
 
 	@Override
 	public Job getJob(Competency competency) throws JobNotFoundException {

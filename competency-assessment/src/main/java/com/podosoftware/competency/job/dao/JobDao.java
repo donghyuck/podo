@@ -36,6 +36,14 @@ public interface JobDao {
 	
 	public abstract List<Long> getJobIds(Company company, Classification classify, int startIndex, int numResults);
 	
+	
+	public abstract int getJobCount(int objectType, long objectId, Classification classify );
+	
+	public abstract List<Long> getJobIds(int objectType, long objectId, Classification classify);
+	
+	public abstract List<Long> getJobIds(int objectType, long objectId, Classification classify, int startIndex, int numResults);
+	
+	
 	public abstract List<Long> getJobCompetencyIds(Job job);
 	
 	public abstract Long getJobIdByCompetency(Competency competency) ;

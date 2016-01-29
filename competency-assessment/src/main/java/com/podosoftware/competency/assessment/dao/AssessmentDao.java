@@ -9,6 +9,8 @@ import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
 import com.podosoftware.competency.assessment.Subject;
 
+import architecture.common.user.User;
+
 public interface AssessmentDao {
 	
 	public abstract List<Long> getRatingSchemeIds( int objectType, long objectId);
@@ -91,5 +93,13 @@ public interface AssessmentDao {
 	
 	public abstract void saveOrUpdateAssessment(Assessment assessment); 
 	
+	
+	
+	/**
+	 * user 가 이용가능한 모든 진단 객체 ID를 리턴한다.
+	 * @param user
+	 * @return
+	 */
+	public abstract List<Long> getAssessmentIdsByUser(User user);
 	
 }

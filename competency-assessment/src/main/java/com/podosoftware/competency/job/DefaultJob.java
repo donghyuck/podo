@@ -3,6 +3,8 @@ package com.podosoftware.competency.job;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -128,6 +130,19 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		+ CacheSizes.sizeOfString(description)
 		+ CacheSizes.sizeOfDate() + CacheSizes.sizeOfDate();
 		return totalSize;
+	}
+
+	public int hashCode() {
+		return new HashCodeBuilder().append(jobId).toHashCode();
+	}
+
+	public boolean equals(Object obj) {
+		if( obj instanceof Job ){
+			if( this.jobId == ((Job)obj).getJobId() )
+				return true;
+			return false;
+		}
+		return super.equals(obj);
 	}
 
 	@Override

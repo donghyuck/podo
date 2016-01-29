@@ -35,11 +35,9 @@ import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
 import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
-import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
 import com.podosoftware.competency.assessment.RatingScheme;
 import com.podosoftware.competency.assessment.RatingSchemeNotFoundException;
-import com.podosoftware.competency.assessment.Subject;
 import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetManager.CodeItem;
@@ -625,7 +623,7 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/assessment/list.json", method=RequestMethod.POST)
 	@ResponseBody
-	public List<Assessment> listAssessmentPlan(
+	public List<Assessment> listAssessment(
 			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
 			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
 	) {
@@ -634,37 +632,47 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/assessment/create.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Assessment createAssessmentPlan( @RequestBody DefaultAssessment assessmentScheme ) throws AssessmentNotFoundException {		
-		log.debug(assessmentScheme);
-		assessmentManager.saveOrUpdateAssessment(assessmentScheme);
-		return assessmentManager.getAssessment( assessmentScheme.getAssessmentId() );
+	public Assessment createAssessmentByPlan( @RequestBody AssessmentPlan plan ) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
+		log.debug(plan);		
+		Assessment newAssessment = createAssessment(plan);
+		log.debug( newAssessment );
+		assessmentManager.saveOrUpdateAssessment(newAssessment);
+		return assessmentManager.getAssessment( newAssessment.getAssessmentId() );
+	}
+	
+	private Assessment createAssessment(AssessmentPlan plan) throws AssessmentSchemeNotFoundException{
+		
+		DefaultAssessment newAssessment	= new DefaultAssessment();	
+		newAssessment.setObjectType(plan.getObjectType());
+		newAssessment.setObjectId(plan.getObjectId());
+		newAssessment.setName(plan.getName());
+		newAssessment.setDescription(plan.getDescription());
+		newAssessment.setStartDate(plan.getStartDate());
+		newAssessment.setEndDate(plan.getEndDate());		
+		if( plan.getAssessmentSchemeId() > 0 ){
+			AssessmentScheme assessmentScheme = assessmentManager.getAssessmentScheme(plan.getAssessmentSchemeId());
+			if( StringUtils.isEmpty( newAssessment.getDescription() ))
+				newAssessment.setDescription( assessmentScheme.getDescription() );
+			newAssessment.setFeedbackEnabled(assessmentScheme.isFeedbackEnabled());
+			newAssessment.setMultipleApplyAllowed(assessmentScheme.isMultipleApplyAllowed());
+			newAssessment.setRatingScheme(assessmentScheme.getRatingScheme());		
+			newAssessment.setJobSelections(assessmentScheme.getJobSelections());
+			newAssessment.setSubjects(assessmentScheme.getSubjects());
+		}
+		
+		return newAssessment;
 	}
 	
 	
 	@RequestMapping(value="/mgmt/competency/assessment/update.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Assessment updateAssessmentPlan(
-			@RequestBody AssessmentPlan assessmentPlan
-			) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
-		log.debug(assessmentPlan);		
-		AssessmentScheme assessmentScheme = assessmentManager.getAssessmentScheme(assessmentPlan.getAssessmentSchemeId());
+	public Assessment updateAssessment(
+			@RequestBody DefaultAssessment assessment
+			) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {
 		
-		DefaultAssessment assessment = new DefaultAssessment();			
-		assessment.setName(assessmentPlan.getName());
-		assessment.setDescription(assessmentPlan.getDescription());
-		assessment.setStartDate(assessmentPlan.getStartDate());
-		assessment.setEndDate(assessmentPlan.getEndDate());		
-		assessment.setFeedbackEnabled(assessmentScheme.isFeedbackEnabled());
-		assessment.setMultipleApplyAllowed(assessmentScheme.isMultipleApplyAllowed());
-		assessment.setRatingScheme(assessmentScheme.getRatingScheme());
-		
-		
-		assessment.setJobSelections(assessmentScheme.getJobSelections());
-		assessment.setSubjects(assessmentScheme.getSubjects());
-		
+		log.debug(assessment);		
 		
 		assessmentManager.saveOrUpdateAssessment(assessment);		
-		
 		return assessmentManager.getAssessment( assessment.getAssessmentId() );
 	}
 	

@@ -2,6 +2,8 @@ package com.podosoftware.competency.assessment;
 
 import java.util.List;
 
+import architecture.common.user.User;
+
 public interface AssessmentManager {
 
 	public abstract List<RatingScheme> getRatingSchemes(int objectType, long objectId);
@@ -43,6 +45,10 @@ public interface AssessmentManager {
 	public abstract void saveOrUpdateAssessment(Assessment assessment);
 	
 	public abstract Assessment getAssessment(long assessment) throws AssessmentNotFoundException ;
+	
+	
+	
+	public abstract List<Assessment> getUserAssessments(User user);
 	
 	
 	

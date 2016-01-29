@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,17 +29,18 @@ import com.podosoftware.competency.assessment.RatingScheme;
 import com.podosoftware.competency.assessment.Subject;
 import com.podosoftware.competency.assessment.dao.AssessmentDao;
 
+import architecture.common.user.User;
 import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
 import architecture.ee.spring.jdbc.support.ExtendedJdbcDaoSupport;
 
 public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements AssessmentDao  {
 
 	private String assessmentSchemeSequencerName = "ASSESSMENT_SCHEME";
-	private String assessmentSchemePropertyTableName = "CA_ASSESSMENT_PLAN_PROPERTY";
+	private String assessmentSchemePropertyTableName = "CA_ASSESSMENT_SCHEME_PROPERTY"; 
 	private String assessmentSchemePropertyPrimaryColumnName = "ASSESSMENT_SCHEME_ID";
 
 	private String assessmentSequencerName = "ASSESSMENT";
-	private String assessmentPropertyTableName = "CA_ASSESSMENT_SCHEME_PROPERTY";
+	private String assessmentPropertyTableName = "CA_ASSESSMENT_PLAN_PROPERTY";
 	private String assessmentPropertyPrimaryColumnName = "ASSESSMENT_ID";	
 	
 	
@@ -63,10 +65,10 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 			scheme.setRatingScheme(new DefaultRatingScheme(rs.getLong("RATING_SCHEME_ID")));
 			scheme.setMultipleApplyAllowed(rs.getInt("MULTIPLE_APPLY_ALLOWED") == 1 ? true : false );
 			scheme.setFeedbackEnabled(rs.getInt("FEEDBACK_ENABLED") == 1 ? true : false );
-			scheme.setCreationDate( rs.getDate("CREATION_DATE") ); 
-			scheme.setModifiedDate( rs.getDate("MODIFIED_DATE") );
-			scheme.setStartDate( rs.getDate("START_DATE") ); 
-			scheme.setEndDate( rs.getDate("END_DATE") );
+			scheme.setCreationDate( rs.getTimestamp("CREATION_DATE") ); 
+			scheme.setModifiedDate( rs.getTimestamp("MODIFIED_DATE") );
+			scheme.setStartDate( rs.getTimestamp("START_DATE") ); 
+			scheme.setEndDate( rs.getTimestamp("END_DATE") );
 			return scheme;
 		}		
 	};
@@ -221,7 +223,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 
 	public Map<String, String> getAssessmentSchemeProperties(long assessmentSchemeId) {
-		return extendedPropertyDao.getProperties(ratingSchemePropertyTableName, assessmentSchemePropertyPrimaryColumnName, assessmentSchemeId);
+		return extendedPropertyDao.getProperties(assessmentSchemePropertyTableName, assessmentSchemePropertyPrimaryColumnName, assessmentSchemeId);
 	}
 
 	public void setAssessmentSchemeProperties(long assessmentSchemeId, Map<String, String> props) {
@@ -465,8 +467,8 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isMultipleApplyAllowed() ? 1 : 0 ),
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isFeedbackEnabled() ? 1 : 0 ),					
 					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getState().name()),
-					new SqlParameterValue (Types.DATE, assessmentScheme.getStartDate()),
-					new SqlParameterValue (Types.DATE, assessmentScheme.getEndDate()),
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getStartDate()),
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getEndDate()),
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate()),
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.getAssessmentId())
 					);
@@ -487,8 +489,8 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isMultipleApplyAllowed() ? 1 : 0 ),
 					new SqlParameterValue (Types.NUMERIC, assessmentScheme.isFeedbackEnabled() ? 1 : 0 ),					
 					new SqlParameterValue (Types.VARCHAR, assessmentScheme.getState().name()),
-					new SqlParameterValue (Types.DATE, assessmentScheme.getStartDate()),
-					new SqlParameterValue (Types.DATE, assessmentScheme.getEndDate()),					
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getStartDate()),
+					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getEndDate()),					
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getCreationDate()),	
 					new SqlParameterValue (Types.TIMESTAMP, assessmentScheme.getModifiedDate())				
 					);
@@ -782,5 +784,14 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					}
 				});		
 		}			
+	}
+	
+	public List<Long> getAssessmentIdsByUser(User user) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("user", user);
+		map.put("state", Assessment.State.PUBLISHED.name() );
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSqlWithAdditionalParameter("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_IDS_BY_USER", map).getSql(), 
+				Long.class);
 	}
 }

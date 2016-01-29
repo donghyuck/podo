@@ -17,6 +17,7 @@ import com.podosoftware.competency.job.JobNotFoundException;
 
 import architecture.common.user.CompanyManager;
 import architecture.common.user.CompanyNotFoundException;
+import architecture.common.user.User;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
@@ -240,12 +241,8 @@ public class DefaultAssessmentManager implements AssessmentManager {
 			if( scheme == null ){				
 				throw new AssessmentSchemeNotFoundException();
 			}
-			
-			
 			List<Subject> subjects = getSubjects(scheme.getModelObjectType(), scheme.getAssessmentSchemeId());
-			scheme.setSubjects(subjects);
-			
-			
+			scheme.setSubjects(subjects);			
 			updateCache(scheme);
 		}
 		return scheme;	
@@ -389,12 +386,11 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdateAssessment(Assessment assessment) {	
 		
-		
 		boolean isNew = true;
 		if( assessment.getAssessmentId() > 0){
 			isNew = false;
 		}
-
+		
 		assessmentDao.saveOrUpdateAssessment(assessment);
 		
 		Assessment dbAssessment = new DefaultAssessment();	
@@ -489,7 +485,10 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return scheme;	
 	}
 
-	
+	public List<Assessment> getUserAssessments(User user) {
+		List<Long> ids = assessmentDao.getAssessmentIdsByUser(user);		
+		return loadAssessments(ids);
+	}	
 
 	private List<JobSelection> loadJobSelections(List<Long> ids){
 		ArrayList<JobSelection> list = new ArrayList<JobSelection>(ids.size());
@@ -575,4 +574,5 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		}
 		return null;
 	}
+
 }
