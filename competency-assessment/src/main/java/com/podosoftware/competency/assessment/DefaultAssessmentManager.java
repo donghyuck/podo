@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.podosoftware.competency.assessment.dao.AssessmentDao;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetNotFoundException;
+import com.podosoftware.competency.job.Job;
 import com.podosoftware.competency.job.JobManager;
 import com.podosoftware.competency.job.JobNotFoundException;
 
@@ -573,6 +574,24 @@ public class DefaultAssessmentManager implements AssessmentManager {
 			return (Assessment) assessmentCache.get(assessmentId).getValue();
 		}
 		return null;
+	}
+
+	@Override
+	public int getUserAssessmentResultCount(Assessment assessment, User candidate, String state) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<AssessmentResult> getUserAssessmentResults(Assessment assessment, User candidate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addAssessmentCandidate(Assessment assessment, User candidate, Job job, int level) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

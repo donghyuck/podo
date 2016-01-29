@@ -2,6 +2,8 @@ package com.podosoftware.competency.assessment;
 
 import java.util.List;
 
+import com.podosoftware.competency.job.Job;
+
 import architecture.common.user.User;
 
 public interface AssessmentManager {
@@ -47,9 +49,17 @@ public interface AssessmentManager {
 	public abstract Assessment getAssessment(long assessment) throws AssessmentNotFoundException ;
 	
 	
+	/**
+	 * 권한이 있는 진단 목록을 가져온다.
+	 * @param user
+	 * @return
+	 */
+	public abstract List<Assessment> getUserAssessments(User user);	
 	
-	public abstract List<Assessment> getUserAssessments(User user);
+	public abstract int getUserAssessmentResultCount(Assessment assessment, User candidate, String state );	
 	
+	public abstract List<AssessmentResult> getUserAssessmentResults(Assessment assessment, User candidate);
 	
+	public abstract void addAssessmentCandidate(Assessment assessment, User candidate, Job job, int level ); 
 	
 }
