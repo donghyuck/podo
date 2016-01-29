@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentNotFoundException;
-import com.podosoftware.competency.assessment.AssessmentPlan;
+import com.podosoftware.competency.assessment.AssessmentCreatePlan;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
 import com.podosoftware.competency.assessment.DefaultAssessment;
@@ -632,7 +632,7 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/assessment/create.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Assessment createAssessmentByPlan( @RequestBody AssessmentPlan plan ) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
+	public Assessment createAssessmentByPlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
 		log.debug(plan);		
 		Assessment newAssessment = createAssessment(plan);
 		log.debug( newAssessment );
@@ -640,7 +640,7 @@ public class SecureCompetencyMgmtController {
 		return assessmentManager.getAssessment( newAssessment.getAssessmentId() );
 	}
 	
-	private Assessment createAssessment(AssessmentPlan plan) throws AssessmentSchemeNotFoundException{
+	private Assessment createAssessment(AssessmentCreatePlan plan) throws AssessmentSchemeNotFoundException{
 		
 		DefaultAssessment newAssessment	= new DefaultAssessment();	
 		newAssessment.setObjectType(plan.getObjectType());
