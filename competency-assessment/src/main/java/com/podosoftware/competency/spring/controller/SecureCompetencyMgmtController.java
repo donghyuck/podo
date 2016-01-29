@@ -26,13 +26,13 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.podosoftware.competency.assessment.Assessment;
+import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentNotFoundException;
 import com.podosoftware.competency.assessment.AssessmentCreatePlan;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
-import com.podosoftware.competency.assessment.DefaultAssessment;
+import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
 import com.podosoftware.competency.assessment.DefaultAssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultRatingScheme;
 import com.podosoftware.competency.assessment.RatingLevel;
@@ -623,7 +623,7 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/assessment/list.json", method=RequestMethod.POST)
 	@ResponseBody
-	public List<Assessment> listAssessment(
+	public List<AssessmentPlan> listAssessment(
 			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
 			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
 	) {
@@ -632,17 +632,17 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/assessment/create.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Assessment createAssessmentByPlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
+	public AssessmentPlan createAssessmentByPlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
 		log.debug(plan);		
-		Assessment newAssessment = createAssessment(plan);
+		AssessmentPlan newAssessment = createAssessment(plan);
 		log.debug( newAssessment );
 		assessmentManager.saveOrUpdateAssessment(newAssessment);
 		return assessmentManager.getAssessment( newAssessment.getAssessmentId() );
 	}
 	
-	private Assessment createAssessment(AssessmentCreatePlan plan) throws AssessmentSchemeNotFoundException{
+	private AssessmentPlan createAssessment(AssessmentCreatePlan plan) throws AssessmentSchemeNotFoundException{
 		
-		DefaultAssessment newAssessment	= new DefaultAssessment();	
+		DefaultAssessmentPlan newAssessment	= new DefaultAssessmentPlan();	
 		newAssessment.setObjectType(plan.getObjectType());
 		newAssessment.setObjectId(plan.getObjectId());
 		newAssessment.setName(plan.getName());
@@ -666,8 +666,8 @@ public class SecureCompetencyMgmtController {
 	
 	@RequestMapping(value="/mgmt/competency/assessment/update.json", method=RequestMethod.POST)
 	@ResponseBody
-	public Assessment updateAssessment(
-			@RequestBody DefaultAssessment assessment
+	public AssessmentPlan updateAssessment(
+			@RequestBody DefaultAssessmentPlan assessment
 			) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {
 		
 		log.debug(assessment);		

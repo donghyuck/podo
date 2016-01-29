@@ -40,13 +40,13 @@ public interface AssessmentManager {
 	public abstract int getSubjectCount(int objectType, long objectId);
 	
 		
-	public abstract List<Assessment> getAssessments(int objectType, long objectId);
+	public abstract List<AssessmentPlan> getAssessments(int objectType, long objectId);
 	
 	public abstract int getAssessmentCount(int objectType, long objectId);
 	
-	public abstract void saveOrUpdateAssessment(Assessment assessment);
+	public abstract void saveOrUpdateAssessment(AssessmentPlan assessment);
 	
-	public abstract Assessment getAssessment(long assessment) throws AssessmentNotFoundException ;
+	public abstract AssessmentPlan getAssessment(long assessment) throws AssessmentNotFoundException ;
 	
 	
 	/**
@@ -54,12 +54,12 @@ public interface AssessmentManager {
 	 * @param user
 	 * @return
 	 */
-	public abstract List<Assessment> getUserAssessments(User user);	
+	public abstract List<AssessmentPlan> getUserAssessments(User user);	
 	
-	public abstract int getUserAssessmentResultCount(Assessment assessment, User candidate, String state );	
+	public abstract int getUserAssessmentResultCount(AssessmentPlan assessment, User candidate, String state );	
 	
-	public abstract List<AssessmentResult> getUserAssessmentResults(Assessment assessment, User candidate);
+	public abstract List<AssessmentResult> getUserAssessmentResults(AssessmentPlan assessment, User candidate);
 	
-	public abstract void addAssessmentCandidate(Assessment assessment, User candidate, Job job, int level ); 
+	public abstract void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level ); 
 	
 }

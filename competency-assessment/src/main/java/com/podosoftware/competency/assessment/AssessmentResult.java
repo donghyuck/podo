@@ -14,9 +14,9 @@ public interface AssessmentResult extends DateAware {
 		NONE;
 	}
 	
-	public abstract Assessment getAssessment();
+	public abstract AssessmentPlan getAssessment();
 	
-	public abstract void setAssessment(Assessment assessment);
+	public abstract void setAssessment(AssessmentPlan assessment);
 	
 	public abstract State getState();
 	

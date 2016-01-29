@@ -374,7 +374,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	
  
-	public List<Assessment> getAssessments(int objectType, long objectId) {
+	public List<AssessmentPlan> getAssessments(int objectType, long objectId) {
 		List<Long> ids = assessmentDao.getAssessmentIds(objectType, objectId);		
 		return loadAssessments(ids);
 	}
@@ -385,7 +385,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void saveOrUpdateAssessment(Assessment assessment) {	
+	public void saveOrUpdateAssessment(AssessmentPlan assessment) {	
 		
 		boolean isNew = true;
 		if( assessment.getAssessmentId() > 0){
@@ -394,7 +394,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		
 		assessmentDao.saveOrUpdateAssessment(assessment);
 		
-		Assessment dbAssessment = new DefaultAssessment();	
+		AssessmentPlan dbAssessment = new DefaultAssessmentPlan();	
 		if( !isNew ){
 			try {
 				dbAssessment = getAssessment(assessment.getAssessmentId());
@@ -463,8 +463,8 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		}
 	}
  
-	public Assessment getAssessment(long assessmentSchemeId) throws AssessmentNotFoundException {
-		Assessment scheme = getAssessmentInCache(assessmentSchemeId);
+	public AssessmentPlan getAssessment(long assessmentSchemeId) throws AssessmentNotFoundException {
+		AssessmentPlan scheme = getAssessmentInCache(assessmentSchemeId);
 		if(scheme == null){
 			scheme = assessmentDao.getAssessmentById(assessmentSchemeId);		
 			RatingScheme ratingScheme;
@@ -486,7 +486,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return scheme;	
 	}
 
-	public List<Assessment> getUserAssessments(User user) {
+	public List<AssessmentPlan> getUserAssessments(User user) {
 		List<Long> ids = assessmentDao.getAssessmentIdsByUser(user);		
 		return loadAssessments(ids);
 	}	
@@ -501,8 +501,8 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return list;		
 	}
 	
-	private List<Assessment> loadAssessments(List<Long> ids){
-		ArrayList<Assessment> list = new ArrayList<Assessment>(ids.size());
+	private List<AssessmentPlan> loadAssessments(List<Long> ids){
+		ArrayList<AssessmentPlan> list = new ArrayList<AssessmentPlan>(ids.size());
 		for( Long id : ids ){			
 			try {
 				list.add(getAssessment(id));
@@ -562,34 +562,34 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 	
 	
-	private void updateCache( Assessment assessment){
+	private void updateCache( AssessmentPlan assessment){
 		if( assessmentCache.get(assessment.getAssessmentId()) != null ){
 			assessmentCache.remove(assessment.getAssessmentId());
 		}
 		assessmentCache.put(new Element(assessment.getAssessmentId(), assessment));
 	}
 	
-	private Assessment getAssessmentInCache(long assessmentId){
+	private AssessmentPlan getAssessmentInCache(long assessmentId){
 		if(assessmentCache.get(assessmentId)!=null){
-			return (Assessment) assessmentCache.get(assessmentId).getValue();
+			return (AssessmentPlan) assessmentCache.get(assessmentId).getValue();
 		}
 		return null;
 	}
 
 	@Override
-	public int getUserAssessmentResultCount(Assessment assessment, User candidate, String state) {
+	public int getUserAssessmentResultCount(AssessmentPlan assessment, User candidate, String state) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public List<AssessmentResult> getUserAssessmentResults(Assessment assessment, User candidate) {
+	public List<AssessmentResult> getUserAssessmentResults(AssessmentPlan assessment, User candidate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void addAssessmentCandidate(Assessment assessment, User candidate, Job job, int level) {
+	public void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level) {
 		// TODO Auto-generated method stub
 		
 	}

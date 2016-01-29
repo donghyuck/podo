@@ -2,7 +2,7 @@ package com.podosoftware.competency.assessment.dao;
 
 import java.util.List;
 
-import com.podosoftware.competency.assessment.Assessment;
+import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
@@ -89,9 +89,9 @@ public interface AssessmentDao {
 	
 	public abstract int getAssessmentCount(int objectType, long objectId);
 	
-	public abstract Assessment getAssessmentById(long assessmentId);
+	public abstract AssessmentPlan getAssessmentById(long assessmentId);
 	
-	public abstract void saveOrUpdateAssessment(Assessment assessment); 
+	public abstract void saveOrUpdateAssessment(AssessmentPlan assessment); 
 	
 	
 	

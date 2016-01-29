@@ -6,7 +6,7 @@ import java.util.List;
 import architecture.common.model.DateAware;
 import architecture.common.model.PropertyAware;
 
-public interface Assessment extends PropertyAware, DateAware {
+public interface AssessmentPlan extends PropertyAware, DateAware {
 
 	public abstract long getAssessmentId();
 

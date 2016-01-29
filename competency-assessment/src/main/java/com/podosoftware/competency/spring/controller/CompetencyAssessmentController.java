@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.podosoftware.competency.assessment.Assessment;
+import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentNotFoundException;
 import com.podosoftware.competency.assessment.JobSelection;
@@ -109,12 +109,12 @@ public class CompetencyAssessmentController {
 
 	@RequestMapping(value="/assessment/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
-	public List<Assessment> listAssessment(){	
+	public List<AssessmentPlan> listAssessment(){	
 		User user = SecurityHelper.getUser();	
 		if(!user.isAnonymous()){			
-			List<Assessment> list = assessmentManager.getUserAssessments(user);
-			Collections.sort(list, new Comparator<Assessment>(){
-				public int compare(Assessment o1, Assessment o2) {
+			List<AssessmentPlan> list = assessmentManager.getUserAssessments(user);
+			Collections.sort(list, new Comparator<AssessmentPlan>(){
+				public int compare(AssessmentPlan o1, AssessmentPlan o2) {
 					if( o1.getStartDate().after( o2.getStartDate() ) ){
 						return 1;
 					}
@@ -130,7 +130,7 @@ public class CompetencyAssessmentController {
 	public List<Job> listJob(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) Integer assessmentId) throws AssessmentNotFoundException{	
 		User user = SecurityHelper.getUser();		
-		Assessment assessment = assessmentManager.getAssessment(assessmentId);
+		AssessmentPlan assessment = assessmentManager.getAssessment(assessmentId);
 		int objectType = assessment.getObjectType();
 		long objectId = assessment.getObjectId();			
 		List<Job> list = new ArrayList<Job>();		

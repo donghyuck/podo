@@ -18,7 +18,7 @@ import architecture.common.model.json.JsonMapPropertyDeserializer;
 import architecture.common.model.json.JsonMapPropertySerializer;
 import architecture.common.model.support.PropertyAndDateAwareSupport;
 
-public class DefaultAssessment extends PropertyAndDateAwareSupport implements Assessment {
+public class DefaultAssessmentPlan extends PropertyAndDateAwareSupport implements AssessmentPlan {
 
 	private long assessmentId;
 	private int objectType;
@@ -34,7 +34,7 @@ public class DefaultAssessment extends PropertyAndDateAwareSupport implements As
 	private Date endDate;
 	private State state;
 	
-	public DefaultAssessment() {
+	public DefaultAssessmentPlan() {
 		this.assessmentId = -1L;
 		this.ratingScheme = null;
 		this.name = null;
