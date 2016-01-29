@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentManager;
-import com.podosoftware.competency.assessment.AssessmentNotFoundException;
+import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
 import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
@@ -128,9 +128,9 @@ public class CompetencyAssessmentController {
 	@RequestMapping(value="/assessment/job/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<Job> listJob(
-			@RequestParam(value="assessmentId", defaultValue="0", required=false ) Integer assessmentId) throws AssessmentNotFoundException{	
+			@RequestParam(value="assessmentId", defaultValue="0", required=false ) Integer assessmentId) throws AssessmentPlanNotFoundException{	
 		User user = SecurityHelper.getUser();		
-		AssessmentPlan assessment = assessmentManager.getAssessment(assessmentId);
+		AssessmentPlan assessment = assessmentManager.getAssessmentPlan(assessmentId);
 		int objectType = assessment.getObjectType();
 		long objectId = assessment.getObjectId();			
 		List<Job> list = new ArrayList<Job>();		

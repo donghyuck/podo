@@ -374,18 +374,18 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	
  
-	public List<AssessmentPlan> getAssessments(int objectType, long objectId) {
+	public List<AssessmentPlan> getAssessmentPlans(int objectType, long objectId) {
 		List<Long> ids = assessmentDao.getAssessmentIds(objectType, objectId);		
 		return loadAssessments(ids);
 	}
 
  
-	public int getAssessmentCount(int objectType, long objectId) {
+	public int getAssessmentPlanCount(int objectType, long objectId) {
 		return assessmentDao.getAssessmentCount(objectType, objectId);
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void saveOrUpdateAssessment(AssessmentPlan assessment) {	
+	public void saveOrUpdateAssessmentPlan(AssessmentPlan assessment) {	
 		
 		boolean isNew = true;
 		if( assessment.getAssessmentId() > 0){
@@ -397,8 +397,8 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		AssessmentPlan dbAssessment = new DefaultAssessmentPlan();	
 		if( !isNew ){
 			try {
-				dbAssessment = getAssessment(assessment.getAssessmentId());
-			} catch (AssessmentNotFoundException e1) {}
+				dbAssessment = getAssessmentPlan(assessment.getAssessmentId());
+			} catch (AssessmentPlanNotFoundException e1) {}
 		}
 		
 		List<JobSelection> jobSelections = assessment.getJobSelections();
@@ -463,7 +463,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		}
 	}
  
-	public AssessmentPlan getAssessment(long assessmentSchemeId) throws AssessmentNotFoundException {
+	public AssessmentPlan getAssessmentPlan(long assessmentSchemeId) throws AssessmentPlanNotFoundException {
 		AssessmentPlan scheme = getAssessmentInCache(assessmentSchemeId);
 		if(scheme == null){
 			scheme = assessmentDao.getAssessmentById(assessmentSchemeId);		
@@ -477,7 +477,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 			List<JobSelection> selections = getJobSelections(scheme.getModelObjectType(), scheme.getAssessmentId());
 			scheme.setJobSelections(selections);			
 			if( scheme == null ){				
-				throw new AssessmentNotFoundException();
+				throw new AssessmentPlanNotFoundException();
 			}
 			List<Subject> subjects = getSubjects(scheme.getModelObjectType(), scheme.getAssessmentId());
 			scheme.setSubjects(subjects);
@@ -505,8 +505,8 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		ArrayList<AssessmentPlan> list = new ArrayList<AssessmentPlan>(ids.size());
 		for( Long id : ids ){			
 			try {
-				list.add(getAssessment(id));
-			} catch (AssessmentNotFoundException e) {}			
+				list.add(getAssessmentPlan(id));
+			} catch (AssessmentPlanNotFoundException e) {}			
 		}		
 		return list;		
 	}	

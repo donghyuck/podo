@@ -40,13 +40,13 @@ public interface AssessmentManager {
 	public abstract int getSubjectCount(int objectType, long objectId);
 	
 		
-	public abstract List<AssessmentPlan> getAssessments(int objectType, long objectId);
+	public abstract List<AssessmentPlan> getAssessmentPlans(int objectType, long objectId);
 	
-	public abstract int getAssessmentCount(int objectType, long objectId);
+	public abstract int getAssessmentPlanCount(int objectType, long objectId);
 	
-	public abstract void saveOrUpdateAssessment(AssessmentPlan assessment);
+	public abstract void saveOrUpdateAssessmentPlan(AssessmentPlan assessment);
 	
-	public abstract AssessmentPlan getAssessment(long assessment) throws AssessmentNotFoundException ;
+	public abstract AssessmentPlan getAssessmentPlan(long assessment) throws AssessmentPlanNotFoundException ;
 	
 	
 	/**

@@ -2,43 +2,43 @@ package com.podosoftware.competency.assessment;
 
 import architecture.ee.exception.NotFoundException;
 
-public class AssessmentNotFoundException extends NotFoundException {
+public class AssessmentPlanNotFoundException extends NotFoundException {
 
-	public AssessmentNotFoundException() {
+	public AssessmentPlanNotFoundException() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(int errorCode, String msg, Throwable cause) {
+	public AssessmentPlanNotFoundException(int errorCode, String msg, Throwable cause) {
 		super(errorCode, msg, cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(int errorCode, String msg) {
+	public AssessmentPlanNotFoundException(int errorCode, String msg) {
 		super(errorCode, msg);
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(int errorCode, Throwable cause) {
+	public AssessmentPlanNotFoundException(int errorCode, Throwable cause) {
 		super(errorCode, cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(int errorCode) {
+	public AssessmentPlanNotFoundException(int errorCode) {
 		super(errorCode);
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(String msg, Throwable cause) {
+	public AssessmentPlanNotFoundException(String msg, Throwable cause) {
 		super(msg, cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(String msg) {
+	public AssessmentPlanNotFoundException(String msg) {
 		super(msg);
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentNotFoundException(Throwable cause) {
+	public AssessmentPlanNotFoundException(Throwable cause) {
 		super(cause);
 		// TODO Auto-generated constructor stub
 	}

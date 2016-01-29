@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentManager;
-import com.podosoftware.competency.assessment.AssessmentNotFoundException;
+import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
 import com.podosoftware.competency.assessment.AssessmentCreatePlan;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
@@ -627,17 +627,17 @@ public class SecureCompetencyMgmtController {
 			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
 			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
 	) {
-		return assessmentManager.getAssessments(objectType, objectId);
+		return assessmentManager.getAssessmentPlans(objectType, objectId);
 	}
 	
 	@RequestMapping(value="/mgmt/competency/assessment/create.json", method=RequestMethod.POST)
 	@ResponseBody
-	public AssessmentPlan createAssessmentByPlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {		
+	public AssessmentPlan createAssessmentByPlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentPlanNotFoundException, AssessmentSchemeNotFoundException {		
 		log.debug(plan);		
 		AssessmentPlan newAssessment = createAssessment(plan);
 		log.debug( newAssessment );
-		assessmentManager.saveOrUpdateAssessment(newAssessment);
-		return assessmentManager.getAssessment( newAssessment.getAssessmentId() );
+		assessmentManager.saveOrUpdateAssessmentPlan(newAssessment);
+		return assessmentManager.getAssessmentPlan( newAssessment.getAssessmentId() );
 	}
 	
 	private AssessmentPlan createAssessment(AssessmentCreatePlan plan) throws AssessmentSchemeNotFoundException{
@@ -668,12 +668,12 @@ public class SecureCompetencyMgmtController {
 	@ResponseBody
 	public AssessmentPlan updateAssessment(
 			@RequestBody DefaultAssessmentPlan assessment
-			) throws AssessmentNotFoundException, AssessmentSchemeNotFoundException {
+			) throws AssessmentPlanNotFoundException, AssessmentSchemeNotFoundException {
 		
 		log.debug(assessment);		
 		
-		assessmentManager.saveOrUpdateAssessment(assessment);		
-		return assessmentManager.getAssessment( assessment.getAssessmentId() );
+		assessmentManager.saveOrUpdateAssessmentPlan(assessment);		
+		return assessmentManager.getAssessmentPlan( assessment.getAssessmentId() );
 	}
 	
 	
