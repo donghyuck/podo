@@ -41,6 +41,11 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		this.creationDate = now;
 		this.modifiedDate = now;
 	}
+	
+	public DefaultJob(long jobId){
+		this();
+		this.jobId = jobId;
+	}
 
 	public Long getJobId() {
 		return jobId;

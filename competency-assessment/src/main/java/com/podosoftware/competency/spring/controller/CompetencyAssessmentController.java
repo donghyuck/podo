@@ -107,9 +107,9 @@ public class CompetencyAssessmentController {
 	public CompetencyAssessmentController() {
 	}
 
-	@RequestMapping(value="/assessment/list.json", method={RequestMethod.POST, RequestMethod.GET})
+	@RequestMapping(value="/assessment/plan/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
-	public List<AssessmentPlan> listAssessment(){	
+	public List<AssessmentPlan> listAssessmentPlan(){	
 		User user = SecurityHelper.getUser();	
 		if(!user.isAnonymous()){			
 			List<AssessmentPlan> list = assessmentManager.getUserAssessments(user);

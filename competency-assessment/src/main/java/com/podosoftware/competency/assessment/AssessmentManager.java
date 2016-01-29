@@ -58,7 +58,7 @@ public interface AssessmentManager {
 	
 	public abstract int getUserAssessmentResultCount(AssessmentPlan assessment, User candidate, String state );	
 	
-	public abstract List<AssessmentResult> getUserAssessmentResults(AssessmentPlan assessment, User candidate);
+	public abstract List<Assessment> getUserAssessmentResults(AssessmentPlan assessment, User candidate);
 	
 	public abstract void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level ); 
 	

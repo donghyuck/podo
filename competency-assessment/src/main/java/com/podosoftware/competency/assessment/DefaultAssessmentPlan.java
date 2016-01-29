@@ -52,6 +52,10 @@ public class DefaultAssessmentPlan extends PropertyAndDateAwareSupport implement
 		
 	}
 
+	public DefaultAssessmentPlan(long assessmentPlanId) {
+		this();
+		this.assessmentId = assessmentPlanId;
+	}
 	
 	public long getAssessmentId() {
 		return assessmentId;

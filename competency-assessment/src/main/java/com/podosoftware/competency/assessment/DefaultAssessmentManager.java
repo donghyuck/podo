@@ -583,7 +583,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	@Override
-	public List<AssessmentResult> getUserAssessmentResults(AssessmentPlan assessment, User candidate) {
+	public List<Assessment> getUserAssessmentResults(AssessmentPlan assessment, User candidate) {
 		// TODO Auto-generated method stub
 		return null;
 	}

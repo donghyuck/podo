@@ -2,10 +2,12 @@ package com.podosoftware.competency.assessment;
 
 import java.util.List;
 
+import com.podosoftware.competency.job.Job;
+
 import architecture.common.model.DateAware;
 import architecture.common.user.User;
 
-public interface AssessmentResult extends DateAware {
+public interface Assessment extends DateAware {
 
 	public enum State {
 		INCOMPLETE, 
@@ -14,9 +16,9 @@ public interface AssessmentResult extends DateAware {
 		NONE;
 	}
 	
-	public abstract AssessmentPlan getAssessment();
+	public abstract AssessmentPlan getAssessmentPlan();
 	
-	public abstract void setAssessment(AssessmentPlan assessment);
+	public abstract void setAssessmentPlan(AssessmentPlan assessment);
 	
 	public abstract State getState();
 	
@@ -24,14 +26,18 @@ public interface AssessmentResult extends DateAware {
 	
 	public abstract User getCandidate(); 
 	
-	public abstract void setCandidate();
+	public abstract void setCandidate(User user);
 	
 	public abstract List<User> getAssessors();
 	
 	public abstract void setAssessors(List<User> users);
 	
-	public int getTotalScore();
+	public abstract int getTotalScore();
 	
-	public void setTotalScore(int totalScore);
+	public abstract Job getJob();
+	
+	public abstract void setTotalScore(int totalScore);
+	
+	public abstract void setJob(Job job);
 	
 }

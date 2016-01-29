@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.podosoftware.competency.job.Job;
-import com.podosoftware.competency.job.json.JsonJobDeserializer;
+import com.podosoftware.competency.job.json.JobJsonDeserializer;
 
 import architecture.common.model.support.PropertyAwareSupport;
 
@@ -152,7 +152,7 @@ public class DefaultCompetency extends PropertyAwareSupport implements Competenc
 	}
 
 	@JsonIgnore
-	@JsonDeserialize(using = JsonJobDeserializer.class )
+	@JsonDeserialize(using = JobJsonDeserializer.class )
 	public void setJob(Job job) {
 		this.job = job;
 	}

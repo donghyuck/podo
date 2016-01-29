@@ -7,18 +7,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.podosoftware.competency.job.DefaultJob;
 import com.podosoftware.competency.job.Job;
 
-public class JsonJobDeserializer extends JsonDeserializer<Job> {
+public class JobJsonDeserializer extends JsonDeserializer<Job> {
 
-	public JsonJobDeserializer() {
+	public JobJsonDeserializer() {
 	}
 
 	public Job deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		ObjectCodec oc = jp.getCodec();
-		
-		return new DefaultJob();// oc.readValue(jp, DefaultJob.class);
+		ObjectCodec oc = jp.getCodec();		
+		JsonNode node = oc.readTree(jp);		
+		Job job = new DefaultJob(node.get("jobId").asLong(-1L));
+		return job;
 	}
 
 }

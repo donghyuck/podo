@@ -621,26 +621,26 @@ public class SecureCompetencyMgmtController {
 	
 
 	
-	@RequestMapping(value="/mgmt/competency/assessment/list.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment/plan/list.json", method=RequestMethod.POST)
 	@ResponseBody
-	public List<AssessmentPlan> listAssessment(
+	public List<AssessmentPlan> listAssessmentPlan(
 			@RequestParam(value="objectType", defaultValue="0", required=false ) Integer objectType,
 			@RequestParam(value="objectId", defaultValue="0", required=false ) Long objectId
 	) {
 		return assessmentManager.getAssessmentPlans(objectType, objectId);
 	}
 	
-	@RequestMapping(value="/mgmt/competency/assessment/create.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment/plan/create.json", method=RequestMethod.POST)
 	@ResponseBody
-	public AssessmentPlan createAssessmentByPlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentPlanNotFoundException, AssessmentSchemeNotFoundException {		
+	public AssessmentPlan createAssessmentPlanByCreatePlan( @RequestBody AssessmentCreatePlan plan ) throws AssessmentPlanNotFoundException, AssessmentSchemeNotFoundException {		
 		log.debug(plan);		
-		AssessmentPlan newAssessment = createAssessment(plan);
+		AssessmentPlan newAssessment = createAssessmentPlan(plan);
 		log.debug( newAssessment );
 		assessmentManager.saveOrUpdateAssessmentPlan(newAssessment);
 		return assessmentManager.getAssessmentPlan( newAssessment.getAssessmentId() );
 	}
 	
-	private AssessmentPlan createAssessment(AssessmentCreatePlan plan) throws AssessmentSchemeNotFoundException{
+	private AssessmentPlan createAssessmentPlan(AssessmentCreatePlan plan) throws AssessmentSchemeNotFoundException{
 		
 		DefaultAssessmentPlan newAssessment	= new DefaultAssessmentPlan();	
 		newAssessment.setObjectType(plan.getObjectType());
@@ -664,9 +664,9 @@ public class SecureCompetencyMgmtController {
 	}
 	
 	
-	@RequestMapping(value="/mgmt/competency/assessment/update.json", method=RequestMethod.POST)
+	@RequestMapping(value="/mgmt/competency/assessment/plan/update.json", method=RequestMethod.POST)
 	@ResponseBody
-	public AssessmentPlan updateAssessment(
+	public AssessmentPlan updateAssessmentPlan(
 			@RequestBody DefaultAssessmentPlan assessment
 			) throws AssessmentPlanNotFoundException, AssessmentSchemeNotFoundException {
 		
