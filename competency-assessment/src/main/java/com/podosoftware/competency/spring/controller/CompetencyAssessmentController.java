@@ -11,18 +11,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.podosoftware.competency.assessment.AssessmentPlan;
+import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentManager;
+import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
+import com.podosoftware.competency.assessment.DefaultAssessment;
+import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
 import com.podosoftware.competency.assessment.JobSelection;
-import com.podosoftware.competency.codeset.CodeSet;
+import com.podosoftware.competency.assessment.UserAssessmentPlan;
 import com.podosoftware.competency.codeset.CodeSetManager;
-import com.podosoftware.competency.codeset.CodeSetNotFoundException;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
@@ -30,7 +33,6 @@ import com.podosoftware.competency.job.Job;
 import com.podosoftware.competency.job.JobManager;
 
 import architecture.common.user.CompanyManager;
-import architecture.common.user.CompanyTemplate;
 import architecture.common.user.SecurityHelper;
 import architecture.common.user.User;
 
@@ -107,12 +109,38 @@ public class CompetencyAssessmentController {
 	public CompetencyAssessmentController() {
 	}
 
+	@RequestMapping(value="/assessment/list.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public List<Assessment> listAssessment(
+			@RequestParam(value="assessmentPlanId", defaultValue="0", required=false ) long assessmentPlanId,
+			@RequestParam(value="state", required=false ) String state) throws AssessmentPlanNotFoundException{	
+		User user = SecurityHelper.getUser();	
+		if(!user.isAnonymous()){			
+			AssessmentPlan plan = new DefaultAssessmentPlan(assessmentPlanId);
+			return assessmentManager.getUserAssessments(user, plan, state);
+		}
+		return Collections.EMPTY_LIST;
+	}
+	
+	@RequestMapping(value="/assessment/create.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public Assessment createAssessment(@RequestBody DefaultAssessment assessment) throws AssessmentPlanNotFoundException{	
+		User user = SecurityHelper.getUser();
+		Assessment assessmentToUse = assessment;
+		if(!user.isAnonymous()){
+			
+			
+			assessmentManager.addAssessmentCandidate(assessment.getAssessmentPlan(), user, assessment.getJob(), assessment.getJobLevel());
+		}
+		return assessmentToUse ;
+	}	
+	
 	@RequestMapping(value="/assessment/plan/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<AssessmentPlan> listAssessmentPlan(){	
 		User user = SecurityHelper.getUser();	
 		if(!user.isAnonymous()){			
-			List<AssessmentPlan> list = assessmentManager.getUserAssessments(user);
+			List<AssessmentPlan> list = assessmentManager.getUserAssessmentPlans(user);
 			Collections.sort(list, new Comparator<AssessmentPlan>(){
 				public int compare(AssessmentPlan o1, AssessmentPlan o2) {
 					if( o1.getStartDate().after( o2.getStartDate() ) ){
@@ -120,16 +148,29 @@ public class CompetencyAssessmentController {
 					}
 					return 0;
 				}});
-			return list;
+
+			return toUserAssessmentPlans(list);
 		}
 		return Collections.EMPTY_LIST;
 	}
+	private List<AssessmentPlan> toUserAssessmentPlans(List<AssessmentPlan> list){
+		List<AssessmentPlan> alist = new ArrayList<AssessmentPlan>(list.size());
+		for(AssessmentPlan plan : list){
+			alist.add(new UserAssessmentPlan(plan));
+		}
+		return alist;
+	}
+	
 	
 	@RequestMapping(value="/assessment/job/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<Job> listJob(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) Integer assessmentId) throws AssessmentPlanNotFoundException{	
-		User user = SecurityHelper.getUser();		
+		User user = SecurityHelper.getUser();	
+		
+		if( assessmentId <= 0 )
+			return Collections.EMPTY_LIST;
+		
 		AssessmentPlan assessment = assessmentManager.getAssessmentPlan(assessmentId);
 		int objectType = assessment.getObjectType();
 		long objectId = assessment.getObjectId();			

@@ -50,16 +50,27 @@ public interface AssessmentManager {
 	
 	
 	/**
-	 * 권한이 있는 진단 목록을 가져온다.
+	 * 권한이 있는 진단계획 목록을 가져온다.
 	 * @param user
 	 * @return
 	 */
-	public abstract List<AssessmentPlan> getUserAssessments(User user);	
+	public abstract List<AssessmentPlan> getUserAssessmentPlans(User user);	
 	
-	public abstract int getUserAssessmentResultCount(AssessmentPlan assessment, User candidate, String state );	
 	
-	public abstract List<Assessment> getUserAssessmentResults(AssessmentPlan assessment, User candidate);
 	
-	public abstract void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level ); 
+	
+	/**
+	 * 진단에 참여한 사용자 수를 리턴한다.
+	 *  
+	 * @param assessmentPlan
+	 * @return
+	 */	
+	public abstract int getUserAssessmentCount(User candidate, AssessmentPlan assessment, String state);	
+	
+	public abstract List<Assessment> getUserAssessments(User candidate, AssessmentPlan assessment, String state);
+	
+	public abstract boolean hasUserAssessed(AssessmentPlan assessment, User candidate);
+	
+	public abstract void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level );
 	
 }

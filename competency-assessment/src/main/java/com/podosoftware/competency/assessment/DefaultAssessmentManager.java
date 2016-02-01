@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.podosoftware.competency.assessment.Assessment.State;
 import com.podosoftware.competency.assessment.dao.AssessmentDao;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetNotFoundException;
@@ -19,12 +20,14 @@ import com.podosoftware.competency.job.JobNotFoundException;
 import architecture.common.user.CompanyManager;
 import architecture.common.user.CompanyNotFoundException;
 import architecture.common.user.User;
+import architecture.common.user.UserManager;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 public class DefaultAssessmentManager implements AssessmentManager {
 
 	private Log log = LogFactory.getLog(getClass());
+	
 	private AssessmentDao assessmentDao;
 	
 	private JobManager jobManager ;
@@ -33,11 +36,15 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	private CompanyManager companyManager;
 	
+	private UserManager userManager;
+	
 	protected Cache ratingSchemeCache;
+	
+	protected Cache assessmentCache;
 	
 	protected Cache assessmentSchemeCache;
 	
-	protected Cache assessmentCache;
+	protected Cache assessmentPlanCache;
 	
 	protected Cache assessmentJobSelectionCache;
 	
@@ -46,6 +53,14 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	public DefaultAssessmentManager() {
 		
+	}
+
+	public UserManager getUserManager() {
+		return userManager;
+	}
+
+	public void setUserManager(UserManager userManager) {
+		this.userManager = userManager;
 	}
 
 	public CompanyManager getCompanyManager() {
@@ -88,12 +103,12 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		this.assessmentSchemeCache = assessmentSchemeCache;
 	}
 
-	public Cache getAssessmentCache() {
-		return assessmentCache;
+	public Cache getAssessmentPlanCache() {
+		return assessmentPlanCache;
 	}
 
-	public void setAssessmentCache(Cache assessmentCache) {
-		this.assessmentCache = assessmentCache;
+	public void setAssessmentPlanCache(Cache assessmentCache) {
+		this.assessmentPlanCache = assessmentCache;
 	}
 
 	public Cache getRatingSchemeCache() {
@@ -106,6 +121,14 @@ public class DefaultAssessmentManager implements AssessmentManager {
  
 	public Cache getAssessmentJobSelectionCache() {
 		return assessmentJobSelectionCache;
+	}
+
+	public Cache getAssessmentCache() {
+		return assessmentCache;
+	}
+
+	public void setAssessmentCache(Cache assessmentCache) {
+		this.assessmentCache = assessmentCache;
 	}
 
 	public void setAssessmentJobSelectionCache(Cache assessmentJobSelectionCache) {
@@ -375,13 +398,13 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
  
 	public List<AssessmentPlan> getAssessmentPlans(int objectType, long objectId) {
-		List<Long> ids = assessmentDao.getAssessmentIds(objectType, objectId);		
-		return loadAssessments(ids);
+		List<Long> ids = assessmentDao.getAssessmentPlanIds(objectType, objectId);		
+		return loadAssessmentPlans(ids);
 	}
 
  
 	public int getAssessmentPlanCount(int objectType, long objectId) {
-		return assessmentDao.getAssessmentCount(objectType, objectId);
+		return assessmentDao.getAssessmentPlanCount(objectType, objectId);
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
@@ -392,7 +415,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 			isNew = false;
 		}
 		
-		assessmentDao.saveOrUpdateAssessment(assessment);
+		assessmentDao.saveOrUpdateAssessmentPlan(assessment);
 		
 		AssessmentPlan dbAssessment = new DefaultAssessmentPlan();	
 		if( !isNew ){
@@ -457,16 +480,16 @@ public class DefaultAssessmentManager implements AssessmentManager {
 			assessmentDao.saveOrUpdateAssessmentSubjects(subjects);
 		}
 		if( !isNew && assessment.getAssessmentId() > 0 ){
-			if( assessmentCache.get(assessment.getAssessmentId()) != null ){
-				assessmentCache.remove(assessment.getAssessmentId());
+			if( assessmentPlanCache.get(assessment.getAssessmentId()) != null ){
+				assessmentPlanCache.remove(assessment.getAssessmentId());
 			}
 		}
 	}
  
 	public AssessmentPlan getAssessmentPlan(long assessmentSchemeId) throws AssessmentPlanNotFoundException {
-		AssessmentPlan scheme = getAssessmentInCache(assessmentSchemeId);
+		AssessmentPlan scheme = getAssessmentPlanInCache(assessmentSchemeId);
 		if(scheme == null){
-			scheme = assessmentDao.getAssessmentById(assessmentSchemeId);		
+			scheme = assessmentDao.getAssessmentPlanById(assessmentSchemeId);		
 			RatingScheme ratingScheme;
 			try {
 				ratingScheme = getRatingScheme(scheme.getRatingScheme().getRatingSchemeId());
@@ -486,11 +509,94 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return scheme;	
 	}
 
-	public List<AssessmentPlan> getUserAssessments(User user) {
-		List<Long> ids = assessmentDao.getAssessmentIdsByUser(user);		
-		return loadAssessments(ids);
+	public List<AssessmentPlan> getUserAssessmentPlans(User user) {
+		List<Long> ids = assessmentDao.getAssessmentPlanIdsByUser(user);		
+		return loadAssessmentPlans(ids);
 	}	
+	
+	public Assessment getAssessment(long assessmentId) throws AssessmentNotFoundException {
+		Assessment assessment = getAccessmentInCache(assessmentId);
+		if(assessment == null){
+			assessment = assessmentDao.getAssessmentById(assessmentId);		
+			AssessmentPlan plan;
+			
+			if( assessment.getAssessmentPlan().getAssessmentId() > 0){
+				try {
+					plan = getAssessmentPlan(assessment.getAssessmentPlan().getAssessmentId());
+					assessment.setAssessmentPlan(plan);
+				} catch (AssessmentPlanNotFoundException e) {
+				}
+			}
+			
+			if( assessment.getJob().getJobId() > 0 ){				
+				try {
+					Job job = jobManager.getJob(assessment.getJob().getJobId());
+					assessment.setJob(job);
+				} catch (JobNotFoundException e) {
+					e.printStackTrace();
+				}
+			};
+			updateCache(assessment);
+		}
+		return assessment;	
+	}
+	
 
+	/**
+	 * 진단계획에 따른 평가 수를 리턴한다. 
+	 * 
+	 */
+	public int getUserAssessmentCount(User candidate, AssessmentPlan assessment, String state) {
+		return assessmentDao.getUserAssessmentCount( candidate, assessment.getAssessmentId(), state);
+	}
+	
+	public List<Assessment> getUserAssessments(User candidate, AssessmentPlan assessment, String state) {
+		return loadAssessments(assessmentDao.getUserAssessmentIds(candidate, assessment.getAssessmentId(), state ));
+	}
+
+
+	@Override
+	public boolean hasUserAssessed(AssessmentPlan assessmentPlan, User candidate) {
+		if( getUserAssessmentCount(candidate, assessmentPlan, null )>0)
+			return true;
+		
+		return false;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level) {		
+		DefaultAssessment newAssessment = new DefaultAssessment();	
+		newAssessment.setCandidate(candidate);
+		newAssessment.setJob(job);
+		newAssessment.setJobLevel(level);
+		saveOrUpdateUserAssessment(newAssessment);
+	}
+	
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveOrUpdateUserAssessment(Assessment assessment) {	
+		assessmentDao.saveOrUpdateAssessment(assessment);
+	}
+	
+
+	
+	private Assessment getAccessmentInCache(long assessmentId){
+		if(assessmentCache.get(assessmentId)!=null){
+			return (Assessment) assessmentCache.get(assessmentId).getValue();
+		}
+		return null;
+	}
+
+	private List<Assessment> loadAssessments(List<Long> ids){
+		ArrayList<Assessment> list = new ArrayList<Assessment>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getAssessment(id));
+			} catch (AssessmentNotFoundException e) {}			
+		}		
+		return list;		
+	}
+	
 	private List<JobSelection> loadJobSelections(List<Long> ids){
 		ArrayList<JobSelection> list = new ArrayList<JobSelection>(ids.size());
 		for( Long id : ids ){			
@@ -501,7 +607,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return list;		
 	}
 	
-	private List<AssessmentPlan> loadAssessments(List<Long> ids){
+	private List<AssessmentPlan> loadAssessmentPlans(List<Long> ids){
 		ArrayList<AssessmentPlan> list = new ArrayList<AssessmentPlan>(ids.size());
 		for( Long id : ids ){			
 			try {
@@ -535,8 +641,13 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return null;
 	}
 
+	private void updateCache( Assessment assessment){
+		if( assessmentCache.get(assessment.getAssessmentId()) != null ){
+			assessmentCache.remove(assessment.getAssessmentId());
+		}
+		assessmentCache.put(new Element(assessment.getAssessmentId(), assessment));
+	}
 	
-
 	private List<AssessmentScheme> loadAssessmentSchemes(List<Long> ids){
 		ArrayList<AssessmentScheme> list = new ArrayList<AssessmentScheme>(ids.size());
 		for( Long id : ids ){			
@@ -563,35 +674,18 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	
 	private void updateCache( AssessmentPlan assessment){
-		if( assessmentCache.get(assessment.getAssessmentId()) != null ){
-			assessmentCache.remove(assessment.getAssessmentId());
+		if( assessmentPlanCache.get(assessment.getAssessmentId()) != null ){
+			assessmentPlanCache.remove(assessment.getAssessmentId());
 		}
-		assessmentCache.put(new Element(assessment.getAssessmentId(), assessment));
+		assessmentPlanCache.put(new Element(assessment.getAssessmentId(), assessment));
 	}
 	
-	private AssessmentPlan getAssessmentInCache(long assessmentId){
-		if(assessmentCache.get(assessmentId)!=null){
-			return (AssessmentPlan) assessmentCache.get(assessmentId).getValue();
+	private AssessmentPlan getAssessmentPlanInCache(long assessmentId){
+		if(assessmentPlanCache.get(assessmentId)!=null){
+			return (AssessmentPlan) assessmentPlanCache.get(assessmentId).getValue();
 		}
 		return null;
 	}
 
-	@Override
-	public int getUserAssessmentResultCount(AssessmentPlan assessment, User candidate, String state) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List<Assessment> getUserAssessmentResults(AssessmentPlan assessment, User candidate) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

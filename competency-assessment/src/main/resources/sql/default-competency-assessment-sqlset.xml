@@ -1030,11 +1030,80 @@
 		T2.STATE = '${state}' AND 
 		</#if>	
 	 	( 
-		( SUBJECT_OBJECT_TYPE = 2 AND SUBJECT_OBJECT_ID = ${ user.companyId } )
+		( SUBJECT_OBJECT_TYPE = 1 AND SUBJECT_OBJECT_ID = ${ user.companyId } )
 		OR
-		( SUBJECT_OBJECT_TYPE = 1 AND SUBJECT_OBJECT_ID = ${ user.userId } )
+		( SUBJECT_OBJECT_TYPE = 2 AND SUBJECT_OBJECT_ID = ${ user.userId } )
 	)	
 	]]></dynamic></sql-query>	
+	
+	<!-- ASSESSMENT -->
+	<sql-query name="INSERT_ASSESSMENT" description="INSERT_ASSESSMENT"><![CDATA[
+	INSERT INTO CA_ASSESSMENT (
+		ASSESSMENT_ID,
+		ASSESSMENT_PLAN_ID,
+		FEEDBACK_ENABLED, 		
+		CANDIDATE_ID,
+		JOB_ID,
+		JOB_LEVEL,
+		STATE,
+		CREATION_DATE,
+		MODIFIED_DATE
+	) VALUES (?,?,?,?,?,?,?,?,?)		
+	]]></sql-query>		
+	
+	<sql-query name="UPDATE_ASSESSMENT" description="UPDATE_ASSESSMENT"><![CDATA[
+	UPDATE CA_ASSESSMENT SET 
+		STATE = ? ,
+		MODIFIED_DATE = ?
+	WHERE 
+	 	ASSESSMENT_ID = ?		
+	]]></sql-query>	
+	
+	<sql-query name="SELECT_ASSESSMENT_BY_ID" description="SELECT_ASSESSMENT_BY_ID"><![CDATA[
+	SELECT 
+		ASSESSMENT_ID,
+		ASSESSMENT_PLAN_ID,
+		FEEDBACK_ENABLED, 		
+		CANDIDATE_ID,
+		JOB_ID,
+		JOB_LEVEL,
+		STATE,
+		CREATION_DATE,
+		MODIFIED_DATE	
+	FROM CA_ASSESSMENT
+	WHERE 
+	 	ASSESSMENT_ID = ?		
+	]]></sql-query>	
+	
+	<sql-query name="SELECT_ASSESSMENT_IDS_BY_PLAN_AND_USER_AND_STATE" description="SELECT_ASSESSMENT_IDS_BY_PLAN_AND_USER_AND_STATE"><![CDATA[
+	SELECT 	
+		ASSESSMENT_ID
+	FROM CA_ASSESSMENT
+	WHERE CANDIDATE_ID = ? 
+	]]><dynamic><![CDATA[	
+		<#if assessmentPlanId > 0 >
+		AND ASSESSMENT_PLAN_ID = ${assessmentPlanId}	
+		</#if>
+		<#if state??>
+		AND STATE = '${state}'  
+		</#if>	
+	]]></dynamic></sql-query>	
+	
+	<sql-query name="COUNT_ASSESSMENT_BY_PLAN_AND_USER_AND_STATE" description="COUNT_ASSESSMENT_BY_PLAN_AND_USER_AND_STATE"><![CDATA[
+	SELECT 	
+		COUNT(ASSESSMENT_ID)
+	FROM CA_ASSESSMENT	
+	WHERE CANDIDATE_ID = ? 
+	]]><dynamic><![CDATA[	
+		<#if assessmentPlanId > 0 >
+		AND ASSESSMENT_PLAN_ID = ${assessmentPlanId}	
+		</#if>
+		<#if state??>
+		AND STATE = '${state}'  
+		</#if>	
+	]]></dynamic></sql-query>	
+	
+		
 	<row-mapper></row-mapper>	
 						
 </sqlset>

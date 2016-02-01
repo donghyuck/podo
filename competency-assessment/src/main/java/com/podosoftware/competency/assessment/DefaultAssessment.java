@@ -1,5 +1,6 @@
 package com.podosoftware.competency.assessment;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,13 +21,30 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 	private List<User> assessors;
 	private User candidate;
 	private State state;
+	private int jobLevel;
 	private int totalScore;
 	
 	public DefaultAssessment() {
 		this.assessmentId = -1L;
 		this.totalScore = 0;
 		this.state = State.NONE;
+		this.jobLevel = 0;
+		this.assessors = Collections.EMPTY_LIST;
 	}
+
+	
+	
+	public int getJobLevel() {
+		return jobLevel;
+	}
+
+
+
+	public void setJobLevel(int jobLevel) {
+		this.jobLevel = jobLevel;
+	}
+
+
 
 	public AssessmentPlan getAssessmentPlan() {
 		return assessmentPlan;

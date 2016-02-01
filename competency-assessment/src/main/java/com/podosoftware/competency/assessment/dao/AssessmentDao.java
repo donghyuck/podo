@@ -2,6 +2,7 @@ package com.podosoftware.competency.assessment.dao;
 
 import java.util.List;
 
+import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.JobSelection;
@@ -85,13 +86,13 @@ public interface AssessmentDao {
 	
 	
 	
-	public abstract List<Long> getAssessmentIds( int objectType, long objectId);
+	public abstract List<Long> getAssessmentPlanIds( int objectType, long objectId);
 	
-	public abstract int getAssessmentCount(int objectType, long objectId);
+	public abstract int getAssessmentPlanCount(int objectType, long objectId);
 	
-	public abstract AssessmentPlan getAssessmentById(long assessmentId);
+	public abstract AssessmentPlan getAssessmentPlanById(long assessmentId);
 	
-	public abstract void saveOrUpdateAssessment(AssessmentPlan assessment); 
+	public abstract void saveOrUpdateAssessmentPlan(AssessmentPlan assessment); 
 	
 	
 	
@@ -100,6 +101,14 @@ public interface AssessmentDao {
 	 * @param user
 	 * @return
 	 */
-	public abstract List<Long> getAssessmentIdsByUser(User user);
+	public abstract List<Long> getAssessmentPlanIdsByUser(User user);
+	
+	public abstract void saveOrUpdateAssessment(Assessment assessment);
+	
+	public abstract List<Long> getUserAssessmentIds( User user, long assessmentPlanId, String state);
+	
+	public abstract int getUserAssessmentCount(User user, long assessmentPlanId, String state);
+	
+	public abstract Assessment getAssessmentById(long assessmentId);
 	
 }
