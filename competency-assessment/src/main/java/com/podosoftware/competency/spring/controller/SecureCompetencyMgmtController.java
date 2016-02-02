@@ -26,10 +26,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.podosoftware.competency.assessment.AssessmentPlan;
-import com.podosoftware.competency.assessment.AssessmentManager;
-import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
 import com.podosoftware.competency.assessment.AssessmentCreatePlan;
+import com.podosoftware.competency.assessment.AssessmentManager;
+import com.podosoftware.competency.assessment.AssessmentPlan;
+import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.AssessmentSchemeNotFoundException;
 import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
@@ -465,7 +465,6 @@ public class SecureCompetencyMgmtController {
 		Job jobToUse = job;
 		
 		jobManager.saveOrUpdate(jobToUse);
-		
 		return jobManager.getJob(jobToUse.getJobId());
 	}
 	

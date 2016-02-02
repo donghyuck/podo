@@ -6,6 +6,7 @@ import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
 import com.podosoftware.competency.job.JobCompetencyRelationship;
+import com.podosoftware.competency.job.JobLevel;
 
 import architecture.common.user.Company;
 
@@ -47,4 +48,15 @@ public interface JobDao {
 	public abstract List<Long> getJobCompetencyIds(Job job);
 	
 	public abstract Long getJobIdByCompetency(Competency competency) ;
+	
+	public abstract JobLevel getJobLevelById(long jobLevelId);
+		
+	public abstract List<Long> getJobLevelIds(long jobId);
+	
+	public abstract void saveOrUpdateJobLevels(List<JobLevel> jobLevels);
+	
+	public abstract void removeJobLevels(List<JobLevel> jobLevels);
+	
+	
+	
 }

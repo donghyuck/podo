@@ -66,7 +66,6 @@ public class UserAssessmentPlan implements AssessmentPlan {
  
 	@JsonSerialize(using = CustomJsonDateSerializer.class)
 	public Date getModifiedDate() {
-		// TODO Auto-generated method stub
 		return assessmentPlan.getModifiedDate();
 	}
  
@@ -117,7 +116,6 @@ public class UserAssessmentPlan implements AssessmentPlan {
 	public void setRatingScheme(RatingScheme ratingScheme) {
 	}
 
-	@Override
 	public boolean isMultipleApplyAllowed() {
 		return assessmentPlan.isMultipleApplyAllowed();
 	}

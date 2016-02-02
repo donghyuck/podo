@@ -5,7 +5,6 @@ import java.util.List;
 import com.podosoftware.competency.job.Job;
 
 import architecture.common.model.DateAware;
-import architecture.common.model.ModelObject;
 import architecture.common.user.User;
 
 public interface Assessment extends DateAware{

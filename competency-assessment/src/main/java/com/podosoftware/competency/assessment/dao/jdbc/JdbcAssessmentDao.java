@@ -823,6 +823,9 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 	public void saveOrUpdateAssessment(Assessment assessment) {
 		Date now = new Date();
+		
+		log.debug( assessment);
+		
 		if( assessment.getAssessmentId() > 0 ){
 			assessment.setModifiedDate(now);	
 			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT").getSql(),
@@ -831,7 +834,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 					new SqlParameterValue (Types.NUMERIC, assessment.getAssessmentId())
 			);	
 		}else{
-			assessment.setAssessmentId(this.nextAssessmentId());
+			assessment.setAssessmentId(nextAssessmentId());
 			assessment.setCreationDate(now);
 			assessment.setModifiedDate(now);	
 			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT").getSql(),

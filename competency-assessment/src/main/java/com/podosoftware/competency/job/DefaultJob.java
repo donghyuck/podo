@@ -1,7 +1,10 @@
 package com.podosoftware.competency.job;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,6 +16,8 @@ import com.podosoftware.competency.job.json.CustomJsonClassificationDeserializer
 import architecture.common.cache.CacheSizes;
 import architecture.common.model.json.CustomJsonDateDeserializer;
 import architecture.common.model.json.CustomJsonDateSerializer;
+import architecture.common.model.json.JsonMapPropertyDeserializer;
+import architecture.common.model.json.JsonMapPropertySerializer;
 import architecture.common.model.support.PropertyAwareSupport;
 
 public class DefaultJob extends PropertyAwareSupport implements Job {
@@ -32,11 +37,14 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 	private Date modifiedDate;
 
 	private Classification classification;
+	
+	private List<JobLevel> jobLevels ;
 
 	public DefaultJob() {
 		this.jobId = -1L;
 		this.objectType = 0 ;
 		this.objectId = -1L;
+		this.jobLevels = Collections.EMPTY_LIST;
 		Date now = new Date();
 		this.creationDate = now;
 		this.modifiedDate = now;
@@ -116,6 +124,17 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		classification = classfication;
 	}
 
+	
+	@JsonDeserialize(using = JsonMapPropertyDeserializer.class)	
+	public void setProperties(Map<String, String> properties) {
+		super.setProperties(properties);
+	}
+
+	@JsonSerialize(using = JsonMapPropertySerializer.class)	
+	public Map<String, String> getProperties() {
+		return super.getProperties();
+	}
+	
 	@JsonIgnore
 	public Serializable getPrimaryKeyObject() {
 		return jobId;
@@ -155,6 +174,16 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		return "DefaultJob [jobId=" + jobId + ", objectType=" + objectType + ", objectId=" + objectId + ", name=" + name
 				+ ", description=" + description + ", creationDate=" + creationDate + ", modifiedDate=" + modifiedDate
 				+ ", classification=" + classification + "]";
+	}
+
+	@Override
+	public void setJobLevels(List<JobLevel> jobLevels) {
+		this.jobLevels = jobLevels;
+	}
+
+	@Override
+	public List<JobLevel> getJobLevels() {
+		return this.jobLevels;
 	}
 
 }

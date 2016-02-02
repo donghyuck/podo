@@ -17,6 +17,7 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 
 	private long assessmentId;
 	private AssessmentPlan assessmentPlan;
+	
 	private Job job;
 	private List<User> assessors;
 	private User candidate;
@@ -31,8 +32,6 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 		this.jobLevel = 0;
 		this.assessors = Collections.EMPTY_LIST;
 	}
-
-	
 	
 	public int getJobLevel() {
 		return jobLevel;

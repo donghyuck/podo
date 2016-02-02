@@ -4,10 +4,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
@@ -18,6 +20,7 @@ import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.DefaultJob;
 import com.podosoftware.competency.job.Job;
 import com.podosoftware.competency.job.JobCompetencyRelationship;
+import com.podosoftware.competency.job.JobLevel;
 import com.podosoftware.competency.job.dao.JobDao;
 
 import architecture.common.user.Company;
@@ -27,6 +30,8 @@ import architecture.ee.spring.jdbc.support.ExtendedJdbcDaoSupport;
 public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 
 	private String sequencerName = "JOB";
+	
+	private String jobLevelSequencerName = "JOB_LEVEL";
 	
 	private String jobPropertyTableName = "CA_JOB_PROPERTY";
 	
@@ -67,6 +72,19 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 		}		
 	};		
 	
+	private final RowMapper<JobLevel>  jobLevelMapper = new RowMapper<JobLevel>(){
+		public JobLevel mapRow(ResultSet rs, int rowNum) throws SQLException {		
+			JobLevel jobLevel = new JobLevel();		
+			jobLevel.setJobLevelId(rs.getLong("JOB_LEVEL_ID"));
+			jobLevel.setJobId(rs.getLong("JOB_ID"));
+			jobLevel.setName(rs.getString("NAME"));
+			jobLevel.setDescription(rs.getString("DESCRIPTION"));
+			jobLevel.setLevel(rs.getInt("JOB_LEVEL"));
+			jobLevel.setMinWorkExperienceYear(rs.getInt("MIN_YEAR"));
+			jobLevel.setMaxWorkExperienceYear(rs.getInt("MAX_YEAR"));
+			return jobLevel;
+		}		
+	};
 	
 	public JdbcJobDao() {
 		
@@ -122,6 +140,9 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 		return getNextId(sequencerName);
 	}
 
+	public Long nextJobLevelId(){
+		return getNextId(jobLevelSequencerName);
+	}
 
 
 	public void saveOrUpdateJob(Job job) {
@@ -340,4 +361,98 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 		}
 		return jobId;
 	}
+
+	
+	
+	public JobLevel getJobLevelById(long jobLevelId) {
+		JobLevel scheme = null;
+		try {
+			scheme = getExtendedJdbcTemplate().queryForObject(
+					getBoundSql("COMPETENCY_ACCESSMENT.SELECT_JOB_LEVEL_BY_ID").getSql(), 
+					jobLevelMapper, 
+					new SqlParameterValue(Types.NUMERIC, jobLevelId ) );			
+		} catch (IncorrectResultSizeDataAccessException e) {
+			if(e.getActualSize() > 1)
+	        {
+	            log.warn((new StringBuilder()).append("Multiple occurrances of the same JobLevel ID found: ").append(jobLevelId).toString());
+	            throw e;
+	        }
+		} catch (DataAccessException e) {
+			 String message = (new StringBuilder()).append("Failure attempting to load JobLevel by ID : ").append(jobLevelId).append(".").toString();
+			 log.fatal(message, e);
+		}			
+		return scheme;
+	}
+
+	public List<Long> getJobLevelIds(long jobId) {
+		return getExtendedJdbcTemplate().queryForList(getBoundSql("COMPETENCY_ACCESSMENT.SELECT_JOB_LEVEL_IDS_BY_JOB_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, jobId)		
+		);
+	}
+
+	public void removeJobLevels(final List<JobLevel> jobLevels) {
+		getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.REMOVE_JOB_LEVEL").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobLevel jobLevel= jobLevels.get(i);
+						ps.setLong(1, jobLevel.getJobLevelId());	
+					}					
+					public int getBatchSize() {
+						return jobLevels.size();
+					}
+				});	
+	}
+	
+	public void saveOrUpdateJobLevels(List<JobLevel> subjects){	
+		final List<JobLevel> inserts = new ArrayList<JobLevel>();		
+		final List<JobLevel> updates = new ArrayList<JobLevel>();				
+		for(JobLevel jobSel : subjects){
+			if(jobSel.getJobLevelId() > 0){
+				updates.add(jobSel);
+			}else{
+				jobSel.setJobLevelId(this.nextJobLevelId());
+				inserts.add(jobSel);
+			}
+		}	
+		if(updates.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_JOB_LEVEL").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobLevel sbj= updates.get(i);
+						ps.setString(1, sbj.getName());	
+						ps.setString(2, sbj.getDescription());
+						ps.setInt(3, sbj.getMinWorkExperienceYear());
+						ps.setInt(4, sbj.getMaxWorkExperienceYear());
+						ps.setInt(5, sbj.getLevel());
+						ps.setLong(6, sbj.getJobLevelId());
+					}					
+					public int getBatchSize() {
+						return updates.size();
+					}
+				});		
+		}	
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(				
+				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_JOB_LEVEL").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						JobLevel sbj= inserts.get(i);
+						ps.setLong(1, sbj.getJobLevelId());
+						ps.setLong(2, sbj.getJobId());
+						ps.setString(3, sbj.getName());	
+						ps.setString(4, sbj.getDescription());
+						ps.setInt(5, sbj.getMinWorkExperienceYear());
+						ps.setInt(6, sbj.getMaxWorkExperienceYear());
+						ps.setInt(7, sbj.getLevel());
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}			
+	}
+	
 }

@@ -128,8 +128,6 @@ public class CompetencyAssessmentController {
 		User user = SecurityHelper.getUser();
 		Assessment assessmentToUse = assessment;
 		if(!user.isAnonymous()){
-			
-			
 			assessmentManager.addAssessmentCandidate(assessment.getAssessmentPlan(), user, assessment.getJob(), assessment.getJobLevel());
 		}
 		return assessmentToUse ;

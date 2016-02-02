@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.podosoftware.competency.assessment.Assessment.State;
 import com.podosoftware.competency.assessment.dao.AssessmentDao;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetNotFoundException;
@@ -566,6 +565,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level) {		
 		DefaultAssessment newAssessment = new DefaultAssessment();	
+		newAssessment.setAssessmentPlan(assessment);
 		newAssessment.setCandidate(candidate);
 		newAssessment.setJob(job);
 		newAssessment.setJobLevel(level);

@@ -1,6 +1,7 @@
 package com.podosoftware.competency.job;
 
 import java.util.Date;
+import java.util.List;
 
 import architecture.common.cache.Cacheable;
 import architecture.common.model.PropertyAware;
@@ -38,5 +39,9 @@ public interface Job extends PropertyAware, Cacheable  {
 	public Date getModifiedDate() ;
 
 	public void setModifiedDate(Date modifiedDate) ;
+	
+	public void setJobLevels(List<JobLevel> jobLevels);
+	
+	public List<JobLevel> getJobLevels();
 	
 }

@@ -129,14 +129,49 @@ public class DefaultJobManager implements JobManager {
 			job.getClassification().getClassifiedMajorityId() <= 0 || 
 			job.getClassification().getClassifiedMajorityId() <= 0)
 			throw new IllegalArgumentException("Classification can not be null.");
+		boolean isNew = true;
 		Date now = new Date();
 		if( job.getJobId() > 0){			
 			job.setModifiedDate(now);
+			isNew = false;
 		}else{
 			job.setCreationDate(now);
 			job.setModifiedDate(now);
 		}
+				
+		List<JobLevel> jobLevelUpdates = new ArrayList<JobLevel>();
+		List<JobLevel> jobLevelDeletes = new ArrayList<JobLevel>();
+		
+		
+		if(job.getJobLevels().size() > 0){
+			for(JobLevel jobLevel : job.getJobLevels() ){
+				if( jobLevel.getJobId() < 1 || jobLevel.getJobId() != job.getJobId() ){
+					jobLevel.setJobId(job.getJobId());
+				}
+				jobLevelUpdates.add(jobLevel);
+			}
+		}
+		
+		if( !isNew ){
+			List<JobLevel> dbJobLevels = new ArrayList<JobLevel>();
+			try {
+				Job dbJob = getJob(job.getJobId());
+				for(JobLevel dbJobLevel : dbJob.getJobLevels()){
+					if( !jobLevelUpdates.contains(dbJobLevel) )
+						jobLevelDeletes.add(dbJobLevel);
+				}
+			} catch (JobNotFoundException e1) {
+			}	
+		}
+		
 		jobDao.saveOrUpdateJob(job);
+		
+		if( jobLevelUpdates.size() > 0){
+			jobDao.saveOrUpdateJobLevels(jobLevelUpdates);
+		}
+		if( jobLevelDeletes.size() > 0)
+			jobDao.removeJobLevels(jobLevelDeletes);
+				
 		clearCache( job );
 	}
  
@@ -150,11 +185,39 @@ public class DefaultJobManager implements JobManager {
 			if( job == null ){				
 				throw new JobNotFoundException();
 			}
+			job.setJobLevels( getJobLevels(job.getJobId()) );
 			fetchClassification(job);
 			updateCache(job);
 		}
 		return job;
 	}	
+	
+	public List<JobLevel> getJobLevels(long jobId){		
+		return loadJobLevels(jobDao.getJobLevelIds(jobId));		
+	}
+	
+	
+	private List<JobLevel> loadJobLevels(List<Long> ids){
+		ArrayList<JobLevel> list = new ArrayList<JobLevel>(ids.size());
+		for( Long id : ids ){			
+			try {
+				list.add(getJobLevel(id));
+			} catch (JobLevelNotFoundException e) {}			
+		}		
+		return list;		
+	}
+	
+	public JobLevel getJobLevel(long jobLevelId) throws JobLevelNotFoundException {
+		JobLevel jobLevel = null; // = getAssessmentJobSelectionInCache(jobSelectionId);
+		if(jobLevel == null){
+			jobLevel = jobDao.getJobLevelById(jobLevelId);
+			//updateCache(selection);
+		}
+		if( jobLevel == null ){				
+			throw new JobLevelNotFoundException();
+		}
+		return jobLevel;
+	}
 	
 	private void fetchClassification(Job job){
 		

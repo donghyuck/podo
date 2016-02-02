@@ -49,8 +49,6 @@ public interface AssessmentPlan extends PropertyAware, DateAware {
 	
 	public List<Subject> getSubjects();	
 	
-	
-
 	public abstract Date getStartDate();
 
 	public abstract Date getEndDate();

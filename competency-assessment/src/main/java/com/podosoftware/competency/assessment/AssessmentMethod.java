@@ -1,7 +1,5 @@
 package com.podosoftware.competency.assessment;
 
-import com.podosoftware.competency.competency.CompetencyType;
-
 public enum AssessmentMethod {
 	NONE(0),
 	COGNITIVE_ABILITY_TESTS(1), /** 인지능혁테스트 */

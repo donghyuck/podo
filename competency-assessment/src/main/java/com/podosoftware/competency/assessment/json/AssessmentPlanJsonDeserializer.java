@@ -21,11 +21,13 @@ public class AssessmentPlanJsonDeserializer extends JsonDeserializer<AssessmentP
 	
 	private static final Log log = LogFactory.getLog(JsonRatingLevelsDeserializer.class);
 
-	public AssessmentPlan deserialize(JsonParser jsonParser, DeserializationContext ctxt)
-			throws IOException, JsonProcessingException {		
-		ObjectCodec oc = jsonParser.getCodec();
-		JsonNode node = oc.readTree(jsonParser);		
-		AssessmentPlan plan = new DefaultAssessmentPlan(node.get("assessmentId").asLong(-1L));
-		return plan;
+	
+	public AssessmentPlan deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		ObjectCodec oc = jp.getCodec();		
+		JsonNode node = oc.readTree(jp);		
+		AssessmentPlan job = new DefaultAssessmentPlan(node.get("assessmentId").asLong(-1L));
+		return job;
 	}
+	
+	
 }

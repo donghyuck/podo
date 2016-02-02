@@ -11,9 +11,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.podosoftware.competency.assessment.DefaultRatingLevel;
 import com.podosoftware.competency.assessment.JobSelection;
-import com.podosoftware.competency.assessment.RatingLevel;
 
 public class JobSelectionsJsonDeserializer extends JsonDeserializer<List<JobSelection>> {
 
