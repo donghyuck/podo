@@ -22,11 +22,13 @@ import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentNotFoundException;
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
+import com.podosoftware.competency.assessment.AssessmentQuestion;
 import com.podosoftware.competency.assessment.AssessmentStats;
 import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
 import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.codeset.CodeSetManager;
+import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
@@ -131,6 +133,14 @@ public class CompetencyAssessmentController {
 			}			
 		}
 		throw new UnAuthorizedException();
+	}
+	
+	public List<AssessmentQuestion> listAssessmentQuestion(
+			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{
+		User user = SecurityHelper.getUser();	
+		
+		Assessment assessment = assessmentManager.getAssessment(assessmentId);
+		return assessmentManager.getAssessmentQuestions( assessment);
 	}
 	
 	@RequestMapping(value="/assessment/list.json", method={RequestMethod.POST, RequestMethod.GET})
