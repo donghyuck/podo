@@ -56,7 +56,13 @@ public interface AssessmentManager {
 	 */
 	public abstract List<AssessmentPlan> getUserAssessmentPlans(User user);	
 	
-	
+	/**
+	 * 
+	 * @param assessmentPlan
+	 * @param user
+	 * @return
+	 */
+	public abstract AssessmentStats getAssessmentStats(AssessmentPlan assessmentPlan, User user);
 	
 	
 	/**
@@ -66,6 +72,8 @@ public interface AssessmentManager {
 	 * @return
 	 */	
 	public abstract int getUserAssessmentCount(User candidate, AssessmentPlan assessment, String state);	
+	
+	public abstract Assessment getAssessment(long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException;
 	
 	public abstract List<Assessment> getUserAssessments(User candidate, AssessmentPlan assessment, String state);
 	

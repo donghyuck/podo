@@ -19,12 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentManager;
+import com.podosoftware.competency.assessment.AssessmentNotFoundException;
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentPlanNotFoundException;
+import com.podosoftware.competency.assessment.AssessmentStats;
 import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
 import com.podosoftware.competency.assessment.JobSelection;
-import com.podosoftware.competency.assessment.UserAssessmentPlan;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.job.Classification;
@@ -35,6 +36,7 @@ import com.podosoftware.competency.job.JobManager;
 import architecture.common.user.CompanyManager;
 import architecture.common.user.SecurityHelper;
 import architecture.common.user.User;
+import architecture.common.user.authentication.UnAuthorizedException;
 
 @Controller ("competency-assessment-data-controller")
 @RequestMapping("/data/me/competency")
@@ -109,6 +111,28 @@ public class CompetencyAssessmentController {
 	public CompetencyAssessmentController() {
 	}
 
+	@RequestMapping(value="/assessment/get.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public Assessment getAssessment(
+			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{	
+
+		User user = SecurityHelper.getUser();	
+		if(!user.isAnonymous()){			
+			Assessment assessment = assessmentManager.getAssessment(assessmentId);
+			// 
+			if( assessment.getAssessmentPlan().isFeedbackEnabled() && assessment.getAssessors().contains(user) )
+			{
+				return assessment;
+			} else {
+				if( assessment.getCandidate().getUserId() == user.getUserId())
+				{
+					return assessment;
+				}
+			}			
+		}
+		throw new UnAuthorizedException();
+	}
+	
 	@RequestMapping(value="/assessment/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<Assessment> listAssessment(
@@ -147,16 +171,38 @@ public class CompetencyAssessmentController {
 					return 0;
 				}});
 
-			return toUserAssessmentPlans(list);
+			return list;
 		}
 		return Collections.EMPTY_LIST;
 	}
-	private List<AssessmentPlan> toUserAssessmentPlans(List<AssessmentPlan> list){
-		List<AssessmentPlan> alist = new ArrayList<AssessmentPlan>(list.size());
-		for(AssessmentPlan plan : list){
-			alist.add(new UserAssessmentPlan(plan));
+
+	@RequestMapping(value="/assessment/plan/stats/list.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public List<AssessmentStats> listAssessmentStats(){	
+		User user = SecurityHelper.getUser();	
+		if(!user.isAnonymous()){			
+			List<AssessmentPlan> list = assessmentManager.getUserAssessmentPlans(user);
+			Collections.sort(list, new Comparator<AssessmentPlan>(){
+				public int compare(AssessmentPlan o1, AssessmentPlan o2) {
+					if( o1.getStartDate().after( o2.getStartDate() ) ){
+						return 1;
+					}
+					return 0;
+				}});
+			return toAssessmentStatsList(list);
 		}
-		return alist;
+		return Collections.EMPTY_LIST;
+	}
+	
+	
+	private List<AssessmentStats> toAssessmentStatsList(List<AssessmentPlan> assessmentPlans){
+		User user = SecurityHelper.getUser();	
+		List<AssessmentStats> list = new ArrayList<AssessmentStats>(assessmentPlans.size());
+		for(AssessmentPlan plan : assessmentPlans){
+			AssessmentStats stats = assessmentManager.getAssessmentStats(plan, user);
+			list.add(stats);
+		}
+		return list;
 	}
 	
 	

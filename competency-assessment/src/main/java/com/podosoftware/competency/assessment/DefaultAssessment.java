@@ -3,6 +3,7 @@ package com.podosoftware.competency.assessment;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.podosoftware.competency.assessment.json.AssessmentPlanJsonDeserializer;
@@ -24,7 +25,7 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 	private State state;
 	private int jobLevel;
 	private int totalScore;
-	
+	private String jobLevelName;
 	public DefaultAssessment() {
 		this.assessmentId = -1L;
 		this.totalScore = 0;
@@ -44,6 +45,15 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 	}
 
 
+	@JsonGetter
+	public String getJobLevelName() {
+		return jobLevelName;
+	}
+
+	@JsonIgnore
+	public void setJobLevelName(String jobLevelName) {
+		this.jobLevelName = jobLevelName;
+	}
 
 	public AssessmentPlan getAssessmentPlan() {
 		return assessmentPlan;

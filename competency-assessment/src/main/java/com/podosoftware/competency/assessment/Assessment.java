@@ -48,4 +48,8 @@ public interface Assessment extends DateAware{
 	
 	public abstract void setJobLevel(int level);
 	
+	public abstract String getJobLevelName();
+	
+	public abstract void setJobLevelName(String jobLevelName); 
+	
 }

@@ -13,6 +13,7 @@ import com.podosoftware.competency.assessment.dao.AssessmentDao;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.codeset.CodeSetNotFoundException;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobLevel;
 import com.podosoftware.competency.job.JobManager;
 import com.podosoftware.competency.job.JobNotFoundException;
 
@@ -513,20 +514,76 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return loadAssessmentPlans(ids);
 	}	
 	
-	public Assessment getAssessment(long assessmentId) throws AssessmentNotFoundException {
+	public AssessmentStats getAssessmentStats(AssessmentPlan assessmentPlan, User user) {
+		AssessmentStats stats = new AssessmentStats();
+		stats.setAssessmentPlan(assessmentPlan);			
+		int userAssessedCount = 0;				
+		int userIncompleteCount = 0 ;
+		List<Assessment> assessments = loadAssessments(assessmentDao.getUserAssessmentIds(user, assessmentPlan.getAssessmentId(), null));
+		for( Assessment assessment : assessments ){
+			if(assessment.getState() == Assessment.State.ASSESSED ){
+				userAssessedCount ++;
+			}else{
+				userIncompleteCount ++;
+			}
+			if(assessment.getJob() !=null && assessment.getJob().getJobId() > 0){
+				try {
+					Job job = jobManager.getJob(assessment.getJob().getJobId());
+					
+					for( JobLevel jobLevel : job.getJobLevels() ) {
+						if( jobLevel.getLevel() == assessment.getJobLevel() )
+						{
+							assessment.setJobLevelName(jobLevel.getName());
+							break;
+						}
+					}
+					assessment.setJob(job);
+				} catch (JobNotFoundException e) {
+				}
+			}
+		}
+		stats.setUserAssessedCount(userAssessedCount);
+		stats.setUserIncompleteCount(userIncompleteCount);
+		stats.setUserAssessments(assessments);
+		return stats;
+	}
+	
+	public Assessment getAssessment(long assessmentId) throws AssessmentNotFoundException, AssessmentPlanNotFoundException {
+		
+		Assessment assessment = getAssessmentById(assessmentId);
+		
+		assessment.setAssessmentPlan( getAssessmentPlan(assessment.getAssessmentPlan().getAssessmentId()));
+		
+		if(assessment.getJob() !=null && assessment.getJob().getJobId() > 0){
+			try {
+				Job job = jobManager.getJob(assessment.getJob().getJobId());
+				assessment.setJob(job);
+				for( JobLevel jobLevel : job.getJobLevels() ) {
+					if( jobLevel.getLevel() == assessment.getJobLevel() )
+					{
+						assessment.setJobLevelName(jobLevel.getName());
+						break;
+					}
+				}				
+			} catch (JobNotFoundException e) {
+			}
+		}
+		return assessment; 
+	}
+	
+	public Assessment getAssessmentById(long assessmentId) throws AssessmentNotFoundException {
 		Assessment assessment = getAccessmentInCache(assessmentId);
 		if(assessment == null){
 			assessment = assessmentDao.getAssessmentById(assessmentId);		
+			/**
 			AssessmentPlan plan;
-			
 			if( assessment.getAssessmentPlan().getAssessmentId() > 0){
 				try {
 					plan = getAssessmentPlan(assessment.getAssessmentPlan().getAssessmentId());
 					assessment.setAssessmentPlan(plan);
 				} catch (AssessmentPlanNotFoundException e) {
 				}
-			}
-			
+			}			
 			if( assessment.getJob().getJobId() > 0 ){				
 				try {
 					Job job = jobManager.getJob(assessment.getJob().getJobId());
@@ -535,6 +592,23 @@ public class DefaultAssessmentManager implements AssessmentManager {
 					e.printStackTrace();
 				}
 			};
+			*/
+//			if( assessment.getJob().getJobId() > 0 && assessment.getJobLevel() > 0 ){				
+//				try {
+//					Job job = jobManager.getJob(assessment.getJob().getJobId());
+//					assessment.getJob().setName(job.getName());
+//					for( JobLevel jobLevel : job.getJobLevels() ) {
+//						if( jobLevel.getLevel() == assessment.getJobLevel() )
+//						{
+//							assessment.setJobLevelName(jobLevel.getName());
+//							break;
+//						}
+//					}
+//				} catch (JobNotFoundException e) {
+//					e.printStackTrace();
+//				}
+//			};
+			
 			updateCache(assessment);
 		}
 		return assessment;	
@@ -582,7 +656,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	private Assessment getAccessmentInCache(long assessmentId){
 		if(assessmentCache.get(assessmentId)!=null){
-			return (Assessment) assessmentCache.get(assessmentId).getValue();
+			return (Assessment) assessmentCache.get(assessmentId).getObjectValue();
 		}
 		return null;
 	}
@@ -591,7 +665,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		ArrayList<Assessment> list = new ArrayList<Assessment>(ids.size());
 		for( Long id : ids ){			
 			try {
-				list.add(getAssessment(id));
+				list.add(getAssessmentById(id));
 			} catch (AssessmentNotFoundException e) {}			
 		}		
 		return list;		
@@ -636,7 +710,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	private Subject getAccessmentSubjectInCache(long jobSelectionId){
 		if(assessmentSubjectCache.get(jobSelectionId)!=null){
-			return (Subject) assessmentSubjectCache.get(jobSelectionId).getValue();
+			return (Subject) assessmentSubjectCache.get(jobSelectionId).getObjectValue();
 		}
 		return null;
 	}
@@ -667,7 +741,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	private AssessmentScheme getAssessmentSchemeInCache(long assessmentSchemeId){
 		if(assessmentSchemeCache.get(assessmentSchemeId)!=null){
-			return (AssessmentScheme) assessmentSchemeCache.get(assessmentSchemeId).getValue();
+			return (AssessmentScheme) assessmentSchemeCache.get(assessmentSchemeId).getObjectValue();
 		}
 		return null;
 	}
@@ -682,7 +756,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	
 	private AssessmentPlan getAssessmentPlanInCache(long assessmentId){
 		if(assessmentPlanCache.get(assessmentId)!=null){
-			return (AssessmentPlan) assessmentPlanCache.get(assessmentId).getValue();
+			return (AssessmentPlan) assessmentPlanCache.get(assessmentId).getObjectValue();
 		}
 		return null;
 	}
