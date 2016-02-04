@@ -761,5 +761,10 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return null;
 	}
 
+	@Override
+	public List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment) {		
+		return assessmentDao.getAssessmentQuestionByJob(assessment.getJob().getJobId(),assessment.getJobLevel());		
+	}
+
 
 }

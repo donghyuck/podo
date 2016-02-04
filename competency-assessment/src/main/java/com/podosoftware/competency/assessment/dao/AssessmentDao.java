@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentPlan;
+import com.podosoftware.competency.assessment.AssessmentQuestion;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.assessment.RatingLevel;
@@ -111,4 +112,8 @@ public interface AssessmentDao {
 	
 	public abstract Assessment getAssessmentById(long assessmentId);
 	
+	
+	
+	
+	public abstract List<AssessmentQuestion> getAssessmentQuestionByJob(long jobId, int level);
 }

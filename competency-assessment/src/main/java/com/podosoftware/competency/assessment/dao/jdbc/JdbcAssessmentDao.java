@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.SqlParameterValue;
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentPlan.State;
+import com.podosoftware.competency.assessment.AssessmentQuestion;
 import com.podosoftware.competency.assessment.AssessmentScheme;
 import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
@@ -59,6 +60,21 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 	private ExtendedPropertyDao extendedPropertyDao;
 
+	private final RowMapper<AssessmentQuestion> assessmentQuestionMapper = new RowMapper<AssessmentQuestion>(){		
+		public AssessmentQuestion mapRow(ResultSet rs, int rowNum) throws SQLException {				
+			AssessmentQuestion question = new AssessmentQuestion();
+			question.setSeq(rowNum);
+			question.setCompetencyId(rs.getLong("COMPETENCY_ID"));
+			question.setCompetencyName(rs.getString("COMPETENCY_NAME"));
+			question.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
+			question.setEssentialElementName(rs.getString("ESSENTIAL_ELEMENT_NAME"));
+			question.setCompetencyLevel(rs.getInt("COMPETENCY_LEVEL"));
+			question.setQuestionId(rs.getLong("PERFORMANCE_CRITERIA_ID"));
+			question.setQuestion(rs.getString("EXAMPLE"));
+			return question;
+		}		
+	};
+	
 	private final RowMapper<Assessment> assessmentMapper = new RowMapper<Assessment>(){		
 		public Assessment mapRow(ResultSet rs, int rowNum) throws SQLException {				
 			DefaultAssessment scheme = new DefaultAssessment();
@@ -900,5 +916,11 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	}
 
 
-
+	public List<AssessmentQuestion> getAssessmentQuestionByJob(long jobId, int level) {
+		return getExtendedJdbcTemplate().query(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_PERFORMANCE_CRITERIA_BY_JOB").getSql(), 
+				assessmentQuestionMapper,
+				new SqlParameterValue(Types.NUMERIC, jobId ),
+				new SqlParameterValue(Types.NUMERIC, level ));
+	}
 }
