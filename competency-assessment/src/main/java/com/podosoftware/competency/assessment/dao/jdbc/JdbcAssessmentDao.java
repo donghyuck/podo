@@ -63,7 +63,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	private final RowMapper<AssessmentQuestion> assessmentQuestionMapper = new RowMapper<AssessmentQuestion>(){		
 		public AssessmentQuestion mapRow(ResultSet rs, int rowNum) throws SQLException {				
 			AssessmentQuestion question = new AssessmentQuestion();
-			question.setSeq(rowNum);
+			question.setSeq(rowNum++ );
 			question.setCompetencyId(rs.getLong("COMPETENCY_ID"));
 			question.setCompetencyName(rs.getString("COMPETENCY_NAME"));
 			question.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
