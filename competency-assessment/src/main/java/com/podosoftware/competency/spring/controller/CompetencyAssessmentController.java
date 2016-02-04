@@ -135,6 +135,8 @@ public class CompetencyAssessmentController {
 		throw new UnAuthorizedException();
 	}
 	
+	@RequestMapping(value="/assessment/test/list.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
 	public List<AssessmentQuestion> listAssessmentQuestion(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{
 		User user = SecurityHelper.getUser();	
