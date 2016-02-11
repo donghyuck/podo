@@ -21,6 +21,7 @@ import architecture.common.user.CompanyManager;
 import architecture.common.user.CompanyNotFoundException;
 import architecture.common.user.User;
 import architecture.common.user.UserManager;
+import architecture.common.user.UserNotFoundException;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
@@ -551,9 +552,31 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	public Assessment getAssessment(long assessmentId) throws AssessmentNotFoundException, AssessmentPlanNotFoundException {
 		
 		Assessment assessment = getAssessmentById(assessmentId);
-		
 		assessment.setAssessmentPlan( getAssessmentPlan(assessment.getAssessmentPlan().getAssessmentId()));
 		
+		if(assessment.getAssessors() != null && assessment.getAssessors().size() > 0){
+			List<User> assessors = new ArrayList<User>(assessment.getAssessors().size());
+			for(User assessor : assessors){
+				try {
+					assessors.add( userManager.getUser(assessor.getUserId()));
+				} catch (UserNotFoundException e) {
+					assessors.add(assessor);
+				}
+			}
+			assessment.setAssessors(assessors);
+		}
+		
+		if(assessment.getCandidate() != null && assessment.getCandidate().getUserId() > 0 )
+		{
+			User candidate;
+			try {
+				candidate = userManager.getUser(assessment.getCandidate().getUserId());
+				assessment.setCandidate(candidate);
+			} catch (UserNotFoundException e) {
+				log.warn(e);
+			}
+			
+		}
 		if(assessment.getJob() !=null && assessment.getJob().getJobId() > 0){
 			try {
 				Job job = jobManager.getJob(assessment.getJob().getJobId());
@@ -566,6 +589,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 					}
 				}				
 			} catch (JobNotFoundException e) {
+				log.warn(e);
 			}
 		}
 		return assessment; 
@@ -763,8 +787,31 @@ public class DefaultAssessmentManager implements AssessmentManager {
 
 	@Override
 	public List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment) {		
-		return assessmentDao.getAssessmentQuestionByJob(assessment.getJob().getJobId(),assessment.getJobLevel());		
+		List<AssessmentQuestion> list =  assessmentDao.getAssessmentQuestionByJob(assessment.getJob().getJobId(),assessment.getJobLevel());	
+		int no = 0 ;
+		for(AssessmentQuestion q : list){
+			no ++ ;
+			q.setSeq(no);
+			q.setAssessmentId(assessment.getAssessmentId());
+			q.setCandidateId(assessment.getCandidate().getUserId());
+		}
+		return list;
 	}
 
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveUserAssessment(Assessment assessment, List<AssessmentQuestion> answers) {		
+		if( answers.size() > 0){
+			assessmentDao.saveOrUpdateAssessmentQuestions(answers);
+			assessmentDao.updateAssessmentResult(assessment);
+			if( assessmentCache.get(assessment.getAssessmentId()) != null ){
+				assessmentCache.remove(assessment.getAssessmentId());
+			}
+		}
+	}
 
+	
+	
+	
+	
+	
 }

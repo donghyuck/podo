@@ -60,10 +60,10 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 	private ExtendedPropertyDao extendedPropertyDao;
 
-	private final RowMapper<AssessmentQuestion> assessmentQuestionMapper = new RowMapper<AssessmentQuestion>(){		
+	private final RowMapper<AssessmentQuestion> assessmentQuestionMapper = new RowMapper<AssessmentQuestion>(){
+		
 		public AssessmentQuestion mapRow(ResultSet rs, int rowNum) throws SQLException {				
 			AssessmentQuestion question = new AssessmentQuestion();
-			question.setSeq(rowNum);
 			question.setCompetencyId(rs.getLong("COMPETENCY_ID"));
 			question.setCompetencyName(rs.getString("COMPETENCY_NAME"));
 			question.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
@@ -846,7 +846,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 			assessment.setModifiedDate(now);	
 			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT").getSql(),
 					new SqlParameterValue (Types.VARCHAR, assessment.getState().name()),				
-					new SqlParameterValue (Types.TIMESTAMP, assessment.getCreationDate()),	
+					new SqlParameterValue (Types.TIMESTAMP, now),	
 					new SqlParameterValue (Types.NUMERIC, assessment.getAssessmentId())
 			);	
 		}else{
@@ -922,5 +922,64 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				assessmentQuestionMapper,
 				new SqlParameterValue(Types.NUMERIC, jobId ),
 				new SqlParameterValue(Types.NUMERIC, level ));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * 
+	 * 	CREATE TABLE CA_ASSESSED_SCORE (
+	 * 	ASSESSMENT_ID 			INTEGER NOT NULL,
+		CANDIDATE_ID 			INTEGER NOT NULL,
+		ASSESSOR_ID 			INTEGER NOT NULL,
+		COMPETENCY_ID			INTEGER NOT NULL,
+		ESSENTIAL_ELEMENT_ID	INTEGER NOT NULL,
+		PERFORMANCE_CRITERIA_ID INTEGER NOT NULL,
+		CREATION_DATE			TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+		MODIFIED_DATE			TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+		
+		
+	 * @param answers
+	 */
+	public void saveOrUpdateAssessmentQuestions(List<AssessmentQuestion> answers){	
+
+		final List<AssessmentQuestion> inserts = new ArrayList<AssessmentQuestion>();		
+		final Date now = new Date();
+		inserts.addAll(answers);		
+		if(inserts.size() > 0){
+			getExtendedJdbcTemplate().batchUpdate(							
+				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT_SCORE").getSql(), 
+				new BatchPreparedStatementSetter() {					
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						AssessmentQuestion jobSel= inserts.get(i);
+						ps.setLong(1, jobSel.getAssessmentId());	
+						ps.setLong(2, jobSel.getCandidateId());	
+						ps.setLong(3, jobSel.getAssessorId());	
+						ps.setLong(4, jobSel.getCompetencyId());	
+						ps.setLong(5, jobSel.getEssentialElementId());
+						ps.setLong(6, jobSel.getQuestionId());
+						ps.setDate(7, new java.sql.Date(now.getTime()));
+						ps.setDate(8, new java.sql.Date(now.getTime()));
+					}					
+					public int getBatchSize() {
+						return inserts.size();
+					}
+				});		
+		}	
+		
+	}
+
+	@Override
+	public void updateAssessmentResult(Assessment assessment) {
+		Date now = new Date();		
+		if( assessment.getTotalScore() > 0 ){
+			assessment.setModifiedDate(now);	
+			getJdbcTemplate().update(getBoundSql("COMPETENCY_ACCESSMENT.UPDATE_ASSESSMENT_RESULT").getSql(),
+					new SqlParameterValue (Types.VARCHAR, assessment.getState().name()),				
+					new SqlParameterValue (Types.NUMERIC, assessment.getTotalScore()),
+					new SqlParameterValue (Types.TIMESTAMP, now),
+					new SqlParameterValue (Types.NUMERIC, assessment.getAssessmentId())
+			);
+		}
 	}
 }

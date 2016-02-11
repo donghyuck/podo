@@ -30,6 +30,7 @@ import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyManager;
+import com.podosoftware.competency.competency.DefaultPerformanceCriteria;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.Job;
@@ -144,6 +145,26 @@ public class CompetencyAssessmentController {
 		Assessment assessment = assessmentManager.getAssessment(assessmentId);
 		return assessmentManager.getAssessmentQuestions( assessment);
 	}
+	
+	@RequestMapping(value="/assessment/test/update.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public List<AssessmentQuestion> updateAssessmentAnswers(
+			@RequestBody List<AssessmentQuestion> answers ) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{
+		User user = SecurityHelper.getUser();		
+		Assessment assessment = null;
+		int totalScore = 0;
+		for( AssessmentQuestion q: answers){
+			if( assessment == null)
+				assessment = assessmentManager.getAssessment(q.getAssessmentId());			
+			totalScore = totalScore + q.getScore();
+			q.setAssessorId(user.getUserId());
+		}
+		assessment.setTotalScore(totalScore);
+		assessment.setState(Assessment.State.ASSESSED);		
+		assessmentManager.saveUserAssessment(assessment, answers);		
+		return assessmentManager.getAssessmentQuestions(assessment);
+	}
+	
 	
 	@RequestMapping(value="/assessment/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody

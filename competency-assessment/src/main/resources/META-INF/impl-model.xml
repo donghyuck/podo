@@ -10,6 +10,7 @@
 	<model id="55" code="PERFORMANCE_CRITERIA" />
 	<model id="56" code="ABILITY" />	
 	<model id="60" code="JOB" />
+	<model id="61" code="JOB_LEVEL" />
 	
 	<model id="65" code="RATING_SCHEME" />
 	<model id="66" code="RATING_LEVEL" />

@@ -558,6 +558,57 @@
 	]]></sql-query>	
 	
 	
+	<sql-query name="SELECT_JOB_LEVEL_BY_ID" description="SELECT_JOB_LEVEL_BY_ID"><![CDATA[
+	SELECT 
+		JOB_LEVEL_ID,
+		JOB_ID,
+		NAME,
+		DESCRIPTION,
+		MIN_YEAR,
+		MAX_YEAR,
+		JOB_LEVEL	
+	FROM CA_JOB_LEVEL	
+	WHERE
+		JOB_LEVEL_ID = ?
+	]]></sql-query>	
+	
+	<sql-query name="SELECT_JOB_LEVEL_IDS_BY_JOB_ID" description="SELECT_JOB_LEVEL_IDS_BY_JOB_ID"><![CDATA[
+	SELECT 
+		JOB_LEVEL_ID	
+	FROM CA_JOB_LEVEL	
+	WHERE
+		JOB_ID = ?
+	ORDER BY JOB_LEVEL DESC		
+	]]></sql-query>	
+
+	<sql-query name="REMOVE_JOB_LEVEL" description="REMOVE_JOB_LEVEL"><![CDATA[
+	DELETE CA_JOB_LEVEL
+	WHERE JOB_LEVEL_ID = ?
+	]]></sql-query>	
+
+	<sql-query name="UPDATE_JOB_LEVEL" description="UPDATE_JOB_LEVEL"><![CDATA[
+	UPDATE CA_JOB_LEVEL SET
+		NAME = ?,
+		DESCRIPTION = ?,
+		MIN_YEAR = ?,
+		MAX_YEAR = ?,	
+		JOB_LEVEL = ?
+	WHERE JOB_LEVEL_ID =?		
+	]]></sql-query>				
+
+	<sql-query name="INSERT_JOB_LEVEL" description="INSERT_JOB_LEVEL"><![CDATA[
+	INSERT INTO CA_JOB_LEVEL (
+		JOB_LEVEL_ID,
+		JOB_ID,
+		NAME,
+		DESCRIPTION,
+		MIN_YEAR,
+		MAX_YEAR,
+		JOB_LEVEL
+	) VALUES (?,?,?,?,?,?,?)	
+	
+	]]></sql-query>			
+	
 	
 	<sql-query name="CREATE_PERFORMANCE_CRITERIA" description="CREATE_PERFORMANCE_CRITERIA"><![CDATA[
 	INSERT INTO CA_PERFORMANCE_CRITERIA (
@@ -1058,7 +1109,16 @@
 	WHERE 
 	 	ASSESSMENT_ID = ?		
 	]]></sql-query>	
-	
+
+	<sql-query name="UPDATE_ASSESSMENT_RESULT" description="UPDATE_ASSESSMENT_RESULT"><![CDATA[
+	UPDATE CA_ASSESSMENT SET 
+		STATE = ? ,
+		TOTAL_SCORE = ?,
+		MODIFIED_DATE = ?
+	WHERE 
+	 	ASSESSMENT_ID = ?		
+	]]></sql-query>	
+		
 	<sql-query name="SELECT_ASSESSMENT_BY_ID" description="SELECT_ASSESSMENT_BY_ID"><![CDATA[
 	SELECT 
 		ASSESSMENT_ID,
@@ -1081,7 +1141,7 @@
 	FROM CA_ASSESSMENT
 	WHERE CANDIDATE_ID = ? 
 	]]><dynamic><![CDATA[	
-		<#if assessmentPlanId > 0 >
+		<#if (assessmentPlanId > 0) >
 		AND ASSESSMENT_PLAN_ID = ${assessmentPlanId}	
 		</#if>
 		<#if state??>
@@ -1095,7 +1155,7 @@
 	FROM CA_ASSESSMENT	
 	WHERE CANDIDATE_ID = ? 
 	]]><dynamic><![CDATA[	
-		<#if assessmentPlanId > 0 >
+		<#if (assessmentPlanId > 0) >
 		AND ASSESSMENT_PLAN_ID = ${assessmentPlanId}	
 		</#if>
 		<#if state??>
@@ -1103,6 +1163,43 @@
 		</#if>	
 	]]></dynamic></sql-query>	
 	
+	<sql-query name="SELECT_ASSESSMENT_PERFORMANCE_CRITERIA_BY_JOB" description="SELECT_ASSESSMENT_PERFORMANCE_CRITERIA_BY_JOB"><![CDATA[
+	SELECT 
+		T1.COMPETENCY_ID, 
+		T1.NAME AS COMPETENCY_NAME,
+		T3.ESSENTIAL_ELEMENT_ID, 
+		T3.NAME AS ESSENTIAL_ELEMENT_NAME,
+		T3.COMPETENCY_LEVEL, 
+		T4.PERFORMANCE_CRITERIA_ID, 
+		T4.DESCRIPTION AS EXAMPLE,
+		T4.SORT_ORDER
+	FROM 
+		CA_COMPETENCY T1, 
+		CA_JOB_COMPETENCY_REL T2, 
+		CA_ESSENTIAL_ELEMENT T3, 
+		CA_PERFORMANCE_CRITERIA T4
+	WHERE
+		T1.COMPETENCY_ID = T2.COMPETENCY_ID
+		AND T1.COMPETENCY_ID = T3.COMPETENCY_ID
+		AND T2.JOB_ID = ?
+		AND T3.COMPETENCY_LEVEL >= ?
+		AND T4.OBJECT_TYPE = 54
+		AND T4.OBJECT_ID = T3.ESSENTIAL_ELEMENT_ID
+	ORDER BY T3.COMPETENCY_ID , T3.ESSENTIAL_ELEMENT_ID , T4.PERFORMANCE_CRITERIA_ID , T4.SORT_ORDER	
+	]]></sql-query>	
+		
+	<sql-query name="INSERT_ASSESSMENT_SCORE" description="INSERT_ASSESSMENT_SCORE"><![CDATA[
+	INSERT INTO CA_ASSESSED_SCORE (
+		ASSESSMENT_ID,
+		CANDIDATE_ID,
+		ASSESSOR_ID, 		
+		COMPETENCY_ID,
+		ESSENTIAL_ELEMENT_ID,
+		PERFORMANCE_CRITERIA_ID,
+		CREATION_DATE,
+		MODIFIED_DATE
+	) VALUES (?,?,?,?,?,?,?,?)		
+	]]></sql-query>	
 		
 	<row-mapper></row-mapper>	
 						

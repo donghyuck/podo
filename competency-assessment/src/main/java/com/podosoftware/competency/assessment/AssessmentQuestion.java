@@ -7,6 +7,7 @@ import architecture.common.cache.Cacheable;
 
 public class AssessmentQuestion implements Cacheable{
 	
+	private long assessmentId;
 	private int seq;
 	private long competencyId;
 	private String competencyName;
@@ -14,20 +15,62 @@ public class AssessmentQuestion implements Cacheable{
 	private String essentialElementName;
 	private int competencyLevel;
 	private long questionId;
+	private long candidateId;
+	private long assessorId;
+	
 	private String question;
 	private int score;
 	
 	public AssessmentQuestion() {
 		seq = 1;
+		assessmentId = -1L;
 		competencyId = -1L;
 		essentialElementId = -1L;
 		competencyLevel = 0;
 		score = 0;
 		questionId = -1L;
+		candidateId = -1L;
+		assessorId = -1L;
 	}
 
 	
 	
+	public long getCandidateId() {
+		return candidateId;
+	}
+
+
+
+	public void setCandidateId(long candidateId) {
+		this.candidateId = candidateId;
+	}
+
+
+
+	public long getAssessorId() {
+		return assessorId;
+	}
+
+
+
+	public void setAssessorId(long assessorId) {
+		this.assessorId = assessorId;
+	}
+
+
+
+	public long getAssessmentId() {
+		return assessmentId;
+	}
+
+
+
+	public void setAssessmentId(long assessmentId) {
+		this.assessmentId = assessmentId;
+	}
+
+
+
 	public long getQuestionId() {
 		return questionId;
 	}

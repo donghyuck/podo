@@ -63,6 +63,10 @@ public interface AssessmentDao {
 	
 	
 	
+	
+	
+	
+	
 	/**
 	 * 파라메터 objectType, objectId 에 해당하는 대상자 객체 ID 를 리턴한다.
 	 * @param objectType
@@ -116,4 +120,9 @@ public interface AssessmentDao {
 	
 	
 	public abstract List<AssessmentQuestion> getAssessmentQuestionByJob(long jobId, int level);
+	
+	public abstract void saveOrUpdateAssessmentQuestions(List<AssessmentQuestion> answers);
+	
+	public abstract void updateAssessmentResult(Assessment assessment);	
+	
 }
