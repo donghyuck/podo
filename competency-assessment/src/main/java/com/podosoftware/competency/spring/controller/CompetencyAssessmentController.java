@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.podosoftware.competency.assessment.AssessedEssentialElementSummary;
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentNotFoundException;
@@ -143,6 +144,15 @@ public class CompetencyAssessmentController {
 		User user = SecurityHelper.getUser();			
 		Assessment assessment = assessmentManager.getAssessment(assessmentId);
 		return assessmentManager.getUserAssessmentQuestions(assessment);
+	}
+	
+	@RequestMapping(value="/assessment/test/summary.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public List<AssessedEssentialElementSummary> listAssessmentEssentialElementSummary(
+			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{
+		User user = SecurityHelper.getUser();			
+		Assessment assessment = assessmentManager.getAssessment(assessmentId);
+		return assessmentManager.getUserAssessedSummaries(assessment);
 	}
 	
 	@RequestMapping(value="/assessment/test/update.json", method={RequestMethod.POST, RequestMethod.GET})
