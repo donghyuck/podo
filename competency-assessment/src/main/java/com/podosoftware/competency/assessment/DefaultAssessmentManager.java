@@ -3,9 +3,13 @@ package com.podosoftware.competency.assessment;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.math3.util.MathUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -321,7 +325,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	
-	 
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveOrUpdateJobSelections(List<JobSelection> jobSelections) {
 		assessmentDao.saveOrUpdateAssessmentJobSelections(jobSelections);
 		for(JobSelection selection : jobSelections){
@@ -808,6 +812,16 @@ public class DefaultAssessmentManager implements AssessmentManager {
 				assessmentCache.remove(assessment.getAssessmentId());
 			}
 		}
+	}
+
+	@Override
+	public List<AssessedEssentialElementSummary> getUserAssessedSummaries(Assessment assessment) {
+		
+		List<AssessedEssentialElementSummary> list = assessmentDao.getAssessedEssentialElementSummaries(assessment.getAssessmentId());
+		for(AssessedEssentialElementSummary summary : list){
+			summary.setFinalScore(summary.getTotalScore()/summary.getTotalCount());
+		}
+		return list;
 	}
 	
 }
