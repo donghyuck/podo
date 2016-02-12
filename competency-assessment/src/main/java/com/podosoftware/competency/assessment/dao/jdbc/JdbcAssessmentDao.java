@@ -77,38 +77,37 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 	private final RowMapper<Assessment> assessmentMapper = new RowMapper<Assessment>(){		
 		public Assessment mapRow(ResultSet rs, int rowNum) throws SQLException {				
-			DefaultAssessment scheme = new DefaultAssessment();
-			
-			scheme.setAssessmentId(rs.getLong("ASSESSMENT_ID"));
-			scheme.setState(Assessment.State.valueOf(rs.getString("STATE").toUpperCase()));			
-			scheme.setCandidate(new UserTemplate(rs.getLong("CANDIDATE_ID")));
-			scheme.setJob( new DefaultJob(rs.getLong("JOB_ID")) );
-			scheme.setAssessmentPlan(new DefaultAssessmentPlan(rs.getLong("ASSESSMENT_PLAN_ID")) );
-			scheme.setJobLevel(rs.getInt("JOB_LEVEL") );
-			
-			scheme.setCreationDate( rs.getTimestamp("CREATION_DATE") ); 
-			scheme.setModifiedDate( rs.getTimestamp("MODIFIED_DATE") );
-			return scheme;
+			DefaultAssessment assessment = new DefaultAssessment();			
+			assessment.setAssessmentId(rs.getLong("ASSESSMENT_ID"));
+			assessment.setState(Assessment.State.valueOf(rs.getString("STATE").toUpperCase()));			
+			assessment.setCandidate(new UserTemplate(rs.getLong("CANDIDATE_ID")));
+			assessment.setJob( new DefaultJob(rs.getLong("JOB_ID")) );
+			assessment.setAssessmentPlan(new DefaultAssessmentPlan(rs.getLong("ASSESSMENT_PLAN_ID")) );
+			assessment.setJobLevel(rs.getInt("JOB_LEVEL") );
+			assessment.setTotalScore(rs.getInt("TOTAL_SCORE"));
+			assessment.setCreationDate( rs.getTimestamp("CREATION_DATE") ); 
+			assessment.setModifiedDate( rs.getTimestamp("MODIFIED_DATE") );
+			return assessment;
 		}		
 	};
 	
 	private final RowMapper<AssessmentPlan> assessmentPlanMapper = new RowMapper<AssessmentPlan>(){		
 		public AssessmentPlan mapRow(ResultSet rs, int rowNum) throws SQLException {				
-			DefaultAssessmentPlan scheme = new DefaultAssessmentPlan();
-			scheme.setAssessmentId(rs.getLong("ASSESSMENT_ID"));
-			scheme.setObjectType(rs.getInt("OBJECT_TYPE"));
-			scheme.setObjectId(rs.getLong("OBJECT_ID"));
-			scheme.setName(rs.getString("NAME"));
-			scheme.setDescription(rs.getString("DESCRIPTION"));
-			scheme.setState(State.valueOf(rs.getString("STATE").toUpperCase()));
-			scheme.setRatingScheme(new DefaultRatingScheme(rs.getLong("RATING_SCHEME_ID")));
-			scheme.setMultipleApplyAllowed(rs.getInt("MULTIPLE_APPLY_ALLOWED") == 1 ? true : false );
-			scheme.setFeedbackEnabled(rs.getInt("FEEDBACK_ENABLED") == 1 ? true : false );
-			scheme.setCreationDate( rs.getTimestamp("CREATION_DATE") ); 
-			scheme.setModifiedDate( rs.getTimestamp("MODIFIED_DATE") );
-			scheme.setStartDate( rs.getTimestamp("START_DATE") ); 
-			scheme.setEndDate( rs.getTimestamp("END_DATE") );
-			return scheme;
+			DefaultAssessmentPlan plan = new DefaultAssessmentPlan();
+			plan.setAssessmentId(rs.getLong("ASSESSMENT_ID"));
+			plan.setObjectType(rs.getInt("OBJECT_TYPE"));
+			plan.setObjectId(rs.getLong("OBJECT_ID"));
+			plan.setName(rs.getString("NAME"));
+			plan.setDescription(rs.getString("DESCRIPTION"));
+			plan.setState(State.valueOf(rs.getString("STATE").toUpperCase()));
+			plan.setRatingScheme(new DefaultRatingScheme(rs.getLong("RATING_SCHEME_ID")));
+			plan.setMultipleApplyAllowed(rs.getInt("MULTIPLE_APPLY_ALLOWED") == 1 ? true : false );
+			plan.setFeedbackEnabled(rs.getInt("FEEDBACK_ENABLED") == 1 ? true : false );
+			plan.setCreationDate( rs.getTimestamp("CREATION_DATE") ); 
+			plan.setModifiedDate( rs.getTimestamp("MODIFIED_DATE") );
+			plan.setStartDate( rs.getTimestamp("START_DATE") ); 
+			plan.setEndDate( rs.getTimestamp("END_DATE") );
+			return plan;
 		}		
 	};
 	
