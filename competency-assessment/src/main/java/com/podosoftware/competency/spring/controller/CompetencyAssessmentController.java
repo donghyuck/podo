@@ -140,10 +140,9 @@ public class CompetencyAssessmentController {
 	@ResponseBody
 	public List<AssessmentQuestion> listAssessmentQuestion(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{
-		User user = SecurityHelper.getUser();	
-		
+		User user = SecurityHelper.getUser();			
 		Assessment assessment = assessmentManager.getAssessment(assessmentId);
-		return assessmentManager.getAssessmentQuestions( assessment);
+		return assessmentManager.getUserAssessmentQuestions(assessment);
 	}
 	
 	@RequestMapping(value="/assessment/test/update.json", method={RequestMethod.POST, RequestMethod.GET})
@@ -161,8 +160,8 @@ public class CompetencyAssessmentController {
 		}
 		assessment.setTotalScore(totalScore);
 		assessment.setState(Assessment.State.ASSESSED);		
-		assessmentManager.saveUserAssessment(assessment, answers);		
-		return assessmentManager.getAssessmentQuestions(assessment);
+		assessmentManager.saveOrUpdateUserAssessmentScores(assessment, user, answers);		
+		return assessmentManager.getUserAssessmentQuestions(assessment);
 	}
 	
 	

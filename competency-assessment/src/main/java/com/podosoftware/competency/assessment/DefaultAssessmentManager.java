@@ -786,7 +786,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	@Override
-	public List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment) {		
+	public List<AssessmentQuestion> getUserAssessmentQuestions(Assessment assessment) {		
 		List<AssessmentQuestion> list =  assessmentDao.getAssessmentQuestionByJob(assessment.getJob().getJobId(),assessment.getJobLevel());	
 		int no = 0 ;
 		for(AssessmentQuestion q : list){
@@ -799,19 +799,15 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void saveUserAssessment(Assessment assessment, List<AssessmentQuestion> answers) {		
+	public void saveOrUpdateUserAssessmentScores(Assessment assessment, User assessor, List<AssessmentQuestion> answers) {		
 		if( answers.size() > 0){
-			assessmentDao.saveOrUpdateAssessmentQuestions(answers);
-			assessmentDao.updateAssessmentResult(assessment);
+			assessmentDao.removeAssessmentScores(assessment, assessor);
+			assessmentDao.saveOrUpdateAssessmentScores(answers);
+			assessmentDao.updateAssessmentScoreAndState(assessment);
 			if( assessmentCache.get(assessment.getAssessmentId()) != null ){
 				assessmentCache.remove(assessment.getAssessmentId());
 			}
 		}
 	}
-
-	
-	
-	
-	
 	
 }

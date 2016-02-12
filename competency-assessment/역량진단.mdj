@@ -2764,7 +2764,7 @@
 									"height": 13,
 									"autoResize": false,
 									"underline": false,
-									"text": "ASSESSMENT_RESULT",
+									"text": "ASSESSMENT",
 									"horizontalAlignment": 2,
 									"verticalAlignment": 5
 								},
@@ -3079,30 +3079,6 @@
 									"subViews": [
 										{
 											"_type": "ERDColumnView",
-											"_id": "AAAAAAFRyPfaYC4aoCw=",
-											"_parent": {
-												"$ref": "AAAAAAFRyO5GFnWWorc="
-											},
-											"model": {
-												"$ref": "AAAAAAFRyPfaRy4Xq+E="
-											},
-											"visible": true,
-											"enabled": true,
-											"lineColor": "#000000",
-											"fillColor": "#ffffff",
-											"fontColor": "#000000",
-											"font": "Arial;13;0",
-											"showShadow": true,
-											"containerChangeable": false,
-											"containerExtending": false,
-											"left": 149,
-											"top": 1732,
-											"width": 335,
-											"height": 13,
-											"autoResize": false
-										},
-										{
-											"_type": "ERDColumnView",
 											"_id": "AAAAAAFRzJDL2zdjAfs=",
 											"_parent": {
 												"$ref": "AAAAAAFRyO5GFnWWorc="
@@ -3120,7 +3096,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 149,
-											"top": 1747,
+											"top": 1732,
 											"width": 335,
 											"height": 13,
 											"autoResize": false
@@ -3144,7 +3120,7 @@
 											"containerChangeable": false,
 											"containerExtending": false,
 											"left": 149,
-											"top": 1762,
+											"top": 1747,
 											"width": 335,
 											"height": 13,
 											"autoResize": false
@@ -3157,6 +3133,30 @@
 											},
 											"model": {
 												"$ref": "AAAAAAFRzLD5XjjwtfU="
+											},
+											"visible": true,
+											"enabled": true,
+											"lineColor": "#000000",
+											"fillColor": "#ffffff",
+											"fontColor": "#000000",
+											"font": "Arial;13;0",
+											"showShadow": true,
+											"containerChangeable": false,
+											"containerExtending": false,
+											"left": 149,
+											"top": 1762,
+											"width": 335,
+											"height": 13,
+											"autoResize": false
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFSzrzlf39q3Dc=",
+											"_parent": {
+												"$ref": "AAAAAAFRyO5GFnWWorc="
+											},
+											"model": {
+												"$ref": "AAAAAAFSzrzlSn9nNWE="
 											},
 											"visible": true,
 											"enabled": true,
@@ -3436,9 +3436,9 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 608,
+									"left": 560,
 									"top": 1461,
-									"width": 353,
+									"width": 273,
 									"height": 13,
 									"autoResize": false,
 									"underline": false,
@@ -3474,33 +3474,9 @@
 											"showShadow": true,
 											"containerChangeable": false,
 											"containerExtending": false,
-											"left": 613,
+											"left": 565,
 											"top": 1484,
-											"width": 343,
-											"height": 13,
-											"autoResize": false
-										},
-										{
-											"_type": "ERDColumnView",
-											"_id": "AAAAAAFSi4MZyuzmmOA=",
-											"_parent": {
-												"$ref": "AAAAAAFRzFXbazbY4qk="
-											},
-											"model": {
-												"$ref": "AAAAAAFSi4MZoOzjtfM="
-											},
-											"visible": true,
-											"enabled": true,
-											"lineColor": "#000000",
-											"fillColor": "#ffffff",
-											"fontColor": "#000000",
-											"font": "Arial;13;0",
-											"showShadow": true,
-											"containerChangeable": false,
-											"containerExtending": false,
-											"left": 613,
-											"top": 1499,
-											"width": 343,
+											"width": 263,
 											"height": 13,
 											"autoResize": false
 										},
@@ -3522,9 +3498,9 @@
 											"showShadow": true,
 											"containerChangeable": false,
 											"containerExtending": false,
-											"left": 613,
-											"top": 1514,
-											"width": 343,
+											"left": 565,
+											"top": 1499,
+											"width": 263,
 											"height": 13,
 											"autoResize": false
 										},
@@ -3546,9 +3522,9 @@
 											"showShadow": true,
 											"containerChangeable": false,
 											"containerExtending": false,
-											"left": 613,
-											"top": 1529,
-											"width": 343,
+											"left": 565,
+											"top": 1514,
+											"width": 263,
 											"height": 13,
 											"autoResize": false
 										},
@@ -3570,9 +3546,9 @@
 											"showShadow": true,
 											"containerChangeable": false,
 											"containerExtending": false,
-											"left": 613,
-											"top": 1544,
-											"width": 343,
+											"left": 565,
+											"top": 1529,
+											"width": 263,
 											"height": 13,
 											"autoResize": false
 										},
@@ -3594,9 +3570,9 @@
 											"showShadow": true,
 											"containerChangeable": false,
 											"containerExtending": false,
-											"left": 613,
-											"top": 1559,
-											"width": 343,
+											"left": 565,
+											"top": 1544,
+											"width": 263,
 											"height": 13,
 											"autoResize": false
 										},
@@ -3618,9 +3594,9 @@
 											"showShadow": true,
 											"containerChangeable": false,
 											"containerExtending": false,
-											"left": 613,
-											"top": 1574,
-											"width": 343,
+											"left": 565,
+											"top": 1559,
+											"width": 263,
 											"height": 13,
 											"autoResize": false
 										}
@@ -3634,10 +3610,10 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 608,
+									"left": 560,
 									"top": 1479,
-									"width": 353,
-									"height": 113,
+									"width": 273,
+									"height": 98,
 									"autoResize": false
 								}
 							],
@@ -3650,9 +3626,9 @@
 							"showShadow": true,
 							"containerChangeable": false,
 							"containerExtending": false,
-							"left": 608,
+							"left": 560,
 							"top": 1456,
-							"width": 353,
+							"width": 273,
 							"height": 136,
 							"autoResize": false,
 							"nameLabel": {
@@ -5434,7 +5410,7 @@
 									"containerChangeable": false,
 									"containerExtending": false,
 									"left": 1279,
-									"top": 1385,
+									"top": 1401,
 									"width": 0,
 									"height": 13,
 									"autoResize": false,
@@ -5525,7 +5501,7 @@
 								"$ref": "AAAAAAFRyJ/pJivYVmU="
 							},
 							"lineStyle": 0,
-							"points": "1232:528;1280:528;1280:1376;360:1376;360:1456",
+							"points": "1232:528;1280:528;1280:1392;360:1392;360:1456",
 							"nameLabel": {
 								"$ref": "AAAAAAFSi38dAOy42Lw="
 							},
@@ -5561,7 +5537,7 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 548,
+									"left": 524,
 									"top": 1483,
 									"width": 0,
 									"height": 13,
@@ -5621,7 +5597,7 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 582,
+									"left": 534,
 									"top": 1483,
 									"width": 0,
 									"height": 13,
@@ -5653,7 +5629,7 @@
 								"$ref": "AAAAAAFRyOul5i1VExA="
 							},
 							"lineStyle": 0,
-							"points": "488:1504;608:1504",
+							"points": "488:1504;560:1504",
 							"nameLabel": {
 								"$ref": "AAAAAAFSi4QsROz21uQ="
 							},
@@ -5817,8 +5793,8 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 783,
-									"top": 1764,
+									"left": 703,
+									"top": 1785,
 									"width": 0,
 									"height": 13,
 									"autoResize": false,
@@ -5847,7 +5823,7 @@
 									"showShadow": true,
 									"containerChangeable": false,
 									"containerExtending": false,
-									"left": 799,
+									"left": 719,
 									"top": 1610,
 									"width": 0,
 									"height": 13,
@@ -5878,7 +5854,7 @@
 									"containerChangeable": false,
 									"containerExtending": false,
 									"left": 513,
-									"top": 1763,
+									"top": 1784,
 									"width": 0,
 									"height": 13,
 									"autoResize": false,
@@ -5909,7 +5885,7 @@
 								"$ref": "AAAAAAFRzFXbajbWr50="
 							},
 							"lineStyle": 0,
-							"points": "784:1591;784:1755;488:1755",
+							"points": "704:1591;704:1776;488:1776",
 							"nameLabel": {
 								"$ref": "AAAAAAFSi5VF1O1mQLI="
 							},
@@ -7277,7 +7253,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFLzntJC6EktCk="
 					},
-					"name": "ASSESSMENT_RESULT",
+					"name": "ASSESSMENT",
 					"ownedElements": [
 						{
 							"_type": "ERDRelationship",
@@ -7438,7 +7414,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFRyOul5i1TsRo="
 							},
-							"name": "ASSESSMENT_RESULT_ID",
+							"name": "ASSESSMENT_ID",
 							"type": "INTEGER",
 							"length": 0,
 							"primaryKey": true,
@@ -7452,9 +7428,10 @@
 							"_parent": {
 								"$ref": "AAAAAAFRyOul5i1TsRo="
 							},
-							"name": "ASSESSMENT_ID",
+							"name": "ASSESSMENT_PLAN_ID",
 							"documentation": "역량진단 진단 ID",
 							"type": "INTEGER",
+							"length": 0,
 							"primaryKey": false,
 							"foreignKey": true,
 							"referenceTo": {
@@ -7609,23 +7586,6 @@
 					"columns": [
 						{
 							"_type": "ERDColumn",
-							"_id": "AAAAAAFRyPfaRy4Xq+E=",
-							"_parent": {
-								"$ref": "AAAAAAFRyOvonC1hvqI="
-							},
-							"name": "ASSESSMENT_TAKE_ID",
-							"type": "INTEGER",
-							"length": 0,
-							"primaryKey": false,
-							"foreignKey": true,
-							"referenceTo": {
-								"$ref": "AAAAAAFRzKsJEzjC158="
-							},
-							"nullable": false,
-							"unique": false
-						},
-						{
-							"_type": "ERDColumn",
 							"_id": "AAAAAAFRzJDLujdgSg0=",
 							"_parent": {
 								"$ref": "AAAAAAFRyOvonC1hvqI="
@@ -7647,7 +7607,7 @@
 							"name": "CANDIDATE_ID",
 							"type": "INTEGER",
 							"length": 0,
-							"primaryKey": false,
+							"primaryKey": true,
 							"foreignKey": false,
 							"nullable": false,
 							"unique": false
@@ -7661,7 +7621,21 @@
 							"name": "COMPETENCY_ID",
 							"type": "INTEGER",
 							"length": 0,
-							"primaryKey": false,
+							"primaryKey": true,
+							"foreignKey": false,
+							"nullable": false,
+							"unique": false
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFSzrzlSn9nNWE=",
+							"_parent": {
+								"$ref": "AAAAAAFRyOvonC1hvqI="
+							},
+							"name": "ASSESSOR_ID",
+							"type": "INTEGER",
+							"length": 0,
+							"primaryKey": true,
 							"foreignKey": false,
 							"nullable": false,
 							"unique": false
@@ -7675,7 +7649,7 @@
 							"name": "ESSENTIAL_ELEMENT_ID",
 							"type": "INTEGER",
 							"length": 0,
-							"primaryKey": false,
+							"primaryKey": true,
 							"foreignKey": false,
 							"nullable": false,
 							"unique": false
@@ -7689,7 +7663,7 @@
 							"name": "PERFORMANCE_CRITERIA_ID",
 							"type": "INTEGER",
 							"length": 0,
-							"primaryKey": false,
+							"primaryKey": true,
 							"foreignKey": false,
 							"nullable": false,
 							"unique": false
@@ -7787,28 +7761,11 @@
 							"_parent": {
 								"$ref": "AAAAAAFRzFXbajbUEF4="
 							},
-							"name": "FEEDBACK_ID",
+							"name": "ASSESSMENT_ID",
 							"type": "INTEGER",
 							"length": 0,
 							"primaryKey": true,
 							"foreignKey": false,
-							"nullable": false,
-							"unique": false
-						},
-						{
-							"_type": "ERDColumn",
-							"_id": "AAAAAAFSi4MZoOzjtfM=",
-							"_parent": {
-								"$ref": "AAAAAAFRzFXbajbUEF4="
-							},
-							"name": "TAKE_ID",
-							"type": "INTEGER",
-							"length": 0,
-							"primaryKey": false,
-							"foreignKey": true,
-							"referenceTo": {
-								"$ref": "AAAAAAFRzKsJEzjC158="
-							},
 							"nullable": false,
 							"unique": false
 						},
@@ -7846,10 +7803,10 @@
 							"_parent": {
 								"$ref": "AAAAAAFRzFXbajbUEF4="
 							},
-							"name": "DEGREE",
+							"name": "DIRECTION",
 							"type": "INTEGER",
 							"length": 0,
-							"primaryKey": false,
+							"primaryKey": true,
 							"foreignKey": false,
 							"nullable": false,
 							"unique": false

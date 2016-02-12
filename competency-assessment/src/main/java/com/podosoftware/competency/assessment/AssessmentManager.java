@@ -81,10 +81,9 @@ public interface AssessmentManager {
 	
 	public abstract void addAssessmentCandidate(AssessmentPlan assessment, User candidate, Job job, int level );
 	
+	public abstract List<AssessmentQuestion> getUserAssessmentQuestions(Assessment assessment);
 	
-	public abstract List<AssessmentQuestion> getAssessmentQuestions(Assessment assessment);
-	
-	public abstract void saveUserAssessment(Assessment assessment, List<AssessmentQuestion> answers );
+	public abstract void saveOrUpdateUserAssessmentScores(Assessment assessment, User assessor, List<AssessmentQuestion> answers );
 	
 	
 }

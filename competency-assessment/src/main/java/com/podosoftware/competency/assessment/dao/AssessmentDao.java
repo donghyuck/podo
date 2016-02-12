@@ -117,12 +117,12 @@ public interface AssessmentDao {
 	public abstract Assessment getAssessmentById(long assessmentId);
 	
 	
-	
+	public abstract void removeAssessmentScores(Assessment assessment, User assessor);
 	
 	public abstract List<AssessmentQuestion> getAssessmentQuestionByJob(long jobId, int level);
 	
-	public abstract void saveOrUpdateAssessmentQuestions(List<AssessmentQuestion> answers);
+	public abstract void saveOrUpdateAssessmentScores(List<AssessmentQuestion> answers);
 	
-	public abstract void updateAssessmentResult(Assessment assessment);	
+	public abstract void updateAssessmentScoreAndState(Assessment assessment);	
 	
 }

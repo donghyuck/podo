@@ -941,12 +941,11 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 		
 	 * @param answers
 	 */
-	public void saveOrUpdateAssessmentQuestions(List<AssessmentQuestion> answers){	
-
+	public void saveOrUpdateAssessmentScores(List<AssessmentQuestion> answers){	
 		final List<AssessmentQuestion> inserts = new ArrayList<AssessmentQuestion>();		
 		final Date now = new Date();
 		inserts.addAll(answers);		
-		if(inserts.size() > 0){
+		if(inserts.size() > 0){			
 			getExtendedJdbcTemplate().batchUpdate(							
 				getBoundSql("COMPETENCY_ACCESSMENT.INSERT_ASSESSMENT_SCORE").getSql(), 
 				new BatchPreparedStatementSetter() {					
@@ -958,19 +957,29 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 						ps.setLong(4, jobSel.getCompetencyId());	
 						ps.setLong(5, jobSel.getEssentialElementId());
 						ps.setLong(6, jobSel.getQuestionId());
-						ps.setDate(7, new java.sql.Date(now.getTime()));
-						ps.setDate(8, new java.sql.Date(now.getTime()));
+						ps.setInt(7, jobSel.getScore());
+						ps.setTimestamp(8, new java.sql.Timestamp(now.getTime()));
+						ps.setTimestamp(9, new java.sql.Timestamp(now.getTime()));
 					}					
 					public int getBatchSize() {
 						return inserts.size();
 					}
 				});		
-		}	
-		
+		}
+	}
+	
+	
+	public void removeAssessmentScores(Assessment assessment, User assessor){
+		getExtendedJdbcTemplate().update(
+			getBoundSql("COMPETENCY_ACCESSMENT.DELETE_ASSESSMENT_SCORE_BY_ASSESSOR").getSql(),	
+			new SqlParameterValue (Types.NUMERIC, assessment.getAssessmentId()),
+			new SqlParameterValue (Types.NUMERIC, assessment.getCandidate().getUserId()),
+			new SqlParameterValue (Types.NUMERIC, assessor.getUserId())
+		);
 	}
 
 	@Override
-	public void updateAssessmentResult(Assessment assessment) {
+	public void updateAssessmentScoreAndState(Assessment assessment) {
 		Date now = new Date();		
 		if( assessment.getTotalScore() > 0 ){
 			assessment.setModifiedDate(now);	
