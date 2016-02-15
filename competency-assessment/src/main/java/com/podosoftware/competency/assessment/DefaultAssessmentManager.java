@@ -1,15 +1,14 @@
 package com.podosoftware.competency.assessment;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.math3.util.MathUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -817,11 +816,35 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	@Override
 	public List<AssessedEssentialElementSummary> getUserAssessedSummaries(Assessment assessment) {
 		
+		Map<Long, AssessedEssentialElementScore> averages = listToMap(
+				assessmentDao.getAssessedEssentialElementScoreAverageByPlanAndJob(
+						assessment.getAssessmentPlan().getAssessmentId(), 
+						assessment.getJob().getJobId(), 
+						assessment.getJobLevel()));
 		List<AssessedEssentialElementSummary> list = assessmentDao.getAssessedEssentialElementSummaries(assessment.getAssessmentId());
 		for(AssessedEssentialElementSummary summary : list){
-			summary.setFinalScore(summary.getTotalScore()/summary.getTotalCount());
+			summary.setFinalScore( computeAssessedFinalScore(summary.getTotalScore(), summary.getTotalCount()) );			
+			AssessedEssentialElementScore average = averages.get(summary.getEssentialElementId());
+			if(average!=null)
+				summary.setOthersAverageScore(computeAssessedFinalScore(average.getTotalScore(), average.getTotalCount()));
 		}
 		return list;
 	}
+	
+	private double computeAssessedFinalScore( int totalScore, int totalCount ){
+		BigDecimal preNum = new BigDecimal(totalScore);
+		BigDecimal postNum = new BigDecimal(totalCount);		
+		BigDecimal divideResult = preNum.divide(postNum, 2, BigDecimal.ROUND_UP);
+		return divideResult.doubleValue() ;
+	}
+	
+	private Map<Long, AssessedEssentialElementScore> listToMap(List<AssessedEssentialElementScore> list){
+		Map<Long, AssessedEssentialElementScore> map = new HashMap<Long, AssessedEssentialElementScore>();
+		for(AssessedEssentialElementScore score : list){
+			map.put(score.getEssentialElementId(), score);
+		}
+		return map;
+	}
+	
 	
 }

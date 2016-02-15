@@ -2,6 +2,8 @@ package com.podosoftware.competency.assessment.dao;
 
 import java.util.List;
 
+import com.podosoftware.competency.assessment.AssessedEssentialElementScore;
+import com.podosoftware.competency.assessment.AssessedEssentialElementSummary;
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentQuestion;
@@ -114,8 +116,7 @@ public interface AssessmentDao {
 	
 	public abstract int getUserAssessmentCount(User user, long assessmentPlanId, String state);
 	
-	public abstract Assessment getAssessmentById(long assessmentId);
-	
+	public abstract Assessment getAssessmentById(long assessmentId);	
 	
 	public abstract void removeAssessmentScores(Assessment assessment, User assessor);
 	
@@ -124,5 +125,9 @@ public interface AssessmentDao {
 	public abstract void saveOrUpdateAssessmentScores(List<AssessmentQuestion> answers);
 	
 	public abstract void updateAssessmentScoreAndState(Assessment assessment);	
+	
+	public abstract List<AssessedEssentialElementSummary> getAssessedEssentialElementSummaries(long assessmentId);
+	
+	public abstract List<AssessedEssentialElementScore> getAssessedEssentialElementScoreAverageByPlanAndJob(long assessmentPlanId, long jobId, int jobLevel);
 	
 }

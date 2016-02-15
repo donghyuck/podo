@@ -51,6 +51,4 @@ public class AssessmentStats {
 	public void setUserAssessments(List<Assessment> userAssessments) {
 		this.userAssessments = userAssessments;
 	}
-
-	
 }

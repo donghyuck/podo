@@ -17,6 +17,8 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlParameterValue;
 
+import com.podosoftware.competency.assessment.AssessedEssentialElementScore;
+import com.podosoftware.competency.assessment.AssessedEssentialElementSummary;
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentPlan;
 import com.podosoftware.competency.assessment.AssessmentPlan.State;
@@ -60,6 +62,34 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	
 	private ExtendedPropertyDao extendedPropertyDao;
 
+	private final RowMapper<AssessedEssentialElementSummary> assessedEssentialElementSummaryMapper = new RowMapper<AssessedEssentialElementSummary>(){
+		
+		public AssessedEssentialElementSummary mapRow(ResultSet rs, int rowNum) throws SQLException {				
+			AssessedEssentialElementSummary summary = new AssessedEssentialElementSummary();
+			summary.setAssessmentId(rs.getLong("ASSESSMENT_ID"));
+			summary.setCompetencyId(rs.getLong("COMPETENCY_ID"));
+			summary.setCompetencyName(rs.getString("COMPETENCY_NAME"));
+			summary.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
+			summary.setEssentialElementName(rs.getString("ESSENTIAL_ELEMENT_NAME"));
+			summary.setAssessorId(rs.getLong("ASSESSOR_ID"));
+			summary.setCandidateId(rs.getLong("CANDIDATE_ID"));
+			summary.setTotalScore(rs.getInt("SUB_TOTAL"));
+			summary.setTotalCount(rs.getInt("SUB_COUNT"));
+			return summary;
+		}		
+	};
+	
+	private final RowMapper<AssessedEssentialElementScore> assessedEssentialElementScoreMapper = new RowMapper<AssessedEssentialElementScore>(){		
+		public AssessedEssentialElementScore mapRow(ResultSet rs, int rowNum) throws SQLException {				
+			AssessedEssentialElementScore summary = new AssessedEssentialElementScore();
+			summary.setCompetencyId(rs.getLong("COMPETENCY_ID"));
+			summary.setEssentialElementId(rs.getLong("ESSENTIAL_ELEMENT_ID"));
+			summary.setTotalScore(rs.getInt("SUB_TOTAL"));
+			summary.setTotalCount(rs.getInt("SUB_COUNT"));
+			return summary;
+		}		
+	};
+	
 	private final RowMapper<AssessmentQuestion> assessmentQuestionMapper = new RowMapper<AssessmentQuestion>(){
 		
 		public AssessmentQuestion mapRow(ResultSet rs, int rowNum) throws SQLException {				
@@ -923,6 +953,26 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				new SqlParameterValue(Types.NUMERIC, level ));
 	}
 	
+	
+	public List<AssessedEssentialElementScore> getAssessedEssentialElementScoreAverageByPlanAndJob(long assessmentPlanId, long jobId, int jobLevel)
+	{
+		return getExtendedJdbcTemplate().query(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_OTHERS_AVG").getSql(), 
+				assessedEssentialElementScoreMapper,
+				new SqlParameterValue(Types.NUMERIC, assessmentPlanId ),
+				new SqlParameterValue(Types.NUMERIC, jobId ),
+				new SqlParameterValue(Types.NUMERIC, jobLevel ));		
+		
+	}
+	
+	public List<AssessedEssentialElementSummary> getAssessedEssentialElementSummaries(long assessmentId){
+		return getExtendedJdbcTemplate().query(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_SUMMARY").getSql(), 
+				assessedEssentialElementSummaryMapper,
+				new SqlParameterValue(Types.NUMERIC, assessmentId ));			
+	}
+	
+	
 	/**
 	 * 
 	 * 
@@ -990,4 +1040,6 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 			);
 		}
 	}
+	
+	
 }
