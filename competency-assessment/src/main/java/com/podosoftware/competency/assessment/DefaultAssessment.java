@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.podosoftware.competency.assessment.json.AssessmentPlanJsonDeserializer;
+import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.job.Job;
 import com.podosoftware.competency.job.json.JobJsonDeserializer;
 
@@ -18,7 +19,7 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 
 	private long assessmentId;
 	private AssessmentPlan assessmentPlan;
-	
+	private List<Competency> competencies;
 	private Job job;
 	private List<User> assessors;
 	private User candidate;
@@ -26,19 +27,29 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 	private int jobLevel;
 	private int totalScore;
 	private String jobLevelName;
+	
 	public DefaultAssessment() {
 		this.assessmentId = -1L;
 		this.totalScore = 0;
 		this.state = State.NONE;
 		this.jobLevel = 0;
 		this.assessors = Collections.EMPTY_LIST;
+		this.competencies = Collections.EMPTY_LIST;
 	}
 	
 	public int getJobLevel() {
 		return jobLevel;
 	}
 
+	@JsonGetter
+	public List<Competency> getCompetencies() {
+		return competencies;
+	}
 
+	@JsonIgnore
+	public void setCompetencies(List<Competency> competencies) {
+		this.competencies = competencies;
+	}
 
 	public void setJobLevel(int jobLevel) {
 		this.jobLevel = jobLevel;

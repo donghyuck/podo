@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.podosoftware.competency.assessment.AssessedEssentialElementSummary;
+import com.podosoftware.competency.assessment.AssessedEssentialElementScore;
 import com.podosoftware.competency.assessment.Assessment;
 import com.podosoftware.competency.assessment.AssessmentManager;
 import com.podosoftware.competency.assessment.AssessmentNotFoundException;
@@ -119,11 +119,15 @@ public class CompetencyAssessmentController {
 	@ResponseBody
 	public Assessment getAssessment(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{	
-
 		User user = SecurityHelper.getUser();	
 		if(!user.isAnonymous()){			
+			
 			Assessment assessment = assessmentManager.getAssessment(assessmentId);
-			// 
+			
+			if( assessment.getJob().getJobId() > 0){
+				List<Competency> competencies = competencyManager.getCompetencies(assessment.getJob());
+				assessment.setCompetencies(competencies);
+			}
 			if( assessment.getAssessmentPlan().isFeedbackEnabled() && assessment.getAssessors().contains(user) )
 			{
 				return assessment;
@@ -137,6 +141,7 @@ public class CompetencyAssessmentController {
 		throw new UnAuthorizedException();
 	}
 	
+	
 	@RequestMapping(value="/assessment/test/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<AssessmentQuestion> listAssessmentQuestion(
@@ -146,9 +151,9 @@ public class CompetencyAssessmentController {
 		return assessmentManager.getUserAssessmentQuestions(assessment);
 	}
 	
-	@RequestMapping(value="/assessment/test/summary.json", method={RequestMethod.POST, RequestMethod.GET})
+	@RequestMapping(value="/assessment/test/scores.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
-	public List<AssessedEssentialElementSummary> listAssessmentEssentialElementSummary(
+	public List<AssessedEssentialElementScore> listAssessmentEssentialElementSummary(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{
 		User user = SecurityHelper.getUser();			
 		Assessment assessment = assessmentManager.getAssessment(assessmentId);
@@ -199,6 +204,7 @@ public class CompetencyAssessmentController {
 		return assessmentToUse ;
 	}	
 	
+	
 	@RequestMapping(value="/assessment/plan/list.json", method={RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public List<AssessmentPlan> listAssessmentPlan(){	
@@ -246,6 +252,7 @@ public class CompetencyAssessmentController {
 		}
 		return list;
 	}
+	
 	
 	
 	@RequestMapping(value="/assessment/job/list.json", method={RequestMethod.POST, RequestMethod.GET})

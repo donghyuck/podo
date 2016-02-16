@@ -814,20 +814,24 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	@Override
-	public List<AssessedEssentialElementSummary> getUserAssessedSummaries(Assessment assessment) {
+	public List<AssessedEssentialElementScore> getUserAssessedSummaries(Assessment assessment) {
 		
-		Map<Long, AssessedEssentialElementScore> averages = listToMap(
-				assessmentDao.getAssessedEssentialElementScoreAverageByPlanAndJob(
-						assessment.getAssessmentPlan().getAssessmentId(), 
-						assessment.getJob().getJobId(), 
-						assessment.getJobLevel()));
-		List<AssessedEssentialElementSummary> list = assessmentDao.getAssessedEssentialElementSummaries(assessment.getAssessmentId());
-		for(AssessedEssentialElementSummary summary : list){
+		Map<Long, AssessedEssentialElementScoreItem> averages = listToMap(
+			assessmentDao.getAssessedEssentialElementScoreAverageByPlanAndJob(
+			assessment.getAssessmentPlan().getAssessmentId(), 
+			assessment.getJob().getJobId(), 
+			assessment.getJobLevel())
+		);
+		
+		List<AssessedEssentialElementScore> list = assessmentDao.getAssessedEssentialElementSummaries(assessment.getAssessmentId());
+		
+		for(AssessedEssentialElementScore summary : list){
 			summary.setFinalScore( computeAssessedFinalScore(summary.getTotalScore(), summary.getTotalCount()) );			
-			AssessedEssentialElementScore average = averages.get(summary.getEssentialElementId());
+			AssessedEssentialElementScoreItem average = averages.get(summary.getEssentialElementId());
 			if(average!=null)
 				summary.setOthersAverageScore(computeAssessedFinalScore(average.getTotalScore(), average.getTotalCount()));
 		}
+		
 		return list;
 	}
 	
@@ -838,9 +842,9 @@ public class DefaultAssessmentManager implements AssessmentManager {
 		return divideResult.doubleValue() ;
 	}
 	
-	private Map<Long, AssessedEssentialElementScore> listToMap(List<AssessedEssentialElementScore> list){
-		Map<Long, AssessedEssentialElementScore> map = new HashMap<Long, AssessedEssentialElementScore>();
-		for(AssessedEssentialElementScore score : list){
+	private Map<Long, AssessedEssentialElementScoreItem> listToMap(List<AssessedEssentialElementScoreItem> list){
+		Map<Long, AssessedEssentialElementScoreItem> map = new HashMap<Long, AssessedEssentialElementScoreItem>();
+		for(AssessedEssentialElementScoreItem score : list){
 			map.put(score.getEssentialElementId(), score);
 		}
 		return map;

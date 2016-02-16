@@ -85,7 +85,7 @@ public interface AssessmentManager {
 	
 	public abstract void saveOrUpdateUserAssessmentScores(Assessment assessment, User assessor, List<AssessmentQuestion> answers );
 	
-	public abstract List<AssessedEssentialElementSummary> getUserAssessedSummaries(Assessment assessment);
+	public abstract List<AssessedEssentialElementScore> getUserAssessedSummaries(Assessment assessment);
 	
 	
 }

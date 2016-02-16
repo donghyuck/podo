@@ -2,6 +2,7 @@ package com.podosoftware.competency.assessment;
 
 import java.util.List;
 
+import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.job.Job;
 
 import architecture.common.model.DateAware;
@@ -51,5 +52,9 @@ public interface Assessment extends DateAware{
 	public abstract String getJobLevelName();
 	
 	public abstract void setJobLevelName(String jobLevelName); 
+	
+	public abstract List<Competency> getCompetencies();
+	
+	public abstract void setCompetencies(List<Competency> competencies);
 	
 }
