@@ -124,8 +124,19 @@ public class CompetencyAssessmentController {
 			
 			Assessment assessment = assessmentManager.getAssessment(assessmentId);
 			
+			log.debug("JOB_LEVEL_ID:" + assessment.getJobLevelId());
+			
 			if( assessment.getJob().getJobId() > 0){
-				List<Competency> competencies = competencyManager.getCompetencies(assessment.getJob());
+					
+				List<Competency> competencies ;
+				
+				if(assessment.getJobLevelId() > 0) {
+					log.debug("competency by job and jobLevel ----------- ");
+					competencies = competencyManager.getCompetenciesByJobAndJobLevel(assessment.getJob(), assessment.getJobLevelId());
+				} else {
+					log.debug("competency by job -------------");
+					competencies = competencyManager.getCompetencies(assessment.getJob());
+				}				
 				assessment.setCompetencies(competencies);
 			}
 			if( assessment.getAssessmentPlan().isFeedbackEnabled() && assessment.getAssessors().contains(user) )
