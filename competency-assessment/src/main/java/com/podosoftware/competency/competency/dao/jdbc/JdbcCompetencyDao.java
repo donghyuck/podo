@@ -29,6 +29,7 @@ import com.podosoftware.competency.competency.PerformanceCriteria;
 import com.podosoftware.competency.competency.dao.CompetencyDao;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobLevel;
 
 import architecture.common.user.Company;
 import architecture.ee.jdbc.property.dao.ExtendedPropertyDao;
@@ -551,6 +552,31 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 	}
 
 
+
+	@Override
+	public List<Long> getCompetencyIdsByJobAndJobLevel(Job job, long jobLevelId) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_IDS_BY_JOB_ID_AND_JOB_LEVEL_ID").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, job.getJobId()),
+				new SqlParameterValue( Types.NUMERIC, jobLevelId)	
+		);
+	}
+
+
+
+	@Override
+	public List<Long> getCompetencyIdsByJobAndLevel(Job job, int level) {
+		return getExtendedJdbcTemplate().queryForList(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_COMPETENCY_IDS_BY_JOB_ID_AND_LEVEL").getSql(), 
+				Long.class,
+				new SqlParameterValue( Types.NUMERIC, job.getJobId()),
+				new SqlParameterValue( Types.NUMERIC, level)	
+		);
+	}
+	
+	
+
 	public int getCompetencyCount(int objectType, long objectId, CompetencyType competencyType) {
 		return getExtendedJdbcTemplate().queryForObject( 
 				getBoundSql("COMPETENCY_ACCESSMENT.COUNT_COMPETENCY_BY_OBJECT_TYPE_AND_OBJECT_ID_AND_TYPE").getSql(),
@@ -875,6 +901,7 @@ public class JdbcCompetencyDao extends ExtendedJdbcDaoSupport implements Compete
 			});	
 		}
 	}
+
 
 
 }

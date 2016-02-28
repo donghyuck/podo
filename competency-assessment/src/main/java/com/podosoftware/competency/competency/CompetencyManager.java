@@ -77,6 +77,9 @@ public interface CompetencyManager {
 	public abstract List<Competency> getCompetencies(Job job, int startIndex, int numResults) ;		
 		
 	
+	public abstract List<Competency> getCompetenciesByJobAndJobLevel(Job job, long jobLevelId) ;
+	
+	
 	public abstract List<EssentialElement> getEssentialElements(Competency competency) ;
 	
 	public abstract void createEssentialElement( EssentialElement essentialElement) throws CompetencyNotFoundException ;

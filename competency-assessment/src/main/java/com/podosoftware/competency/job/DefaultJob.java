@@ -169,11 +169,12 @@ public class DefaultJob extends PropertyAwareSupport implements Job {
 		return super.equals(obj);
 	}
 
+
 	@Override
 	public String toString() {
 		return "DefaultJob [jobId=" + jobId + ", objectType=" + objectType + ", objectId=" + objectId + ", name=" + name
 				+ ", description=" + description + ", creationDate=" + creationDate + ", modifiedDate=" + modifiedDate
-				+ ", classification=" + classification + "]";
+				+ ", classification=" + classification + ", jobLevels=" + jobLevels + "]";
 	}
 
 	@Override

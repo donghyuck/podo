@@ -82,6 +82,7 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 			jobLevel.setLevel(rs.getInt("JOB_LEVEL"));
 			jobLevel.setMinWorkExperienceYear(rs.getInt("MIN_YEAR"));
 			jobLevel.setMaxWorkExperienceYear(rs.getInt("MAX_YEAR"));
+			jobLevel.setStrong(rs.getInt("IS_STRONG_REL") == 1 ? true : false);
 			return jobLevel;
 		}		
 	};
@@ -330,7 +331,8 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 						ps.setInt(1, relationship.getObjectType() );
 						ps.setLong(2, relationship.getObjectId());
 						ps.setLong(3, relationship.getJobId() );
-						ps.setLong(4, relationship.getCompetencyId());
+						ps.setLong(4, relationship.getJobLevelId() );
+						ps.setLong(5, relationship.getCompetencyId());
 					}					
 					public int getBatchSize() {
 						return inserts.size();
@@ -427,7 +429,8 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 						ps.setInt(3, sbj.getMinWorkExperienceYear());
 						ps.setInt(4, sbj.getMaxWorkExperienceYear());
 						ps.setInt(5, sbj.getLevel());
-						ps.setLong(6, sbj.getJobLevelId());
+						ps.setInt(6, sbj.isStrong() ? 1 : 0);
+						ps.setLong(7, sbj.getJobLevelId());
 					}					
 					public int getBatchSize() {
 						return updates.size();
@@ -447,6 +450,7 @@ public class JdbcJobDao extends ExtendedJdbcDaoSupport implements JobDao{
 						ps.setInt(5, sbj.getMinWorkExperienceYear());
 						ps.setInt(6, sbj.getMaxWorkExperienceYear());
 						ps.setInt(7, sbj.getLevel());
+						ps.setInt(8, sbj.isStrong()?1:0);
 					}					
 					public int getBatchSize() {
 						return inserts.size();

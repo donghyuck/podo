@@ -25,6 +25,8 @@ public class JobLevel implements Cacheable, ModelObject {
 	private Integer minWorkExperienceYear;
 
 	private Integer maxWorkExperienceYear;
+	
+	private boolean strong ;
 
 	public JobLevel() {
 		this.jobLevelId = -1L;
@@ -34,6 +36,7 @@ public class JobLevel implements Cacheable, ModelObject {
 		this.level = 0;
 		this.minWorkExperienceYear = 0;
 		this.maxWorkExperienceYear = 0;
+		this.strong = false;
 	}
 
 	
@@ -47,6 +50,37 @@ public class JobLevel implements Cacheable, ModelObject {
 		this.level = level;
 		this.minWorkExperienceYear = minWorkExperienceYear;
 		this.maxWorkExperienceYear = maxWorkExperienceYear;
+		this.strong = false;
+	}
+
+	public JobLevel(Long jobLevelId, Long jobId, String name, String description, Integer level,
+			Integer minWorkExperienceYear, Integer maxWorkExperienceYear, boolean strong) {
+		this.jobLevelId = jobLevelId;
+		this.jobId = jobId;
+		this.name = name;
+		this.description = description;
+		this.level = level;
+		this.minWorkExperienceYear = minWorkExperienceYear;
+		this.maxWorkExperienceYear = maxWorkExperienceYear;
+		this.strong = strong;
+	}
+
+	
+	
+	/**
+	 * if is true 
+	 * assosication with competency is strong.
+	 * 
+	 * @return
+	 */
+	public boolean isStrong() {
+		return strong;
+	}
+
+
+
+	public void setStrong(boolean strong) {
+		this.strong = strong;
 	}
 
 
@@ -130,6 +164,15 @@ public class JobLevel implements Cacheable, ModelObject {
 	public int getModelObjectType() {
 		return 61;
 	}
+
+	@Override
+	public String toString() {
+		return "JobLevel [jobLevelId=" + jobLevelId + ", jobId=" + jobId + ", name=" + name + ", description="
+				+ description + ", level=" + level + ", minWorkExperienceYear=" + minWorkExperienceYear
+				+ ", maxWorkExperienceYear=" + maxWorkExperienceYear + ", strong=" + strong + "]";
+	}
+
+
 
 	public int hashCode() {
 		return new HashCodeBuilder().append(jobLevelId).toHashCode();

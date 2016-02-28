@@ -44,6 +44,10 @@ public interface Assessment extends DateAware{
 	public abstract void setTotalScore(int totalScore);
 	
 	public abstract void setJob(Job job);
+
+	public abstract long getJobLevelId();
+	
+	public abstract void setJobLevelId(long jobLevelId);
 	
 	public abstract int getJobLevel();
 	

@@ -26,6 +26,7 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 	private State state;
 	private int jobLevel;
 	private int totalScore;
+	private long jobLevelId;
 	private String jobLevelName;
 	
 	public DefaultAssessment() {
@@ -35,6 +36,7 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 		this.jobLevel = 0;
 		this.assessors = Collections.EMPTY_LIST;
 		this.competencies = Collections.EMPTY_LIST;
+		this.jobLevelId = -1L;
 	}
 	
 	public int getJobLevel() {
@@ -55,6 +57,16 @@ public class DefaultAssessment extends DateAwareSupport implements Assessment {
 		this.jobLevel = jobLevel;
 	}
 
+
+	@JsonIgnore
+	public void setJobLevelId(long jobLevelId){
+		this.jobLevelId = jobLevelId;
+	}
+	
+	@JsonGetter
+	public long getJobLevelId(){
+		return jobLevelId;
+	}
 
 	@JsonGetter
 	public String getJobLevelName() {

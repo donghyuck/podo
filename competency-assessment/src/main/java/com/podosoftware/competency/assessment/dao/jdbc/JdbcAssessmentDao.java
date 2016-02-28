@@ -945,6 +945,16 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 	}
 
 
+	public List<AssessmentQuestion> getAssessmentQuestionByJobAndJobLevel(long jobId, int level) {
+		return getExtendedJdbcTemplate().query(
+				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_PERFORMANCE_CRITERIA_BY_JOB_AND_LEVEL").getSql(), 
+				assessmentQuestionMapper,
+				new SqlParameterValue(Types.NUMERIC, jobId ),
+				new SqlParameterValue(Types.NUMERIC, level ));
+	}
+	
+	
+	@Override
 	public List<AssessmentQuestion> getAssessmentQuestionByJob(long jobId, int level) {
 		return getExtendedJdbcTemplate().query(
 				getBoundSql("COMPETENCY_ACCESSMENT.SELECT_ASSESSMENT_PERFORMANCE_CRITERIA_BY_JOB").getSql(), 
@@ -952,8 +962,7 @@ public class JdbcAssessmentDao extends ExtendedJdbcDaoSupport implements Assessm
 				new SqlParameterValue(Types.NUMERIC, jobId ),
 				new SqlParameterValue(Types.NUMERIC, level ));
 	}
-	
-	
+
 	public List<AssessedEssentialElementScoreItem> getAssessedEssentialElementScoreAverageByPlanAndJob(long assessmentPlanId, long jobId, int jobLevel)
 	{
 		return getExtendedJdbcTemplate().query(

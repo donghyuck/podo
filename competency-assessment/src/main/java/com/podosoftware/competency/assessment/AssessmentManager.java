@@ -49,6 +49,8 @@ public interface AssessmentManager {
 	public abstract AssessmentPlan getAssessmentPlan(long assessment) throws AssessmentPlanNotFoundException ;
 	
 	
+	
+	public abstract void saveOrUpdateUserAssessment(Assessment assessment);
 	/**
 	 * 권한이 있는 진단계획 목록을 가져온다.
 	 * @param user

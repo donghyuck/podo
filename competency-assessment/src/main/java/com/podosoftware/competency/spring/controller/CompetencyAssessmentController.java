@@ -31,10 +31,10 @@ import com.podosoftware.competency.assessment.JobSelection;
 import com.podosoftware.competency.codeset.CodeSetManager;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyManager;
-import com.podosoftware.competency.competency.DefaultPerformanceCriteria;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobLevel;
 import com.podosoftware.competency.job.JobManager;
 
 import architecture.common.user.CompanyManager;
@@ -120,25 +120,28 @@ public class CompetencyAssessmentController {
 	public Assessment getAssessment(
 			@RequestParam(value="assessmentId", defaultValue="0", required=false ) long assessmentId) throws AssessmentPlanNotFoundException, AssessmentNotFoundException{	
 		User user = SecurityHelper.getUser();	
-		if(!user.isAnonymous()){			
-			
-			Assessment assessment = assessmentManager.getAssessment(assessmentId);
-			
-			log.debug("JOB_LEVEL_ID:" + assessment.getJobLevelId());
-			
-			if( assessment.getJob().getJobId() > 0){
-					
-				List<Competency> competencies ;
-				
+		if(!user.isAnonymous()){	
+			Assessment assessment = assessmentManager.getAssessment(assessmentId);			
+			log.debug("JOB_LEVEL_ID:" + assessment.getJobLevelId());			
+			if( assessment.getJob().getJobId() > 0){					
+				List<Competency> competencies = Collections.EMPTY_LIST;				
 				if(assessment.getJobLevelId() > 0) {
-					log.debug("competency by job and jobLevel ----------- ");
+					log.debug("1. competency by job and jobLevel ----------- ");
 					competencies = competencyManager.getCompetenciesByJobAndJobLevel(assessment.getJob(), assessment.getJobLevelId());
-				} else {
-					log.debug("competency by job -------------");
+				}
+				
+				
+				if( competencies.size() == 0 )
+				{
+					log.debug("2. competency by job -------------");
 					competencies = competencyManager.getCompetencies(assessment.getJob());
 				}				
+				
 				assessment.setCompetencies(competencies);
 			}
+			
+			
+			
 			if( assessment.getAssessmentPlan().isFeedbackEnabled() && assessment.getAssessors().contains(user) )
 			{
 				return assessment;
@@ -208,9 +211,13 @@ public class CompetencyAssessmentController {
 	@ResponseBody
 	public Assessment createAssessment(@RequestBody DefaultAssessment assessment) throws AssessmentPlanNotFoundException{	
 		User user = SecurityHelper.getUser();
-		Assessment assessmentToUse = assessment;
+		Assessment assessmentToUse = new DefaultAssessment();;
 		if(!user.isAnonymous()){
-			assessmentManager.addAssessmentCandidate(assessment.getAssessmentPlan(), user, assessment.getJob(), assessment.getJobLevel());
+			assessmentToUse.setAssessmentPlan(assessment.getAssessmentPlan());
+			assessmentToUse.setCandidate(user);
+			assessmentToUse.setJob(assessment.getJob());
+			assessmentToUse.setJobLevel(assessment.getJobLevel());
+			assessmentManager.saveOrUpdateUserAssessment(assessmentToUse);
 		}
 		return assessmentToUse ;
 	}	

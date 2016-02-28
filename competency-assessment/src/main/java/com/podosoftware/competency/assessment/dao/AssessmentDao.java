@@ -122,6 +122,8 @@ public interface AssessmentDao {
 	
 	public abstract List<AssessmentQuestion> getAssessmentQuestionByJob(long jobId, int level);
 	
+	public abstract List<AssessmentQuestion> getAssessmentQuestionByJobAndJobLevel(long jobId, int level);
+	
 	public abstract void saveOrUpdateAssessmentScores(List<AssessmentQuestion> answers);
 	
 	public abstract void updateAssessmentScoreAndState(Assessment assessment);	

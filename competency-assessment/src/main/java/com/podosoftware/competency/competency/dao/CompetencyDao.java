@@ -98,6 +98,11 @@ public interface CompetencyDao {
 	 */
 	public abstract List<Long> getCompetencyIds(Job job, int startIndex, int numResults);
 		
+	
+	public abstract List<Long> getCompetencyIdsByJobAndJobLevel(Job job, long jobLevelId);
+	
+	public abstract List<Long> getCompetencyIdsByJobAndLevel(Job job, int level);
+	
 	public abstract void createEssentialElement(EssentialElement essentialElement);
 	
 	public abstract void updateEssentialElement(EssentialElement essentialElement);

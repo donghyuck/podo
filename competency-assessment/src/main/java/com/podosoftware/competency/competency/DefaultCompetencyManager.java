@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.podosoftware.competency.competency.dao.CompetencyDao;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.Job;
+import com.podosoftware.competency.job.JobLevel;
 
 import architecture.common.user.Company;
 import net.sf.ehcache.Cache;
@@ -283,6 +284,27 @@ public class DefaultCompetencyManager implements CompetencyManager {
 	}
 	
 
+	public List<Competency> getCompetenciesByJobAndJobLevel(Job job, long jobLevelId) {
+		
+		int levelToUse = 0 ;
+		boolean isStrong = false;
+		for( JobLevel jobLevel : job.getJobLevels())
+		{
+			if( jobLevel.getJobLevelId() == jobLevelId ){
+				levelToUse = jobLevel.getLevel();
+				isStrong = jobLevel.isStrong();
+				break;
+			}
+		}
+		if( isStrong )
+		{
+			return loadCompetencies(competencyDao.getCompetencyIdsByJobAndJobLevel(job, jobLevelId));
+		}else{
+			return loadCompetencies(competencyDao.getCompetencyIdsByJobAndLevel(job, levelToUse));
+		}
+	}
+	
+	
 	@Override
 	public List<Competency> findCompetency(Company company, String groupCode, int level, String name, Classification classify, long jobId, int startIndex, int numResults) {
 		List<Long> ids = competencyDao.getCompetencyIds(1, company.getCompanyId(), groupCode, level, name, classify, jobId, startIndex, numResults);

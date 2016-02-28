@@ -587,6 +587,7 @@ public class DefaultAssessmentManager implements AssessmentManager {
 				for( JobLevel jobLevel : job.getJobLevels() ) {
 					if( jobLevel.getLevel() == assessment.getJobLevel() )
 					{
+						assessment.setJobLevelId(jobLevel.getJobLevelId());
 						assessment.setJobLevelName(jobLevel.getName());
 						break;
 					}
@@ -789,9 +790,25 @@ public class DefaultAssessmentManager implements AssessmentManager {
 	}
 
 	@Override
-	public List<AssessmentQuestion> getUserAssessmentQuestions(Assessment assessment) {		
-		List<AssessmentQuestion> list =  assessmentDao.getAssessmentQuestionByJob(assessment.getJob().getJobId(),assessment.getJobLevel());	
+	public List<AssessmentQuestion> getUserAssessmentQuestions(Assessment assessment) {	
+		
+		boolean isStrong = false;
+		
+		for(JobLevel jobLevel : assessment.getJob().getJobLevels() )
+		{
+			if( jobLevel.getJobLevelId() == assessment.getJobLevelId()){
+				isStrong = jobLevel.isStrong();
+				break;
+			}
+		}
+		
+		List<AssessmentQuestion> list ;
+		if( isStrong )
+			list = assessmentDao.getAssessmentQuestionByJobAndJobLevel(assessment.getJob().getJobId(), assessment.getJobLevel());	
+		else
+			list = assessmentDao.getAssessmentQuestionByJob(assessment.getJob().getJobId(), assessment.getJobLevel());
 		int no = 0 ;
+		
 		for(AssessmentQuestion q : list){
 			no ++ ;
 			q.setSeq(no);
