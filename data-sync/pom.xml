@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.podosoftware</groupId>
 	<artifactId>data-sync</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0.RELEASE</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javac.src.version>1.6</javac.src.version>
@@ -19,7 +19,7 @@
 
 맥에서 작성되어 윈도우에서는 동작하지 않을 수 있습니다.</description>
 	<name>DATA SYNC</name>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -142,7 +142,18 @@
 
 		</plugins>
 	</build>
-
+	
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>FUSE ARCHITECTURE Maven Repository</name>
+			<url>http://222.122.63.146/artifactory/repo</url>
+		</repository>
+	</repositories>
+	
 	<distributionManagement>
 		<repository>
 			<id>hadoop-master</id>
@@ -150,6 +161,50 @@
 			<url>http://222.122.63.146/artifactory/ext-release-local</url>
 		</repository>
 	</distributionManagement>
-	
+
+
+	<dependencies>
+		<dependency>
+			<groupId>architecture.common</groupId>
+			<artifactId>architecture-common</artifactId>
+			<version>2.0.0.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>moskito-core</artifactId>
+					<groupId>net.anotheria</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>moskito-aop</artifactId>
+					<groupId>net.anotheria</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>moskito-web</artifactId>
+					<groupId>net.anotheria</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>		
+		<dependency>		
+			<groupId>gpki</groupId>
+	 	 	<artifactId>gpkiapi</artifactId>
+	 		<version>1.5</version>
+		</dependency>
+
+<!-- 		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.5</version>
+		</dependency>
+-->
+		<dependency>
+		    <groupId>commons-httpclient</groupId>
+		    <artifactId>commons-httpclient</artifactId>
+		    <version>3.1</version>
+		</dependency>
 		
+	</dependencies>
+	
+	<organization>
+		<name>podosoftware</name>
+		<url>www.podosw.com</url>
+	</organization>
 </project>
