@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import com.podosoftware.competency.assessment.AssessedEssentialElementScore;
 import com.podosoftware.competency.assessment.Assessment;
@@ -28,19 +30,26 @@ import com.podosoftware.competency.assessment.AssessmentStats;
 import com.podosoftware.competency.assessment.DefaultAssessment;
 import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
 import com.podosoftware.competency.assessment.JobSelection;
+import com.podosoftware.competency.codeset.CodeSet;
 import com.podosoftware.competency.codeset.CodeSetManager;
+import com.podosoftware.competency.codeset.CodeSetNotFoundException;
 import com.podosoftware.competency.competency.Competency;
 import com.podosoftware.competency.competency.CompetencyManager;
 import com.podosoftware.competency.job.Classification;
 import com.podosoftware.competency.job.DefaultClassification;
 import com.podosoftware.competency.job.Job;
-import com.podosoftware.competency.job.JobLevel;
 import com.podosoftware.competency.job.JobManager;
 
+import architecture.common.user.Company;
 import architecture.common.user.CompanyManager;
+import architecture.common.user.CompanyNotFoundException;
 import architecture.common.user.SecurityHelper;
 import architecture.common.user.User;
 import architecture.common.user.authentication.UnAuthorizedException;
+import architecture.ee.web.site.WebSite;
+import architecture.ee.web.site.WebSiteNotFoundException;
+import architecture.ee.web.spring.controller.MyCloudDataController.ItemList;
+import architecture.ee.web.util.WebSiteUtils;
 
 @Controller ("competency-assessment-data-controller")
 @RequestMapping("/data/me/competency")
@@ -293,4 +302,73 @@ public class CompetencyAssessmentController {
 		}
 		return list;
 	}
+	
+	
+	@RequestMapping(value="/job/category/list.json", method={RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public List<CodeSet> listJobCategory(
+			@RequestParam(value="codeSetId", defaultValue="0", required=false ) Integer codeSetId) throws CodeSetNotFoundException{	
+		User user = SecurityHelper.getUser();	
+		if( codeSetId > 0 ){
+			CodeSet codeset = codeSetManager.getCodeSet(codeSetId);
+			return codeSetManager.getCodeSets(codeset);
+		}
+		return Collections.EMPTY_LIST;
+	}
+	
+	
+	@RequestMapping(value="/job/list.json", method=RequestMethod.POST)
+	@ResponseBody
+	public ItemList listJob(
+		@RequestParam(value="companyId", defaultValue="0", required=false ) Long companyId,
+		@RequestParam(value="classifyType", defaultValue="0", required=false ) Long classifyType,
+		@RequestParam(value="classifiedMajorityId", defaultValue="0", required=false ) Long classifiedMajorityId,
+		@RequestParam(value="classifiedMiddleId", defaultValue="0", required=false ) Long classifiedMiddleId,	
+		@RequestParam(value="classifiedMinorityId", defaultValue="0", required=false ) Long classifiedMinorityId,					
+		@RequestParam(value="startIndex", defaultValue="0", required=false ) Integer startIndex,
+		@RequestParam(value="pageSize", defaultValue="0", required=false ) Integer pageSize, 
+		NativeWebRequest request) {
+		User user = SecurityHelper.getUser();
+		Company company = user.getCompany();		
+		if( companyId > 0){
+			try {
+				company = companyManager.getCompany(companyId);
+			} catch (CompanyNotFoundException e) {
+			}
+		}else{			
+			try {
+				WebSite site = WebSiteUtils.getWebSite(request.getNativeRequest(HttpServletRequest.class));
+				company = site.getCompany();				
+			} catch (WebSiteNotFoundException e1) {
+			}						
+		}		
+		
+		List<Job> items = Collections.EMPTY_LIST;
+		int totalCount = 0 ;		
+		Classification classify = new DefaultClassification(classifyType, classifiedMajorityId, classifiedMiddleId, classifiedMinorityId);
+		if( classify.getClassifyType() >0 || classify.getClassifiedMajorityId() > 0 || classify.getClassifiedMiddleId() > 0 || classify.getClassifiedMinorityId() > 0)
+		{
+			totalCount = jobManager.getJobCount(company, classify);
+			if( totalCount > 0 ){
+				if( pageSize > 0){
+					items = jobManager.getJobs(company, classify, startIndex, pageSize);
+				}else{
+					items = jobManager.getJobs(company, classify);
+				}
+			}	
+			
+		} else {
+			totalCount = jobManager.getJobCount(company);
+			if( totalCount > 0 ){
+				if( pageSize > 0){
+					items = jobManager.getJobs(company, startIndex, pageSize);
+				}else{
+					items = jobManager.getJobs(company);
+				}
+			}		
+		}
+		ItemList list = new ItemList(items, totalCount);		
+		return list;
+	}	
+	
 }
