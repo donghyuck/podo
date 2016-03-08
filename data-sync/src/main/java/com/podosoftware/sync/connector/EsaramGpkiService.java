@@ -13,12 +13,12 @@ import com.gpki.gpkiapi.cert.X509Certificate;
 import com.gpki.gpkiapi.crypto.PrivateKey;
 import com.gpki.gpkiapi.storage.Disk;
 
-public class GpkiService {
+public class EsaramGpkiService {
 
-	public GpkiService() {
+	public EsaramGpkiService() {
 	}
 	
-	private static Log log = LogFactory.getLog(GpkiService.class);
+	private static Log log = LogFactory.getLog(EsaramGpkiService.class);
 	
 	byte[] myEnvCert, myEnvKey, mySigCert, mySigKey;
 	

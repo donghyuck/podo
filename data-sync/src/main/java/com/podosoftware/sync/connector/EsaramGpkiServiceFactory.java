@@ -2,9 +2,9 @@ package com.podosoftware.sync.connector;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class GpkiServiceFactory implements FactoryBean {
+public class EsaramGpkiServiceFactory implements FactoryBean {
 
-	private static final Class objectType = GpkiService.class;
+	private static final Class objectType = EsaramGpkiService.class;
 	private String myServerId;
 	private String targetServerIdList;
 	private String envCertFilePathName;
@@ -18,7 +18,7 @@ public class GpkiServiceFactory implements FactoryBean {
 	private boolean usingLDAP = true;
 	
 	
-	public GpkiServiceFactory() {
+	public EsaramGpkiServiceFactory() {
 	}
 
 	
@@ -158,7 +158,7 @@ public class GpkiServiceFactory implements FactoryBean {
 	@Override
 	public Object getObject() throws Exception {
 		
-		GpkiService g = new GpkiService();
+		EsaramGpkiService g = new EsaramGpkiService();
 		
 		// 이용기관 서버인증서 경로
 		g.setCertFilePath(this.getCertFilePath());

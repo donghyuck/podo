@@ -27,7 +27,7 @@ public class EsaramReaderConnector implements ReadConnector {
 
 	private static Log log = LogFactory.getLog(EsaramReaderConnector.class);
 	private SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.KOREA);
-	private GpkiService gpkiService ;
+	private EsaramGpkiService gpkiService ;
 	private EsaramHttpClient httpClient ;
 	private String encoding = EsaramHttpClient.DEFAULT_CHARSET;
 	
@@ -62,11 +62,11 @@ public class EsaramReaderConnector implements ReadConnector {
 		this.httpClient = httpClient;
 	}
 
-	public GpkiService getGpkiService() {
+	public EsaramGpkiService getGpkiService() {
 		return gpkiService;
 	}
 
-	public void setGpkiService(GpkiService gpkiService) {
+	public void setGpkiService(EsaramGpkiService gpkiService) {
 		this.gpkiService = gpkiService;
 	}
 
