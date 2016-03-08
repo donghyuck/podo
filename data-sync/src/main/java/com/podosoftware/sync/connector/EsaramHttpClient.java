@@ -135,6 +135,8 @@ public class EsaramHttpClient  {
 				
 				tryCount++;
 				
+				log.debug("["+ tryCount +"] try connection --------------------");
+				
 				int responseCode = client.executeMethod(method); // XML 송신 및 응답코드 수신				
 				log.debug("responseCode=" + responseCode);
 				{
@@ -178,9 +180,7 @@ public class EsaramHttpClient  {
 				}
 
 			}// end for 재처리
-		} catch (Throwable e) {
-			log.error(e);
-			throw new Exception(e);
+		
 		} finally {
 			if (method != null) {
 				method.releaseConnection();// 메소스 종료

@@ -1,5 +1,6 @@
 package com.podosoftware.sync.connector;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,11 +13,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+
+import com.podosoftware.sync.DataSyncLogger;
+import com.podosoftware.sync.DataSyncLogger.State;
+import com.podosoftware.sync.DataSyncLogger.SyncLog;
 
 import architecture.common.adaptor.Context;
 import architecture.common.adaptor.ReadConnector;
@@ -30,9 +36,35 @@ public class EsaramReaderConnector implements ReadConnector {
 	private EsaramGpkiService gpkiService ;
 	private EsaramHttpClient httpClient ;
 	private String encoding = EsaramHttpClient.DEFAULT_CHARSET;
+	private DataSyncLogger dataSyncLogger ;
+	private boolean test = false;
 	
 	
+	public boolean isTest() {
+		return test;
+	}
+
+	public void setTest(boolean test) {
+		this.test = test;
+	}
+
+
 	
+	public DataSyncLogger getDataSyncLogger() {
+		return dataSyncLogger;
+	}
+
+	public void setDataSyncLogger(DataSyncLogger dataSyncLogger) {
+		this.dataSyncLogger = dataSyncLogger;
+	}
+
+	public boolean isSetDataSyncLogger(){
+		if(dataSyncLogger!=null) 
+			return true;
+		
+		return false;
+	}
+
 	public String getEncoding() {
 		return encoding;
 	}
@@ -94,7 +126,7 @@ public class EsaramReaderConnector implements ReadConnector {
 		return getCurrentTimeString() + rnd1 + rnd2;
 	}
 	
-	public Object pull(Context context) {		
+	public Object pull(Context context) {	
 		Properties properties = context.getObject("properties", Properties.class);
 		List<ParameterMapping> parameterMappings = context.getObject("parameterMappings", List.class);	
 		Object[] data = context.getObject("data", Object[].class);	
@@ -124,6 +156,9 @@ public class EsaramReaderConnector implements ReadConnector {
 		String userDeptCode 		= properties.getProperty("userDeptCode");	  // 연계부처코드:7자리(부처변경)
 		String userName 			= properties.getProperty("userName");	      // 사용자 이름:연계담당 공무원 성명(부처변경)		
 		String xmlnsUrl             = properties.getProperty("xmlns_url");
+		
+		boolean hasError = false;
+		SyncLog syncLog = new SyncLog(transactionUniqueId, serviceName);
 		
 		/**************************************************
 		 * 요청 XML 생성
@@ -180,17 +215,27 @@ public class EsaramReaderConnector implements ReadConnector {
 			}
 			
 		} catch (Exception e) {
-			log.error(e);				
+			log.error(e);	
+			hasError = true;
+			syncLog.setState(State.FAIL);
+			syncLog.setErrorMsg("전송데이터 암호화 실패");
+			syncLog.setError(e);
+			if(isSetDataSyncLogger()){
+				this.dataSyncLogger.write(syncLog);
+			}			
+			
+			//return Collections.emptyList();
 		}		
 		
 		try {
 			
 			String responseStr = httpClient.send(serviceUrl, requestXml);			
 			// TODO 서비스 명이 바뀌면 수정해야함. (응답은 "<typ:get" + 서비스명 에서 "Service"가 빠진것 + "Response>" 임.
-			
+			log.debug("checking response date !!");
 			String resEncodeStr = responseStr
 					.split("<typ:get" + StringUtils.removeEnd(serviceName, "Service") + "Response xmlns:typ=\"" + xmlnsUrl +  "\">")[1]
 					.split("</typ:get" + StringUtils.removeEnd(serviceName, "Service") + "Response>")[0];
+			
 			if (responseStr.indexOf("Fault>") > 0) {
 					/**************************************************
 					 * 응답 데이터 복호화
@@ -207,14 +252,16 @@ public class EsaramReaderConnector implements ReadConnector {
 						log.debug( "ERROR XML RESPONSE : " +
 							new String(gpkiService.decrypt(validated), httpClient.getCharset())
 						);
+						throw new EsaramException("RESPONSE IS FAULT!!!" + new String(gpkiService.decrypt(validated), httpClient.getCharset()));		
 						
 					} catch (Exception e) {
-						throw new Exception("RESPONSE IS FAULT!!!", e);
+						//"응답 오류 데이터 복호화 실패"
+						throw new EsaramException("응답 데이터 복호화 실패", e);
 					}
-				}	
-				throw new Exception("RESPONSE IS FAULT!!!");
+				}
+				throw new EsaramException("RESPONSE IS FAULT!!!");				
 			}else if(responseStr.trim().equals("") || responseStr == null){
-				throw new Exception("RESPONSE IS EMPTY!!!");
+				throw new EsaramException("RESPONSE IS EMPTY!!!");
 			}
 			
 			String decrypted = "";	
@@ -232,7 +279,7 @@ public class EsaramReaderConnector implements ReadConnector {
 					 //복호화
 					decrypted = new String(gpkiService.decrypt(validated), httpClient.getCharset());
 				} catch (Exception e) {
-					throw new Exception(e.toString());
+					throw new EsaramException("수신데이터 복호화 오류", e);
 				}
 			}else{
 				decrypted = resEncodeStr;
@@ -240,14 +287,39 @@ public class EsaramReaderConnector implements ReadConnector {
 			
 			log.info("XML RESPONSE :" + decrypted );
 			responseXml = "<data>" +  StringUtils.remove(decrypted, "typ:") + "</data>";
-		} catch (Exception e) {
-			log.error(e);
+		} catch (Throwable e) {		
+			hasError = true;
+			syncLog.setState(State.FAIL);
+			syncLog.setError(e);
+			if( e instanceof IOException ){
+				syncLog.setErrorMsg("데이터 통신 오류 : " + e.getMessage() );
+			}else if ( e instanceof EsaramException ){
+				syncLog.setErrorMsg("e사람 오류 : " + e.getMessage());				
+			}
+			else{
+				syncLog.setErrorMsg("수신테이터 처리 오류");
+			
+			}
+			log.error(e);			
 		}	
-		return xmlToList(responseXml);
+		
+		List<Map<String, Object>>  list = xmlToList(responseXml, syncLog.getUid());
+		if(isSetDataSyncLogger()){
+			if( !hasError && StringUtils.isEmpty(syncLog.getErrorMsg()))
+				syncLog.setState(State.SUCCESS);
+			
+			syncLog.setRowCount(list.size());
+			this.dataSyncLogger.write(syncLog);
+		}
+		return list ;
 	}
 	
 	
-	protected List<Map<String, Object>> xmlToList (String xml) {		
+	protected List<Map<String, Object>> xmlToList (String xml , String uid) {	
+		
+		if( StringUtils.isEmpty(xml))
+			return Collections.emptyList();
+		
 		SAXReader saxReader = new SAXReader();
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		try {
@@ -260,8 +332,10 @@ public class EsaramReaderConnector implements ReadConnector {
 				for( Element attr : attrs ){
 					String name = attr.getName();
 					String value = attr.getTextTrim();
-					row.put(name, value);					
+					row.put(name, value);		
 				}
+				if(StringUtils.isNotEmpty(uid))
+					row.put("SYNC_ID", uid);
 				result.add(row);
 			}
 				
@@ -271,5 +345,5 @@ public class EsaramReaderConnector implements ReadConnector {
 		}
 		return result;
 	}
-	
+
 }

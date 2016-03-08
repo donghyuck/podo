@@ -277,6 +277,8 @@ public class DefaultDataSyncClient implements DataSyncClient {
 	}
 	
 	public List<Map<String, Object>> read(String processName, Object[] args) {
+		
+		log.debug("get context for:" + DEFAULT_READ_CONNECTOR_PREFIX + processName);
 		Context context = getContext(DEFAULT_READ_CONNECTOR_PREFIX + processName);
 		context.setObject("data", args);		
 		return (List<Map<String, Object>>) getConnector(context.getConnectorName(), ReadConnector.class).pull(context);

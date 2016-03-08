@@ -58,23 +58,18 @@ public class EsaramGpkiService {
 			}
 		}
 		
-		log.info("Loading gpki certificate : myServerId="
-				+ this.getMyServerId());
+		log.info("Loading gpki certificate : myServerId=" + this.getMyServerId());
 
-		X509Certificate _myEnvCert = Disk.readCert(this
-				.getEnvCertFilePathName());
+		X509Certificate _myEnvCert = Disk.readCert(this.getEnvCertFilePathName());
 		myEnvCert = _myEnvCert.getCert();
 
-		PrivateKey _myEnvKey = Disk.readPriKey(this
-				.getEnvPrivateKeyFilePathName(), this.getEnvPrivateKeyPasswd());
+		PrivateKey _myEnvKey = Disk.readPriKey(this.getEnvPrivateKeyFilePathName(), this.getEnvPrivateKeyPasswd());
 		myEnvKey = _myEnvKey.getKey();
 
-		X509Certificate _mySigCert = Disk.readCert(this
-				.getSigCertFilePathName());
+		X509Certificate _mySigCert = Disk.readCert(this.getSigCertFilePathName());
 		mySigCert = _mySigCert.getCert();
 
-		PrivateKey _mySigKey = Disk.readPriKey(this
-				.getSigPrivateKeyFilePathName(), this.getSigPrivateKeyPasswd());
+		PrivateKey _mySigKey = Disk.readPriKey(this.getSigPrivateKeyFilePathName(), this.getSigPrivateKeyPasswd());
 		mySigKey = _mySigKey.getKey();
 
 		//test my cert GPKI
@@ -88,8 +83,7 @@ public class EsaramGpkiService {
 
 	private void load(gpkiapi_jni gpki, String certId) throws Exception {
 
-		log.debug("Loading gpki certificate : targetServerId="
-				+ certId);
+		log.debug("Loading gpki certificate : targetServerId=" + certId);
 
 		X509Certificate cert = targetServerCertMap.get(certId);
 		if (cert != null) {
@@ -115,7 +109,6 @@ public class EsaramGpkiService {
 				log.debug("not certFilePath");
 			}
 		}
-
 		targetServerCertMap.put(certId, cert);
 	}
 	
@@ -157,13 +150,10 @@ public class EsaramGpkiService {
 	}
 	
 	public byte[] decrypt(byte[] encrypted) throws Exception {
-
 		gpkiapi_jni gpki = this.getGPKI();
 		try{
-			int result = gpki.CMS_ProcessEnvelopedData(myEnvCert, myEnvKey,
-					encrypted);
-			checkResult(result, "Fail to decrpyt message", gpki);
-	
+			int result = gpki.CMS_ProcessEnvelopedData(myEnvCert, myEnvKey, encrypted);
+			checkResult(result, "Fail to decrpyt message", gpki);	
 			return gpki.baReturnArray;
 		}catch(Exception ex){
 			throw ex;
@@ -173,12 +163,10 @@ public class EsaramGpkiService {
 	}
 
 	public byte[] sign(byte[] plain) throws Exception {
-
 		gpkiapi_jni gpki = this.getGPKI();
 		try{
 			int result = gpki.CMS_MakeSignedData(mySigCert, mySigKey, plain, null);
-			checkResult(result, "Fail to sign message", gpki);
-	
+			checkResult(result, "Fail to sign message", gpki);	
 			return gpki.baReturnArray;
 		}catch(Exception ex){
 			throw ex;
@@ -188,7 +176,6 @@ public class EsaramGpkiService {
 	}
 
 	public byte[] validate(byte[] signed) throws Exception {
-
 		gpkiapi_jni gpki = this.getGPKI();
 		try{
 			int result = gpki.CMS_ProcessSignedData(signed);
@@ -202,7 +189,6 @@ public class EsaramGpkiService {
 	}
 
 	public String encode(byte[] plain) throws Exception {
-
 		gpkiapi_jni gpki = this.getGPKI();
 		try{
 			int result = gpki.BASE64_Encode(plain);
@@ -213,12 +199,10 @@ public class EsaramGpkiService {
 			throw ex;
 		}finally{
 			finish(gpki);
-		}
-		
+		}		
 	}
 
 	public byte[] decode(String base64) throws Exception {
-
 		gpkiapi_jni gpki = this.getGPKI();
 		try{
 			int result = gpki.BASE64_Decode(base64);
