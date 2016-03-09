@@ -4,7 +4,6 @@ import java.sql.Types;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 

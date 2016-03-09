@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.springframework.util.StringUtils;
+
 import architecture.common.adaptor.Pipeline;
 import architecture.common.jdbc.ParameterMapping;
-
-import org.springframework.util.StringUtils;
 
 public class DefaultDataSyncMetaInfo {
 

@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -223,8 +222,7 @@ public class EsaramReaderConnector implements ReadConnector {
 			if(isSetDataSyncLogger()){
 				this.dataSyncLogger.write(syncLog);
 			}			
-			
-			//return Collections.emptyList();
+			return Collections.emptyList();
 		}		
 		
 		try {
@@ -318,8 +316,7 @@ public class EsaramReaderConnector implements ReadConnector {
 	protected List<Map<String, Object>> xmlToList (String xml , String uid) {	
 		
 		if( StringUtils.isEmpty(xml))
-			return Collections.emptyList();
-		
+			return Collections.emptyList();		
 		SAXReader saxReader = new SAXReader();
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		try {

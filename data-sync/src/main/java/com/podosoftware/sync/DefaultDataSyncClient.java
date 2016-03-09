@@ -72,27 +72,15 @@ public class DefaultDataSyncClient implements DataSyncClient {
 			
 			// STEP 2.1 프로세스 존재 유무를 검사한다.
 			if( hasConnector( processor.connectorName )){
-				
 				// STEP 2.2 프로세스에 대한 컨택스트를 가져온다.
-				Context context = getContext(processor);
-				
+				Context context = getContext(processor);				
 				if( processor.type == DefaultDataSyncMetaInfo.Type.READ ){
-					
-					context.setObject(Context.DATA, args);
-					
-					ReadConnector connector = getConnector( processor.connectorName, ReadConnector.class);
-					input = (List<Map<String, Object>>) connector.pull(context);
-					
-					if( connector instanceof EsaramReaderConnector ){
-						// todo : log into jdbc ..						
-					}
-					
+				    	context.setObject(Context.DATA, args);					
+				    	ReadConnector connector = getConnector( processor.connectorName, ReadConnector.class);
+				    	input = (List<Map<String, Object>>) connector.pull(context);			
 				}else  if( processor.type == DefaultDataSyncMetaInfo.Type.FILTER ){ 
-					
-					List<Map<String, Object>> inputToUse = new ArrayList<Map<String, Object>>();
-					
+    					List<Map<String, Object>> inputToUse = new ArrayList<Map<String, Object>>();
 					log.debug("filter applied!!");
-					
 					if ( input.size() > 0 ){
 						List<ParameterMapping> mappings = processor.getParameterMappings();						
 						for( Map<String, Object> row : input ){
@@ -128,37 +116,32 @@ public class DefaultDataSyncClient implements DataSyncClient {
 					}
 					
 					log.debug("merge (" + primaryKey + "):" + list.size() + " with " + input.size());
-					
 					List<Map<String, Object>> insert = new ArrayList<Map<String, Object>>();
 					List<Map<String, Object>> update = new ArrayList<Map<String, Object>>();
-					
 					// READ DATA
 					for( Map<String, Object> row : input){						
 						String value = (String)row.get(primaryKey);
 						boolean merge = false;	
-						
 						for(String no : list )
 						{
 							if(value.equals(no)){
 								merge = true;
-				                break;
+								break;
 							}
-						}	
-						
+						}						
 						if(merge){
 							update.add(row);
 						}else{
 							insert.add(row);
 						}
 					}
-					
+					    
 					log.debug("update:" + update.size() );
 					log.debug("insert`:" + insert.size() );
 					
 					for(Pipeline p : processor.getPipelineMappings())
 					{
-						log.debug( "[Pipeline]"+ p.getName() + ", " + p.getIndex() + ", " + p.isMatch() );
-						
+						log.debug( "[Pipeline]"+ p.getName() + ", " + p.getIndex() + ", " + p.isMatch() );						
 						if(processMappings.containsKey(p.getName())){
 							DefaultDataSyncMetaInfo subProcessor = processMappings.get(p.getName());
 							Context subContext = getContext(subProcessor);
