@@ -53,15 +53,18 @@ public class DataSyncJob extends QuartzJobBean {
     }
 
     protected void executeInternal(JobExecutionContext ctx) throws JobExecutionException {
-	try {
-	    
-	    log.debug("execute sync job : " + jobCode + " with " + dataSyncClient.getClass().getName());
+	long start = System.currentTimeMillis();
+	try {	    
+	    log.info("execute sync job [" + jobCode + "] by " + dataSyncClient.getClass().getName());
 	    //System.out.println("execute sync job : " + jobCode + " with " + dataSyncClient.getClass().getName());
 	    dataSyncClient.process(jobCode);
 	    
 	} catch (Throwable e) {
 	    log.error(e);
 	    throw new JobExecutionException(e);
+	} finally {
+	    long end = System.currentTimeMillis();
+	    log.info("sync job [" + jobCode + "] done in " + (end - start) + "ms.");	    
 	}
     }
 
