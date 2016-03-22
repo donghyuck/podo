@@ -9,14 +9,14 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.podosoftware.competency.assessment.RatingLevel;
 
-public class JsonRatingLevelsSerializer extends JsonSerializer<List<RatingLevel>>{
+public class JsonRatingLevelsSerializer extends JsonSerializer<List<RatingLevel>> {
 
-	public JsonRatingLevelsSerializer() {
-	}
+    public JsonRatingLevelsSerializer() {
+    }
 
-	public void serialize(List<RatingLevel> value, JsonGenerator jgen, SerializerProvider provider)
-			throws IOException, JsonProcessingException {
-		jgen.writeObject(value);
-	}
+    public void serialize(List<RatingLevel> value, JsonGenerator jgen, SerializerProvider provider)
+	    throws IOException, JsonProcessingException {
+	jgen.writeObject(value);
+    }
 
 }

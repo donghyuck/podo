@@ -2,61 +2,60 @@ package com.podosoftware.competency.codeset;
 
 public class DefaultCode {
 
-	private long codeId;
-	
-	private long codeSetId;
-	
-	private String name;
-	
-	private int index;
-	
-	private String description;
-	
-	
-	public DefaultCode() {
-		this.codeId = -1L;
-		this.codeSetId = -1L;
-		this.index = 0 ;
-	}
+    private long codeId;
 
-	public long getCodeId() {
-		return codeId;
-	}
+    private long codeSetId;
 
-	public void setCodeId(long codeId) {
-		this.codeId = codeId;
-	}
+    private String name;
 
-	public long getCodeSetId() {
-		return codeSetId;
-	}
+    private int index;
 
-	public void setCodeSetId(long codeSetId) {
-		this.codeSetId = codeSetId;
-	}
+    private String description;
 
-	public String getName() {
-		return name;
-	}
+    public DefaultCode() {
+	this.codeId = -1L;
+	this.codeSetId = -1L;
+	this.index = 0;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public long getCodeId() {
+	return codeId;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public void setCodeId(long codeId) {
+	this.codeId = codeId;
+    }
 
-	public void setIndex(int index) {
-		this.index = index;
-	}
+    public long getCodeSetId() {
+	return codeSetId;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setCodeSetId(long codeSetId) {
+	this.codeSetId = codeSetId;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
+    public String getName() {
+	return name;
+    }
+
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    public int getIndex() {
+	return index;
+    }
+
+    public void setIndex(int index) {
+	this.index = index;
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
+    }
+
 }

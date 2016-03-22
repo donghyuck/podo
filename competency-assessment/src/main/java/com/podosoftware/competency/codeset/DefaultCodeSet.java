@@ -19,184 +19,177 @@ import architecture.common.model.json.JsonMapPropertySerializer;
 import architecture.common.model.support.PropertyAwareSupport;
 
 public class DefaultCodeSet extends PropertyAwareSupport implements CodeSet {
-	
-	private int objectType;
-	private long objectId;
 
-	private long codeSetId;
-	private Long parentCodeSetId;
-	private String code;
-	private String name;	
+    private int objectType;
+    private long objectId;
+
+    private long codeSetId;
+    private Long parentCodeSetId;
+    private String code;
+    private String name;
     private String description;
-	private boolean enabled;
+    private boolean enabled;
     private Date creationDate;
     private Date modifiedDate;
-    private List<Code> codes;    
+    private List<Code> codes;
     private boolean hasChildren;
-    private String groupCode;	
-    
-	public DefaultCodeSet() {
-		this.codeSetId = -1L;
-		this.parentCodeSetId = -1L;
-		this.objectType = -1;
-		this.objectId = -1L;		
-		this.creationDate = new Date();
-		this.modifiedDate = this.creationDate;
-		this.hasChildren = false;
-		this.code = null;
-		this.codes = Collections.EMPTY_LIST;
-		this.groupCode = null;
-	}	
-	
-	public DefaultCodeSet(long codeGroupId) {
-		this.codeSetId = codeGroupId;
-	}
-	
-	@JsonSerialize(using = CustomJsonLongSerializer.class)	
-	public Long getParentCodeSetId() {
-		return parentCodeSetId;
-	}
+    private String groupCode;
 
-	@JsonDeserialize(using = CustomJsonLongDeserializer.class)	
-	public void setParentCodeSetId(Long parentCodeSetId) {
-		this.parentCodeSetId = parentCodeSetId;
-	}
+    public DefaultCodeSet() {
+	this.codeSetId = -1L;
+	this.parentCodeSetId = -1L;
+	this.objectType = -1;
+	this.objectId = -1L;
+	this.creationDate = new Date();
+	this.modifiedDate = this.creationDate;
+	this.hasChildren = false;
+	this.code = null;
+	this.codes = Collections.EMPTY_LIST;
+	this.groupCode = null;
+    }
 
-	public int getObjectType() {
-		return objectType;
-	}
+    public DefaultCodeSet(long codeGroupId) {
+	this.codeSetId = codeGroupId;
+    }
 
-	public void setObjectType(int objectType) {
-		this.objectType = objectType;
-	}
+    @JsonSerialize(using = CustomJsonLongSerializer.class)
+    public Long getParentCodeSetId() {
+	return parentCodeSetId;
+    }
 
-	public long getObjectId() {
-		return objectId;
-	}
+    @JsonDeserialize(using = CustomJsonLongDeserializer.class)
+    public void setParentCodeSetId(Long parentCodeSetId) {
+	this.parentCodeSetId = parentCodeSetId;
+    }
 
-	public void setObjectId(long objectId) {
-		this.objectId = objectId;
-	}
+    public int getObjectType() {
+	return objectType;
+    }
 
-	public boolean isEnabled() {
-		return enabled;
-	}
+    public void setObjectType(int objectType) {
+	this.objectType = objectType;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public long getObjectId() {
+	return objectId;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setObjectId(long objectId) {
+	this.objectId = objectId;
+    }
 
-	@JsonSerialize(using = CustomJsonDateSerializer.class)	
-	public Date getCreationDate() {
-		return creationDate;
-	}
+    public boolean isEnabled() {
+	return enabled;
+    }
 
-	@JsonDeserialize(using = CustomJsonDateDeserializer.class)
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
+    public String getDescription() {
+	return description;
+    }
 
-	@JsonSerialize(using = CustomJsonDateSerializer.class)	
-	public Date getModifiedDate() {
-		return modifiedDate;
-	}
+    public void setDescription(String description) {
+	this.description = description;
+    }
 
-	@JsonDeserialize(using = CustomJsonDateDeserializer.class)
-	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
-	}
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    public Date getCreationDate() {
+	return creationDate;
+    }
 
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    public void setCreationDate(Date creationDate) {
+	this.creationDate = creationDate;
+    }
 
-	public String getName() {
-		return name;
-	}
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    public Date getModifiedDate() {
+	return modifiedDate;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    public void setModifiedDate(Date modifiedDate) {
+	this.modifiedDate = modifiedDate;
+    }
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    public String getName() {
+	return name;
+    }
 
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public long getCodeSetId() {
-		return codeSetId;
-	}
+    public void setEnabled(boolean enabled) {
+	this.enabled = enabled;
+    }
 
-	@JsonDeserialize(using = CustomJsonLongDeserializer.class)	
-	public void setCodeSetId(long codeSetId) {
-		this.codeSetId = codeSetId;
-	}
+    public long getCodeSetId() {
+	return codeSetId;
+    }
 
-	
-	@JsonDeserialize(using = JsonMapPropertyDeserializer.class)	
-	public void setProperties(Map<String, String> properties) {
-		super.setProperties(properties);
-	}
+    @JsonDeserialize(using = CustomJsonLongDeserializer.class)
+    public void setCodeSetId(long codeSetId) {
+	this.codeSetId = codeSetId;
+    }
 
-	@JsonSerialize(using = JsonMapPropertySerializer.class)	
-	public Map<String, String> getProperties() {
-		return super.getProperties();
-	}
-	
-	public List<Code> getCodes() {
-		return codes;
-	}
+    @JsonDeserialize(using = JsonMapPropertyDeserializer.class)
+    public void setProperties(Map<String, String> properties) {
+	super.setProperties(properties);
+    }
 
+    @JsonSerialize(using = JsonMapPropertySerializer.class)
+    public Map<String, String> getProperties() {
+	return super.getProperties();
+    }
 
-	public void setCodes(List<Code> codes) {
-		this.codes = codes;
-	}
+    public List<Code> getCodes() {
+	return codes;
+    }
 
+    public void setCodes(List<Code> codes) {
+	this.codes = codes;
+    }
 
-	public String getCode() {
-		return code;
-	}
+    public String getCode() {
+	return code;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void setCode(String code) {
+	this.code = code;
+    }
 
-	public boolean isHasChildren() {
-		return hasChildren;
-	}
+    public boolean isHasChildren() {
+	return hasChildren;
+    }
 
-	public void setHasChildren(boolean hasChildren) {
-		this.hasChildren = hasChildren;
-	}
+    public void setHasChildren(boolean hasChildren) {
+	this.hasChildren = hasChildren;
+    }
 
-	@JsonIgnore
-	public int getCachedSize() {
-		return 0;
-	}
+    @JsonIgnore
+    public int getCachedSize() {
+	return 0;
+    }
 
-	@JsonIgnore
-	public Serializable getPrimaryKeyObject() {
-		return codeSetId;
-	}
-	
-	
+    @JsonIgnore
+    public Serializable getPrimaryKeyObject() {
+	return codeSetId;
+    }
 
-	public String getGroupCode() {
-		return groupCode;
-	}
+    public String getGroupCode() {
+	return groupCode;
+    }
 
-	public void setGroupCode(String groupCode) {
-		this.groupCode = groupCode;
-	}
+    public void setGroupCode(String groupCode) {
+	this.groupCode = groupCode;
+    }
 
-	public int getModelObjectType() {
-		return 50;
-	}
+    public int getModelObjectType() {
+	return 50;
+    }
 
-	@Override
-	public String toString() {
-		return "DefaultCodeSet [codeSetId=" + codeSetId + ", name=" + name + ", enabled=" + enabled + "]";
-	}
-	
+    @Override
+    public String toString() {
+	return "DefaultCodeSet [codeSetId=" + codeSetId + ", name=" + name + ", enabled=" + enabled + "]";
+    }
+
 }

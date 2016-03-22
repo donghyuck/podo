@@ -17,117 +17,113 @@ import architecture.common.model.support.PropertyAndDateAwareSupport;
 
 public class DefaultRatingScheme extends PropertyAndDateAwareSupport implements RatingScheme {
 
-	private int objectType;
-	private long objectId;
-	private long ratingSchemeId;
-	private String name;
-	private String description;
-	private int scale;
-	private List<RatingLevel> ratingLevels;
-	
-	public DefaultRatingScheme() {
-		this.ratingSchemeId = -1L;
-		this.name = null;
-		this.description = null;
-		this.scale = 2;		
-		this.ratingLevels = null;
-		this.objectType = 0;
-		this.objectId = -1L;
-		Date now = new Date();
-		setCreationDate(now);
-		setModifiedDate(now);	
-	}
+    private int objectType;
+    private long objectId;
+    private long ratingSchemeId;
+    private String name;
+    private String description;
+    private int scale;
+    private List<RatingLevel> ratingLevels;
 
-	public DefaultRatingScheme(long ratingSchemeId) {
-		this();
-		this.ratingSchemeId = ratingSchemeId;
-	}
+    public DefaultRatingScheme() {
+	this.ratingSchemeId = -1L;
+	this.name = null;
+	this.description = null;
+	this.scale = 2;
+	this.ratingLevels = null;
+	this.objectType = 0;
+	this.objectId = -1L;
+	Date now = new Date();
+	setCreationDate(now);
+	setModifiedDate(now);
+    }
 
-	public int getObjectType() {
-		return objectType;
-	}
+    public DefaultRatingScheme(long ratingSchemeId) {
+	this();
+	this.ratingSchemeId = ratingSchemeId;
+    }
 
-	public void setObjectType(int objectType) {
-		this.objectType = objectType;
-	}
+    public int getObjectType() {
+	return objectType;
+    }
 
-	public long getObjectId() {
-		return objectId;
-	}
+    public void setObjectType(int objectType) {
+	this.objectType = objectType;
+    }
 
-	public void setObjectId(long objectId) {
-		this.objectId = objectId;
-	}
+    public long getObjectId() {
+	return objectId;
+    }
 
+    public void setObjectId(long objectId) {
+	this.objectId = objectId;
+    }
 
+    public long getRatingSchemeId() {
+	return ratingSchemeId;
+    }
 
+    public void setRatingSchemeId(long ratingSchemeId) {
+	this.ratingSchemeId = ratingSchemeId;
+    }
 
-	public long getRatingSchemeId() {
-		return ratingSchemeId;
-	}
+    public String getName() {
+	return name;
+    }
 
-	public void setRatingSchemeId(long ratingSchemeId) {
-		this.ratingSchemeId = ratingSchemeId;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getDescription() {
+	return description;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setDescription(String description) {
+	this.description = description;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public int getScale() {
+	return scale;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setScale(int scale) {
+	this.scale = scale;
+    }
 
-	public int getScale() {
-		return scale;
-	}
+    @JsonSerialize(using = JsonRatingLevelsSerializer.class)
+    public List<RatingLevel> getRatingLevels() {
+	return ratingLevels;
+    }
 
-	public void setScale(int scale) {
-		this.scale = scale;
-	}
+    @JsonDeserialize(using = JsonRatingLevelsDeserializer.class)
+    public void setRatingLevels(List<RatingLevel> ratingLevels) {
+	this.ratingLevels = ratingLevels;
+    }
 
-	@JsonSerialize(using = JsonRatingLevelsSerializer.class)	
-	public List<RatingLevel> getRatingLevels() {
-		return ratingLevels;
-	}
+    @JsonDeserialize(using = JsonMapPropertyDeserializer.class)
+    public void setProperties(Map<String, String> properties) {
+	super.setProperties(properties);
+    }
 
-	@JsonDeserialize(using = JsonRatingLevelsDeserializer.class)	
-	public void setRatingLevels(List<RatingLevel> ratingLevels) {
-		this.ratingLevels = ratingLevels;
-	}
-	
-	@JsonDeserialize(using = JsonMapPropertyDeserializer.class)	
-	public void setProperties(Map<String, String> properties) {
-		super.setProperties(properties);
-	}
+    @JsonSerialize(using = JsonMapPropertySerializer.class)
+    public Map<String, String> getProperties() {
+	return super.getProperties();
+    }
 
-	@JsonSerialize(using = JsonMapPropertySerializer.class)	
-	public Map<String, String> getProperties() {
-		return super.getProperties();
-	}
-	
-	@JsonIgnore
-	public int getCachedSize() {
-		return 0;
-	}
+    @JsonIgnore
+    public int getCachedSize() {
+	return 0;
+    }
 
-	@JsonIgnore
-	public Serializable getPrimaryKeyObject() {
-		return ratingSchemeId;
-	}
+    @JsonIgnore
+    public Serializable getPrimaryKeyObject() {
+	return ratingSchemeId;
+    }
 
-	@JsonIgnore
-	public int getModelObjectType() {
-		return 65;
-	}
-	
+    @JsonIgnore
+    public int getModelObjectType() {
+	return 65;
+    }
 
 }

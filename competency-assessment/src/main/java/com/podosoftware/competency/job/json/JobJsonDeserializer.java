@@ -13,14 +13,14 @@ import com.podosoftware.competency.job.Job;
 
 public class JobJsonDeserializer extends JsonDeserializer<Job> {
 
-	public JobJsonDeserializer() {
-	}
+    public JobJsonDeserializer() {
+    }
 
-	public Job deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		ObjectCodec oc = jp.getCodec();		
-		JsonNode node = oc.readTree(jp);		
-		Job job = new DefaultJob(node.get("jobId").asLong(-1L));
-		return job;
-	}
+    public Job deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+	ObjectCodec oc = jp.getCodec();
+	JsonNode node = oc.readTree(jp);
+	Job job = new DefaultJob(node.get("jobId").asLong(-1L));
+	return job;
+    }
 
 }

@@ -6,7 +6,5 @@ package com.podosoftware.competency.competency;
  *
  */
 public interface Attitude extends Ability {
-	
 
-	
 }

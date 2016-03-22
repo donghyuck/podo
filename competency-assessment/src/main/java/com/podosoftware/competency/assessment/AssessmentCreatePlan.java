@@ -7,83 +7,83 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import architecture.common.model.json.CustomJsonDateDeserializer;
 
 public class AssessmentCreatePlan {
-	
-	private int objectType;
-	private long objectId;
-	private String name;
-	private String description;
-	private long assessmentSchemeId;
-	private Date startDate;
-	private Date endDate;
-	
-	public AssessmentCreatePlan() {
-		this.objectType = 0 ;
-		this.objectId = -1L;
-	}
 
-	public int getObjectType() {
-		return objectType;
-	}
+    private int objectType;
+    private long objectId;
+    private String name;
+    private String description;
+    private long assessmentSchemeId;
+    private Date startDate;
+    private Date endDate;
 
-	public void setObjectType(int objectType) {
-		this.objectType = objectType;
-	}
+    public AssessmentCreatePlan() {
+	this.objectType = 0;
+	this.objectId = -1L;
+    }
 
-	public long getObjectId() {
-		return objectId;
-	}
+    public int getObjectType() {
+	return objectType;
+    }
 
-	public void setObjectId(long objectId) {
-		this.objectId = objectId;
-	}
+    public void setObjectType(int objectType) {
+	this.objectType = objectType;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public long getObjectId() {
+	return objectId;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setObjectId(long objectId) {
+	this.objectId = objectId;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getName() {
+	return name;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public long getAssessmentSchemeId() {
-		return assessmentSchemeId;
-	}
+    public String getDescription() {
+	return description;
+    }
 
-	public void setAssessmentSchemeId(long assessmentSchemeId) {
-		this.assessmentSchemeId = assessmentSchemeId;
-	}
+    public void setDescription(String description) {
+	this.description = description;
+    }
 
-	public Date getStartDate() {
-		return startDate;
-	}
+    public long getAssessmentSchemeId() {
+	return assessmentSchemeId;
+    }
 
-	@JsonDeserialize(using = CustomJsonDateDeserializer.class)
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
+    public void setAssessmentSchemeId(long assessmentSchemeId) {
+	this.assessmentSchemeId = assessmentSchemeId;
+    }
 
-	public Date getEndDate() {
-		return endDate;
-	}
+    public Date getStartDate() {
+	return startDate;
+    }
 
-	@JsonDeserialize(using = CustomJsonDateDeserializer.class)
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    public void setStartDate(Date startDate) {
+	this.startDate = startDate;
+    }
 
-	@Override
-	public String toString() {
-		return "AssessmentPlan [objectType=" + objectType + ", objectId=" + objectId + ", name=" + name
-				+ ", description=" + description + ", assessmentSchemeId=" + assessmentSchemeId + ", startDate="
-				+ startDate + ", endDate=" + endDate + "]";
-	}
+    public Date getEndDate() {
+	return endDate;
+    }
+
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    public void setEndDate(Date endDate) {
+	this.endDate = endDate;
+    }
+
+    @Override
+    public String toString() {
+	return "AssessmentPlan [objectType=" + objectType + ", objectId=" + objectId + ", name=" + name
+		+ ", description=" + description + ", assessmentSchemeId=" + assessmentSchemeId + ", startDate="
+		+ startDate + ", endDate=" + endDate + "]";
+    }
 
 }

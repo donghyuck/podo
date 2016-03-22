@@ -11,12 +11,12 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 
 public class CustomJsonLongDeserializer extends JsonDeserializer<Long> {
 
-	public Long deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {		
-		
-		if(StringUtils.isEmpty(jp.getText()) ){
-			return -1L ;
-		}
-		return jp.getLongValue();
+    public Long deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+
+	if (StringUtils.isEmpty(jp.getText())) {
+	    return -1L;
 	}
+	return jp.getLongValue();
+    }
 
 }

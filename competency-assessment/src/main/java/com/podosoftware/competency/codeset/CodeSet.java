@@ -6,54 +6,54 @@ import java.util.List;
 import architecture.common.cache.Cacheable;
 import architecture.common.model.PropertyAware;
 
-public interface CodeSet extends PropertyAware, Cacheable{
-	
-	public boolean isEnabled() ;
+public interface CodeSet extends PropertyAware, Cacheable {
 
-	public String getDescription() ;
+    public boolean isEnabled();
 
-	public void setDescription(String description) ;
+    public String getDescription();
 
-	public Date getCreationDate() ;
+    public void setDescription(String description);
 
-	public void setCreationDate(Date creationDate) ;
+    public Date getCreationDate();
 
-	public Date getModifiedDate() ;
+    public void setCreationDate(Date creationDate);
 
-	public void setModifiedDate(Date modifiedDate) ;
+    public Date getModifiedDate();
 
-	public String getName();
+    public void setModifiedDate(Date modifiedDate);
 
-	public void setName(String name) ;
+    public String getName();
 
-	public void setEnabled(boolean enabled) ;
+    public void setName(String name);
 
-	public long getCodeSetId() ;
+    public void setEnabled(boolean enabled);
 
-	public void setCodeSetId(long codeSetId) ;
+    public long getCodeSetId();
 
-	public Long getParentCodeSetId() ;
+    public void setCodeSetId(long codeSetId);
 
-	public void setParentCodeSetId(Long parentCodeSetId);
+    public Long getParentCodeSetId();
 
-	public List<Code> getCodes() ;
+    public void setParentCodeSetId(Long parentCodeSetId);
 
-	public void setCodes(List<Code> codes) ;
-	
-	public int getObjectType();
+    public List<Code> getCodes();
 
-	public void setObjectType(int objectType) ;
+    public void setCodes(List<Code> codes);
 
-	public long getObjectId() ;
+    public int getObjectType();
 
-	public void setObjectId(long objectId);
+    public void setObjectType(int objectType);
 
-	public String getCode();
+    public long getObjectId();
 
-	public void setCode(String code);
-	
-	public String getGroupCode();
+    public void setObjectId(long objectId);
 
-	public void setGroupCode(String code);
-	
+    public String getCode();
+
+    public void setCode(String code);
+
+    public String getGroupCode();
+
+    public void setGroupCode(String code);
+
 }

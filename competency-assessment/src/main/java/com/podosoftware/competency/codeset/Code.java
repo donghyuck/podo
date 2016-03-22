@@ -2,23 +2,23 @@ package com.podosoftware.competency.codeset;
 
 public interface Code {
 
-	public long getCodeId() ;
+    public long getCodeId();
 
-	public void setCodeId(long codeId) ;
+    public void setCodeId(long codeId);
 
-	public long getCodeSetId() ;
+    public long getCodeSetId();
 
-	public void setCodeSetId(long codeSetId) ;
+    public void setCodeSetId(long codeSetId);
 
-	public String getName();
+    public String getName();
 
-	public void setName(String name) ;
+    public void setName(String name);
 
-	public int getIndex() ;
+    public int getIndex();
 
-	public void setIndex(int index);
+    public void setIndex(int index);
 
-	public String getDescription();
+    public String getDescription();
 
-	public void setDescription(String description) ;
+    public void setDescription(String description);
 }

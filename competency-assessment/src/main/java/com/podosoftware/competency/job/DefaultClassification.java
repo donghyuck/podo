@@ -9,130 +9,126 @@ import architecture.common.cache.CacheSizes;
 
 public class DefaultClassification implements Classification {
 
-	private Long classifyType;
-	
-	private Long classifiedMajorityId;
+    private Long classifyType;
 
-	private Long classifiedMiddleId;
+    private Long classifiedMajorityId;
 
-	private Long classifiedMinorityId;
+    private Long classifiedMiddleId;
 
-	private String classifyTypeName;
-	
-	private String classifiedMajorityName;
+    private Long classifiedMinorityId;
 
-	private String classifiedMiddleName;
+    private String classifyTypeName;
 
-	private String classifiedMinorityName;
+    private String classifiedMajorityName;
 
-	public DefaultClassification() {
-		this.classifyType = -1L;
-		this.classifiedMajorityId = -1L;
-		this.classifiedMiddleId = -1L;
-		this.classifiedMinorityId = -1L;		
-	}
+    private String classifiedMiddleName;
 
-	public DefaultClassification(Long classifyType, Long classifiedMajorityId, Long classifiedMiddleId, Long classifiedMinorityId) {
-		this.classifyType = classifyType;
-		this.classifiedMajorityId = classifiedMajorityId;
-		this.classifiedMiddleId = classifiedMiddleId;
-		this.classifiedMinorityId = classifiedMinorityId;
-	}
+    private String classifiedMinorityName;
 
+    public DefaultClassification() {
+	this.classifyType = -1L;
+	this.classifiedMajorityId = -1L;
+	this.classifiedMiddleId = -1L;
+	this.classifiedMinorityId = -1L;
+    }
 
+    public DefaultClassification(Long classifyType, Long classifiedMajorityId, Long classifiedMiddleId,
+	    Long classifiedMinorityId) {
+	this.classifyType = classifyType;
+	this.classifiedMajorityId = classifiedMajorityId;
+	this.classifiedMiddleId = classifiedMiddleId;
+	this.classifiedMinorityId = classifiedMinorityId;
+    }
 
-	public Long getClassifyType() {
-		return classifyType;
-	}
+    public Long getClassifyType() {
+	return classifyType;
+    }
 
-	public void setClassifyType(Long classifyType) {
-		this.classifyType = classifyType;
-	}
+    public void setClassifyType(Long classifyType) {
+	this.classifyType = classifyType;
+    }
 
-	public String getClassifyTypeName() {
-		return classifyTypeName;
-	}
+    public String getClassifyTypeName() {
+	return classifyTypeName;
+    }
 
-	public void setClassifyTypeName(String classifyTypeName) {
-		this.classifyTypeName = classifyTypeName;
-	}
+    public void setClassifyTypeName(String classifyTypeName) {
+	this.classifyTypeName = classifyTypeName;
+    }
 
-	public Long getClassifiedMajorityId() {
-		return classifiedMajorityId;
-	}
+    public Long getClassifiedMajorityId() {
+	return classifiedMajorityId;
+    }
 
-	public void setClassifiedMajorityId(Long classifiedMajorityId) {
-		this.classifiedMajorityId = classifiedMajorityId;
-	}
+    public void setClassifiedMajorityId(Long classifiedMajorityId) {
+	this.classifiedMajorityId = classifiedMajorityId;
+    }
 
-	public Long getClassifiedMiddleId() {
-		return classifiedMiddleId;
-	}
+    public Long getClassifiedMiddleId() {
+	return classifiedMiddleId;
+    }
 
-	public void setClassifiedMiddleId(Long classifiedMiddleId) {
-		this.classifiedMiddleId = classifiedMiddleId;
-	}
+    public void setClassifiedMiddleId(Long classifiedMiddleId) {
+	this.classifiedMiddleId = classifiedMiddleId;
+    }
 
-	public Long getClassifiedMinorityId() {
-		return classifiedMinorityId;
-	}
+    public Long getClassifiedMinorityId() {
+	return classifiedMinorityId;
+    }
 
-	public void setClassifiedMinorityId(Long classifiedMinorityId) {
-		this.classifiedMinorityId = classifiedMinorityId;
-	}
+    public void setClassifiedMinorityId(Long classifiedMinorityId) {
+	this.classifiedMinorityId = classifiedMinorityId;
+    }
 
-	public String getClassifiedMajorityName() {
-		return classifiedMajorityName;
-	}
+    public String getClassifiedMajorityName() {
+	return classifiedMajorityName;
+    }
 
-	public void setClassifiedMajorityName(String classifiedMajorityName) {
-		this.classifiedMajorityName = classifiedMajorityName;
-	}
+    public void setClassifiedMajorityName(String classifiedMajorityName) {
+	this.classifiedMajorityName = classifiedMajorityName;
+    }
 
-	public String getClassifiedMiddleName() {
-		return classifiedMiddleName;
-	}
+    public String getClassifiedMiddleName() {
+	return classifiedMiddleName;
+    }
 
-	public void setClassifiedMiddleName(String classifiedMiddleName) {
-		this.classifiedMiddleName = classifiedMiddleName;
-	}
+    public void setClassifiedMiddleName(String classifiedMiddleName) {
+	this.classifiedMiddleName = classifiedMiddleName;
+    }
 
-	public String getClassifiedMinorityName() {
-		return classifiedMinorityName;
-	}
+    public String getClassifiedMinorityName() {
+	return classifiedMinorityName;
+    }
 
-	public void setClassifiedMinorityName(String classifiedMinorityName) {
-		this.classifiedMinorityName = classifiedMinorityName;
-	}
-	
-	@JsonIgnore
-	public Map<String, Long> toMap(){
-		Map<String, Long> additionalParameters = new HashMap<String, Long>(4);
-		additionalParameters.put("classifyType", this.classifyType);
-		additionalParameters.put("majorityId", this.classifiedMajorityId);
-		additionalParameters.put("middleId", this.classifiedMiddleId);
-		additionalParameters.put("minorityId", this.classifiedMinorityId);
-		return additionalParameters;
-	}
+    public void setClassifiedMinorityName(String classifiedMinorityName) {
+	this.classifiedMinorityName = classifiedMinorityName;
+    }
 
-	@JsonIgnore
-	public int getCachedSize() {
-		int totalSize = CacheSizes.sizeOfLong() 
-				+ CacheSizes.sizeOfLong() 
-				+ CacheSizes.sizeOfLong()
-				+ CacheSizes.sizeOfString(classifiedMajorityName) 
-				+ CacheSizes.sizeOfString(classifiedMiddleName)
-				+ CacheSizes.sizeOfString(classifiedMinorityName);
-		return totalSize;
-	}
+    @JsonIgnore
+    public Map<String, Long> toMap() {
+	Map<String, Long> additionalParameters = new HashMap<String, Long>(4);
+	additionalParameters.put("classifyType", this.classifyType);
+	additionalParameters.put("majorityId", this.classifiedMajorityId);
+	additionalParameters.put("middleId", this.classifiedMiddleId);
+	additionalParameters.put("minorityId", this.classifiedMinorityId);
+	return additionalParameters;
+    }
 
-	@Override
-	public String toString() {
-		return "DefaultClassification [classifyType=" + classifyType + ", classifiedMajorityId=" + classifiedMajorityId
-				+ ", classifiedMiddleId=" + classifiedMiddleId + ", classifiedMinorityId=" + classifiedMinorityId
-				+ ", classifyTypeName=" + classifyTypeName + ", classifiedMajorityName=" + classifiedMajorityName
-				+ ", classifiedMiddleName=" + classifiedMiddleName + ", classifiedMinorityName="
-				+ classifiedMinorityName + "]";
-	}
+    @JsonIgnore
+    public int getCachedSize() {
+	int totalSize = CacheSizes.sizeOfLong() + CacheSizes.sizeOfLong() + CacheSizes.sizeOfLong()
+		+ CacheSizes.sizeOfString(classifiedMajorityName) + CacheSizes.sizeOfString(classifiedMiddleName)
+		+ CacheSizes.sizeOfString(classifiedMinorityName);
+	return totalSize;
+    }
+
+    @Override
+    public String toString() {
+	return "DefaultClassification [classifyType=" + classifyType + ", classifiedMajorityId=" + classifiedMajorityId
+		+ ", classifiedMiddleId=" + classifiedMiddleId + ", classifiedMinorityId=" + classifiedMinorityId
+		+ ", classifyTypeName=" + classifyTypeName + ", classifiedMajorityName=" + classifiedMajorityName
+		+ ", classifiedMiddleName=" + classifiedMiddleName + ", classifiedMinorityName="
+		+ classifiedMinorityName + "]";
+    }
 
 }

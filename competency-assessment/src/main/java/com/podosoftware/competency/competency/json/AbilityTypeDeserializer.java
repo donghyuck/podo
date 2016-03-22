@@ -12,19 +12,19 @@ import com.podosoftware.competency.competency.AbilityType;
 
 public class AbilityTypeDeserializer extends JsonDeserializer<AbilityType> {
 
-	public AbilityTypeDeserializer() {
-	}
+    public AbilityTypeDeserializer() {
+    }
 
-	public AbilityType deserialize(JsonParser jsonParser, DeserializationContext ctxt)
-			throws IOException, JsonProcessingException {
-		ObjectCodec oc = jsonParser.getCodec();
-		JsonNode node = oc.readTree(jsonParser);
-		
-		if( node == null)
-			return AbilityType.NONE;
-		
-		AbilityType type = AbilityType.valueOf( node.get("abilityType").textValue().toUpperCase() );		
-		return type;
-	}
+    public AbilityType deserialize(JsonParser jsonParser, DeserializationContext ctxt)
+	    throws IOException, JsonProcessingException {
+	ObjectCodec oc = jsonParser.getCodec();
+	JsonNode node = oc.readTree(jsonParser);
+
+	if (node == null)
+	    return AbilityType.NONE;
+
+	AbilityType type = AbilityType.valueOf(node.get("abilityType").textValue().toUpperCase());
+	return type;
+    }
 
 }

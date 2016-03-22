@@ -16,18 +16,17 @@ import com.podosoftware.competency.assessment.DefaultAssessmentPlan;
 
 public class AssessmentPlanJsonDeserializer extends JsonDeserializer<AssessmentPlan> {
 
-	public AssessmentPlanJsonDeserializer() {
-	}
-	
-	private static final Log log = LogFactory.getLog(JsonRatingLevelsDeserializer.class);
+    public AssessmentPlanJsonDeserializer() {
+    }
 
-	
-	public AssessmentPlan deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		ObjectCodec oc = jp.getCodec();		
-		JsonNode node = oc.readTree(jp);		
-		AssessmentPlan job = new DefaultAssessmentPlan(node.get("assessmentId").asLong(-1L));
-		return job;
-	}
-	
-	
+    private static final Log log = LogFactory.getLog(JsonRatingLevelsDeserializer.class);
+
+    public AssessmentPlan deserialize(JsonParser jp, DeserializationContext ctxt)
+	    throws IOException, JsonProcessingException {
+	ObjectCodec oc = jp.getCodec();
+	JsonNode node = oc.readTree(jp);
+	AssessmentPlan job = new DefaultAssessmentPlan(node.get("assessmentId").asLong(-1L));
+	return job;
+    }
+
 }

@@ -10,163 +10,143 @@ import com.podosoftware.competency.job.json.JobJsonDeserializer;
 
 import architecture.common.model.support.PropertyAwareSupport;
 
+public class DefaultCompetency extends PropertyAwareSupport implements Competency {
 
-public class DefaultCompetency extends PropertyAwareSupport implements Competency  {
-    
-        
-	private Integer objectType;
-	
-	private Long objectId;
-	
-	private Long competencyId;
-	
-	private String name;
-	
-	private String description;
-	
-	private Integer level;
-	
-	private String competencyUnitCode;
-	
-	private String competencyGroupCode;
-	
-	private CompetencyType competencyType;
-	
-	private Job job;
-	
-	public DefaultCompetency() {
-		this.objectType = 1;
-		this.objectId = -1L;
-		this.competencyId = -1L;
-		this.name = null;
-		this.description = null;
-		this.level = 0 ;
-		this.competencyUnitCode = null;
-		this.competencyGroupCode = null;
-		this.competencyType = CompetencyType.NONE;
-		this.job = null;
-	}
-	
-	
-	
-	public String getCompetencyGroupCode() {
-		return competencyGroupCode;
-	}
+    private Integer objectType;
 
+    private Long objectId;
 
+    private Long competencyId;
 
-	public void setCompetencyGroupCode(String competencyGroupCode) {
-		this.competencyGroupCode = competencyGroupCode;
-	}
+    private String name;
 
+    private String description;
 
+    private Integer level;
 
-	public String getCompetencyUnitCode() {
-		return competencyUnitCode;
-	}
+    private String competencyUnitCode;
 
-	public void setCompetencyUnitCode(String competencyUnitCode) {
-		this.competencyUnitCode = competencyUnitCode;
-	}
+    private String competencyGroupCode;
 
-	public Integer getLevel() {
-		return level;
-	}
+    private CompetencyType competencyType;
 
-	public void setLevel(Integer level) {
-		this.level = level;
-	}
+    private Job job;
 
+    public DefaultCompetency() {
+	this.objectType = 1;
+	this.objectId = -1L;
+	this.competencyId = -1L;
+	this.name = null;
+	this.description = null;
+	this.level = 0;
+	this.competencyUnitCode = null;
+	this.competencyGroupCode = null;
+	this.competencyType = CompetencyType.NONE;
+	this.job = null;
+    }
 
-	@JsonIgnore
-	public int getCachedSize() {
-		return 0;
-	}
+    public String getCompetencyGroupCode() {
+	return competencyGroupCode;
+    }
 
+    public void setCompetencyGroupCode(String competencyGroupCode) {
+	this.competencyGroupCode = competencyGroupCode;
+    }
 
-	public Integer getObjectType() {
-		return objectType;
-	}
+    public String getCompetencyUnitCode() {
+	return competencyUnitCode;
+    }
 
+    public void setCompetencyUnitCode(String competencyUnitCode) {
+	this.competencyUnitCode = competencyUnitCode;
+    }
 
-	public void setObjectType(Integer objectType) {
-		this.objectType = objectType;
-	}
+    public Integer getLevel() {
+	return level;
+    }
 
+    public void setLevel(Integer level) {
+	this.level = level;
+    }
 
-	public Long getObjectId() {
-		return objectId;
-	}
+    @JsonIgnore
+    public int getCachedSize() {
+	return 0;
+    }
 
+    public Integer getObjectType() {
+	return objectType;
+    }
 
-	public void setObjectId(Long objectId) {
-		this.objectId = objectId;
-	}
+    public void setObjectType(Integer objectType) {
+	this.objectType = objectType;
+    }
 
+    public Long getObjectId() {
+	return objectId;
+    }
 
-	public Long getCompetencyId() {
-		return competencyId;
-	}
+    public void setObjectId(Long objectId) {
+	this.objectId = objectId;
+    }
 
+    public Long getCompetencyId() {
+	return competencyId;
+    }
 
-	public void setCompetencyId(Long competencyId) {
-		this.competencyId = competencyId;
-	}
+    public void setCompetencyId(Long competencyId) {
+	this.competencyId = competencyId;
+    }
 
+    public String getName() {
+	return name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
+    public String getDescription() {
+	return description;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setDescription(String description) {
+	this.description = description;
+    }
 
+    public CompetencyType getCompetencyType() {
+	return competencyType;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setCompetencyType(CompetencyType competencyType) {
+	this.competencyType = competencyType;
+    }
 
+    @JsonIgnore
+    public Serializable getPrimaryKeyObject() {
+	return this.getCompetencyId();
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public int getModelObjectType() {
+	return 53;
+    }
 
-	
-	public CompetencyType getCompetencyType() {
-		return competencyType;
-	}
+    @JsonIgnore
+    @JsonDeserialize(using = JobJsonDeserializer.class)
+    public void setJob(Job job) {
+	this.job = job;
+    }
 
-	public void setCompetencyType(CompetencyType competencyType) {
-		this.competencyType = competencyType;
-	}
+    @JsonGetter
+    public Job getJob() {
+	return job;
+    }
 
-	@JsonIgnore
-	public Serializable getPrimaryKeyObject() {
-		return this.getCompetencyId();
-	}
+    @Override
+    public String toString() {
+	return "DefaultCompetency [competencyId=" + competencyId + ", objectType=" + objectType + ", objectId="
+		+ objectId + ", competencyType=" + competencyType + ", name=" + name + ", description=" + description
+		+ ", level=" + level + ", competencyUnitCode=" + competencyUnitCode + ", job=" + job + "]";
+    }
 
-	public int getModelObjectType() {
-		return 53;
-	}
-
-	@JsonIgnore
-	@JsonDeserialize(using = JobJsonDeserializer.class )
-	public void setJob(Job job) {
-		this.job = job;
-	}
-
-	@JsonGetter
-	public Job getJob() {
-		return job;
-	}
-	
-	@Override
-	public String toString() {
-		return "DefaultCompetency [competencyId=" + competencyId + ", objectType=" + objectType + ", objectId="
-				+ objectId + ", competencyType=" + competencyType + ", name=" + name + ", description=" + description
-				+ ", level=" + level + ", competencyUnitCode=" + competencyUnitCode + ", job=" + job + "]";
-	}
-	
 }

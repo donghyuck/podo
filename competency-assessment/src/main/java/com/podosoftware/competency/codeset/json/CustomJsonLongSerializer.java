@@ -9,13 +9,13 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class CustomJsonLongSerializer extends JsonSerializer<Long> {
 
-	public void serialize(Long value, JsonGenerator jgen, SerializerProvider provider)
-			throws IOException, JsonProcessingException {
-		if( value == null || value == -1L){			
-			jgen.writeNull();
-		}else{
-			jgen.writeNumber(value);
-		}
+    public void serialize(Long value, JsonGenerator jgen, SerializerProvider provider)
+	    throws IOException, JsonProcessingException {
+	if (value == null || value == -1L) {
+	    jgen.writeNull();
+	} else {
+	    jgen.writeNumber(value);
 	}
+    }
 
 }
