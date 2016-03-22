@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	<description><![CDATA[
+        Data Sync Subsystem Context for MPVA
+	]]></description>	
+			
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+			destroy-method="close" p:driverClassName="oracle.jdbc.driver.OracleDriver"
+			p:url="jdbc:oracle:thin:@//222.122.47.196:1521/PODODB"
+			p:username="u_mpva" p:password="podoq23$" p:initialSize="1" />
+			
+	<bean id="dataSyncClient" class="com.podosoftware.sync.DefaultDataSyncClient">
+	    <property name="connectors">
+			<map>
+				<entry key="DB_READER" value-ref="jdbcReadConnector" />
+				<entry key="DB_WRITER" value-ref="jdbcWriteConnector" />
+				<entry key="ESARAM_READER" value-ref="esaramReaderConnector" />	
+			</map>
+	    </property>	    
+		<property name="pipelineMappings">
+		    <map>
+	    	    <entry key="IF_TEST">
+	    	        <list>
+	    	            <value type="java.lang.String">READ_IF_TEST</value>
+	    	        </list>
+	    	    </entry>	
+	    	    <!-- 상시학습 교육훈련내역  -->	
+	    	    <entry key="IF_001">
+	    	        <list>
+	    	            <value type="java.lang.String">READ_IF_001</value>
+	    	            <value type="java.lang.String">WRITE_IF_001</value>
+	    	        </list>
+	    	    </entry> 		    	    	    
+		    </map>
+		</property>	    
+	    <property name="processMappings">
+	    	<map>
+				<entry key="READ_IF_TEST">
+					<bean class="com.podosoftware.sync.DefaultDataSyncMetaInfo">
+						<property name="typeString" value="read"/>
+						<property name="connectorName" value="DB_READER" />					
+						<property name="queryString">
+							<value type="java.lang.String"><![CDATA[
+							select 
+							  LINK_SEQ,
+							  LINK_TRT_DTM_VAL,
+							  LINK_CHG_SC_CD,
+							  DPTCD,
+							  P_ID,
+							  EDU_SNO,
+							  EDU_STR_YMD,
+							  EDU_END_YMD,
+							  EDU_CORS_NM,
+							  THEN_COP_CD,
+							  THEN_CLS_CD,
+							  EDU_TRNNG_KND_CD,
+							  EDU_TRNNG_INST_NM,
+							  TOT_EDU_DDS,
+							  TOT_EDU_TM,
+							  COMPL_SCORE,
+							  CRCMP_SCORE,
+							  RTG_SCORE,
+							  RTG_CNF_YN,
+							  EDU_TTFEE,
+							  R_EDU_YN,
+							  CRCMP_RNK_VAL,
+							  INPT_SC_CD,
+							  CHG_SC_CD,
+							  RCOGN_TM,
+							  MM_UNIT_ACTUL_TM,
+							  EDU_CNTNT,
+							  LRN_KND_CD,
+							  MNDT_YN,
+							  EDU_SHP_CD,
+							  OTS_LRN_TRNNG_OGZCD,
+							  EDU_DEPT_SUPV_YN,
+							  EDU_OGZCD,
+							  USER_INPT_DTM,
+							  INPT_DTM,
+							  THEN_ONPST_NM,
+							  DGHT_SC_CD,
+							  ASGN_LRN_CD,
+							  CONVERSION_YN
+							from  TH_SLK_ICNTY 
+							where
+							  LINK_TRT_DTM_VAL like ?	
+							]]></value>							
+						</property>
+						<property name="parameterMappings">
+							<list>
+								<value type="java.lang.String">index=1, name=LINK_TRT_DTM_VAL, jdbcType=VARCHAR</value>
+							</list>
+						</property>	
+					</bean>
+				</entry>
+				<!-- 상시학습 교육훈련내역  -->	
+				<entry key="READ_IF_001">
+					<bean class="com.podosoftware.sync.DefaultDataSyncMetaInfo">
+						<property name="typeString" value="read"/>
+						<property name="connectorName"><value type="java.lang.String">ESARAM_READER</value></property>
+						<property name="properties">
+						    <props>
+                                <prop key="xmlns_url">http://ccais.mopas.go.kr/dh/osc/services/esaram/intrnnginfo/types</prop>
+						        <prop key="serviceUrl">http://10.50.3.97:80/smx/infoservice/esaram/InTrnngInfoService</prop>
+						        <prop key="serviceName">InTrnngInfoService</prop>
+						        <prop key="useSystemCode">1400000UEM</prop>
+						        <prop key="certServerId">SVR1400000014</prop>
+						        <prop key="userDeptCode">1400000</prop>
+						        <prop key="userName"></prop>
+						    </props>
+						</property>								
+						<property name="parameterMappings">
+							<list/>
+						</property>
+					</bean>
+				</entry>
+				<entry key="WRITE_IF_001">
+					<bean class="com.podosoftware.sync.DefaultDataSyncMetaInfo">
+						<property name="typeString" value="write"/>
+						<property name="connectorName"><value type="java.lang.String">DB_WRITER</value></property>
+						<property name="queryString">
+							<value type="java.lang.String"><![CDATA[
+							MERGE INTO TH_SLK_ICNTY
+							USING 
+							    DUAL
+							ON ( LINK_SEQ = ? )     
+							WHEN MATCHED THEN 
+							    UPDATE SET								  
+								  LINK_TRT_DTM_VAL       = ? ,
+								  LINK_CHG_SC_CD         = ? ,
+								  DPTCD                  = ? ,
+								  P_ID                   = ? ,
+								  EDU_SNO                = ? ,
+								  EDU_STR_YMD            = ? ,
+								  EDU_END_YMD            = ? ,
+								  EDU_CORS_NM            = ? ,
+								  THEN_COP_CD            = ? ,
+								  THEN_CLS_CD            = ? ,
+								  EDU_TRNNG_KND_CD       = ? ,
+								  EDU_TRNNG_INST_NM      = ? ,
+								  TOT_EDU_DDS            = ? ,
+								  TOT_EDU_TM             = ? ,
+								  COMPL_SCORE            = ? ,
+								  CRCMP_SCORE            = ? ,
+								  RTG_SCORE              = ? ,
+								  RTG_CNF_YN             = ? ,
+								  EDU_TTFEE              = ? ,
+								  R_EDU_YN               = ? ,
+								  CRCMP_RNK_VAL          = ? ,
+								  INPT_SC_CD             = ? ,
+								  CHG_SC_CD              = ? ,
+								  RCOGN_TM               = ? ,
+								  MM_UNIT_ACTUL_TM       = ? ,
+								  EDU_CNTNT              = ? ,
+								  LRN_KND_CD             = ? ,
+								  MNDT_YN                = ? ,
+								  EDU_SHP_CD             = ? ,
+								  OTS_LRN_TRNNG_OGZCD    = ? ,
+								  EDU_DEPT_SUPV_YN       = ? ,
+								  EDU_OGZCD              = ? ,
+								  USER_INPT_DTM          = ? ,
+								  INPT_DTM               = ? ,
+								  DGHT_SC_CD             = ? ,
+								  THEN_ONPST_NM          = ? ,
+								  DGHT_SC_CD             = ? ,
+								  ASGN_LRN_CD            = ? ,
+								  COP_CD                 = ?
+							WHEN NOT MATCHED THEN 
+							    INSERT (
+								  LINK_SEQ            ,
+								  LINK_TRT_DTM_VAL    ,
+								  LINK_CHG_SC_CD      ,
+								  DPTCD               ,
+								  P_ID                ,
+								  EDU_SNO             ,
+								  EDU_STR_YMD         ,
+								  EDU_END_YMD         ,
+								  EDU_CORS_NM         ,
+								  THEN_COP_CD         ,								  
+								  THEN_CLS_CD         ,
+								  EDU_TRNNG_KND_CD    ,
+								  EDU_TRNNG_INST_NM   ,
+								  TOT_EDU_DDS         ,
+								  TOT_EDU_TM          ,
+								  COMPL_SCORE         ,
+								  CRCMP_SCORE         ,
+								  RTG_SCORE           ,
+								  RTG_CNF_YN          ,
+								  EDU_TTFEE           ,
+								  R_EDU_YN            ,
+								  CRCMP_RNK_VAL       ,
+								  INPT_SC_CD          ,
+								  CHG_SC_CD           ,
+								  RCOGN_TM            ,
+								  MM_UNIT_ACTUL_TM    ,
+								  EDU_CNTNT           ,
+								  LRN_KND_CD          ,
+								  MNDT_YN             ,
+								  EDU_SHP_CD          ,
+								  OTS_LRN_TRNNG_OGZCD ,
+								  EDU_DEPT_SUPV_YN    ,
+								  EDU_OGZCD           ,
+								  USER_INPT_DTM       ,
+								  INPT_DTM            ,
+								  DGHT_SC_CD          ,
+								  THEN_ONPST_NM       ,
+								  DGHT_SC_CD          ,
+								  ASGN_LRN_CD         ,
+								  COP_CD              ,
+								  SYNC_ID
+							    ) VALUES ( ?,?,?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?,?,?,?, ? ) 							
+							]]></value>			
+						</property>
+						<property name="parameterMappings">
+							<list>
+								<value type="java.lang.String">index=1, name=LINK_SEQ, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=2, name=LINK_TRT_DTM_VAL, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=3, name=LINK_CHG_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=4, name=DPTCD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=5, name=P_ID, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=6, name=EDU_SNO, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=7, name=EDU_STR_YMD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=8, name=EDU_END_YMD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=9, name=EDU_CORS_NM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=10, name=THEN_COP_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=11, name=THEN_CLS_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=12, name=EDU_TRNNG_KND_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=13, name=EDU_TRNNG_INST_NM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=14, name=TOT_EDU_DDS, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=15, name=TOT_EDU_TM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=16, name=COMPL_SCORE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=17, name=CRCMP_SCORE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=18, name=RTG_SCORE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=19, name=RTG_CNF_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=20, name=EDU_TTFEE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=21, name=R_EDU_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=22, name=CRCMP_RNK_VAL, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=23, name=INPT_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=24, name=CHG_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=25, name=RCOGN_TM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=26, name=MM_UNIT_ACTUL_TM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=27, name=EDU_CNTNT, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=28, name=LRN_KND_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=29, name=MNDT_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=30, name=EDU_SHP_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=31, name=OTS_LRN_TRNNG_OGZCD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=32, name=EDU_DEPT_SUPV_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=33, name=EDU_OGZCD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=34, name=USER_INPT_DTM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=35, name=INPT_DTM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=36, name=DGHT_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=37, name=THEN_ONPST_NM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=38, name=DGHT_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=39, name=ASGN_LRN_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=40, name=COP_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=41, name=LINK_SEQ, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=42, name=LINK_TRT_DTM_VAL, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=43, name=LINK_CHG_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=44, name=DPTCD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=45, name=P_ID, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=46, name=EDU_SNO, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=47, name=EDU_STR_YMD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=48, name=EDU_END_YMD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=49, name=EDU_CORS_NM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=50, name=THEN_COP_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=51, name=THEN_CLS_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=52, name=EDU_TRNNG_KND_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=53, name=EDU_TRNNG_INST_NM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=54, name=TOT_EDU_DDS, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=55, name=TOT_EDU_TM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=56, name=COMPL_SCORE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=57, name=CRCMP_SCORE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=58, name=RTG_SCORE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=59, name=RTG_CNF_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=60, name=EDU_TTFEE, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=61, name=R_EDU_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=62, name=CRCMP_RNK_VAL, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=63, name=INPT_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=64, name=CHG_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=65, name=RCOGN_TM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=66, name=MM_UNIT_ACTUL_TM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=67, name=EDU_CNTNT, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=68, name=LRN_KND_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=69, name=MNDT_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=70, name=EDU_SHP_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=71, name=OTS_LRN_TRNNG_OGZCD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=72, name=EDU_DEPT_SUPV_YN, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=73, name=EDU_OGZCD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=74, name=USER_INPT_DTM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=75, name=INPT_DTM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=76, name=DGHT_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=77, name=THEN_ONPST_NM, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=78, name=DGHT_SC_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=79, name=ASGN_LRN_CD, jdbcType=VARCHAR</value>
+								<value type="java.lang.String">index=80, name=COP_CD, jdbcType=VARCHAR</value>			
+								<value type="java.lang.String">index=81, name=SYNC_ID, jdbcType=VARCHAR</value>																														
+							</list>
+						</property>					
+					</bean>
+				</entry>			
+	    	</map>
+	    </property>
+	</bean>
+
+	<bean id="jdbcReadConnector" class="architecture.common.adaptor.connector.jdbc.JdbcReadConnector" p:dataSource-ref="dataSource" />
+
+	<bean id="jdbcWriteConnector" class="architecture.common.adaptor.connector.jdbc.JdbcWriteConnector" p:dataSource-ref="dataSource"/>
+			
+	<bean id="esaramReaderConnector" class="com.podosoftware.sync.connector.EsaramReaderConnector"
+	    depends-on="gpkiService, httpClient"
+	    p:gpkiService-ref="gpkiService"
+	    p:httpClient-ref="httpClient" 
+	    p:dataSyncLogger-ref="dataSyncLogger">
+	</bean>
+	
+	<bean id="dataSyncLogger" class="com.podosoftware.sync.DataSyncJdbcLogger" p:dataSource-ref="dataSource">
+		<property name="queryString"><value type="java.lang.String"><![CDATA[
+		MERGE INTO TB_ESARAM_SYNC_LOG
+		USING DUAL ON ( SYNC_ID = ? )     
+		WHEN MATCHED THEN 
+			UPDATE SET
+				SYNC_STATE = ?, 
+				SYNC_DATA_COUNT = ?,				
+				ERROR_MSG = ?,
+				SYNC_DATE = ?
+		WHEN NOT MATCHED THEN 
+			INSERT(
+				SYNC_ID,
+				SYNC_NAME,
+				SYNC_STATE,
+				SYNC_DATA_COUNT,
+				ERROR_MSG,
+				SYNC_DATE
+			)VALUES(
+				?,?,?,?,?,?
+			)				    					
+		]]></value></property>											
+	</bean>
+	
+	<bean id="httpClient" class="com.podosoftware.sync.connector.EsaramHttpClient"	/>
+	
+	<!-- 	
+	myServerId : 부처 인증서 ID	
+	targetServerId:차세대 e-사람 인증서 ID
+	개발 - SVR131000031T
+	운영 - SVR1311447001
+	certFilePath : 부처 인증서 및 라이센스 파일 Path (ex. /app/eSaram/gpki/certificate/)	
+	복호화에 쓰일 부처 인증서키
+	envCertFilePathName : certFilePath + myServerId + "_sig.cer
+	envPrivateKeyFilePathName : certFilePath + myServerId + "_env.key
+	envPrivateKeyPasswd : password	
+	전자서명에 쓰일 부처 인증서키
+    sigCertFilePathName : certFilePath + myServerId + "_sig.cer
+	sigPrivateKeyFilePathName : certFilePath + myServerId + "_sig.key
+	sigPrivateKeyPasswd : password	
+	
+	init-method="init" 
+	
+	 -->	
+	<bean id="gpkiService" class="com.podosoftware.sync.connector.EsaramGpkiService" 
+	    p:myServerId="SVR1400000014"
+	    p:targetServerIdList="SVR1311447001"
+	    p:envCertFilePathName="/home/nets/gpkicert/class1/SVR1400000014_env.cer"
+	    p:envPrivateKeyFilePathName="/home/nets/gpkicert/class1/SVR1400000014_env.key"
+	    p:envPrivateKeyPasswd="tksflacjd3232"
+	    p:sigCertFilePathName="/home/nets/gpkicert/class1/SVR1400000014_sig.cer"
+	    p:sigPrivateKeyFilePathName="/home/nets/gpkicert/class1/SVR1400000014_sig.key"
+	    p:sigPrivateKeyPasswd="tksflacjd3232"
+	    p:certFilePath="/home/nets/gpkicert/class1"
+	    p:gpkiLicPath="/home/nets/gpkicert/license"
+	    p:isLDAP="true"	   
+	/>	
+
+</beans>	

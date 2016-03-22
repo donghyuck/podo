@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- ============================================== -->
+    <!-- Jobs & Triggers                                -->
+    <!-- ============================================== -->
+    <!-- 상시학습 교육훈련내역  -->
+    <bean id="IF_001_SyncJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.podosoftware.sync.scheduling.DataSyncJob" />
+        <property name="jobDataAsMap">
+		    <map>
+		      <entry key="jobCode" value="IF_001" />
+		      <entry key="dataSyncClient" value-ref="dataSyncClient" />
+		    </map>
+		 </property>
+    </bean>
+    <bean id="IF_001_SyncTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="IF_001_SyncJob" />
+       <!-- <property name="cronExpression" value="0 25 1 * * ?" /> -->
+        <property name="cronExpression" value="0 1 * * * ?" />
+    </bean>      
+	<!-- ============================================== -->
+    <!-- scheduler                                       -->
+    <!-- ============================================== -->      
+	<!-- scheduler itself -->
+    <bean id="commonScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="schedulerName"><value>quartz</value></property>
+            <property name="triggers">
+                <list>
+					<ref local="IF_001_SyncTrigger"/>
+                </list>
+            </property>
+        <property name="autoStartup"><value>true</value></property>
+    </bean>
+</beans>
+
