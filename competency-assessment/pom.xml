@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.podosoftware</groupId>
 	<artifactId>competency-assessment</artifactId>
-	<version>0.0.1-BETA</version>
-	<name>Competency Assessment</name>
+	<version>1.0.0-RELEASE</version>
+	<name>Competency Assessment Tool</name>
 	<description>역량진단 모듈</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javac.src.version>1.6</javac.src.version>
 		<javac.target.version>1.6</javac.target.version>
 		<project.javadoc.docEncoding>UTF-8</project.javadoc.docEncoding>
-		<project.build.version>2.0.0.RELEASE</project.build.version>
+		<project.build.version>2.0.1.RELEASE</project.build.version>
 		<project.dependency.spring.version>4.1.0.RELEASE</project.dependency.spring.version>
 		<project.dependency.spring-security.version>3.2.5.RELEASE</project.dependency.spring-security.version>
 		<javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
@@ -146,4 +146,16 @@
 			<url>http://222.122.63.146/artifactory/ext-release-local</url>
 		</repository>
 	</distributionManagement>
+	<dependencies>
+		<dependency>
+			<groupId>architecture.web</groupId>
+			<artifactId>architecture-web</artifactId>
+			<version>2.0.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>architecture.user</groupId>
+			<artifactId>architecture-user</artifactId>
+			<version>2.0.0.RELEASE</version>
+		</dependency>
+	</dependencies>
 </project>
