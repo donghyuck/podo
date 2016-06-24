@@ -46,9 +46,9 @@ import architecture.common.user.CompanyNotFoundException;
 import architecture.common.user.SecurityHelper;
 import architecture.common.user.User;
 import architecture.common.user.authentication.UnAuthorizedException;
+import architecture.ee.web.model.ItemList;
 import architecture.ee.web.site.WebSite;
 import architecture.ee.web.site.WebSiteNotFoundException;
-import architecture.ee.web.spring.controller.MyCloudDataController.ItemList;
 import architecture.ee.web.util.WebSiteUtils;
 
 @Controller("competency-assessment-data-controller")

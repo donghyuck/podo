@@ -72,7 +72,7 @@ import architecture.common.user.CompanyTemplate;
 import architecture.common.user.SecurityHelper;
 import architecture.common.user.User;
 import architecture.ee.component.impl.ExcelReader;
-import architecture.ee.web.spring.controller.MyCloudDataController.ItemList;
+import architecture.ee.web.model.ItemList;
 
 @Controller("secure-competency-data-controller")
 @RequestMapping("/secure/data")
